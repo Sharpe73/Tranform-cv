@@ -1,0 +1,14 @@
+# Ignorar dependencias
+node_modules/
+package-lock.json
+
+# Variables de entorno
+.env
+
+# Directorios de compilación
+build/
+dist/
+
+# Archivos de sistema
+.DS_Store
+.vscode/
