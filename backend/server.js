@@ -87,11 +87,11 @@ app.get("/styles", (req, res) => {
   }
 });
 
-// GET: listar registros desde cv_files
+// GET: listar registros desde cv_files (con json_data incluido)
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
-      "SELECT id, pdf_url, created_at FROM cv_files ORDER BY created_at DESC"
+      "SELECT id, json_data, pdf_url, created_at FROM cv_files ORDER BY created_at DESC"
     );
     res.json(result.rows);
   } catch (error) {
