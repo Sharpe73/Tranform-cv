@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
   Table,
+  TableHead,
   TableBody,
+  TableRow,
   TableCell,
   TableContainer,
-  TableHead,
-  TableRow,
   Paper,
-  Button,
-  CircularProgress,
   Typography,
+  CircularProgress,
   Box,
+  Button,
 } from "@mui/material";
 
 function ProcessedCVs() {
@@ -44,43 +44,44 @@ function ProcessedCVs() {
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
+
       <TableContainer component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell><strong>#</strong></TableCell>
-              <TableCell><strong>Nombre</strong></TableCell>
-              <TableCell><strong>JSON</strong></TableCell>
-              <TableCell><strong>PDF</strong></TableCell>
-              <TableCell><strong>Fecha</strong></TableCell>
+              <TableCell><strong>🧑 Nombre</strong></TableCell>
+              <TableCell><strong>📦 JSON Completo</strong></TableCell>
+              <TableCell><strong>📥 PDF</strong></TableCell>
+              <TableCell><strong>🗓️ Fecha</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {cvs.map((cv, index) => {
+            {cvs.map((cv) => {
               const parsedJson = cv.json || { error: "JSON inválido" };
               const nombre = parsedJson?.informacion_personal?.nombre || "(Sin nombre)";
-              const resumenJson = JSON.stringify(parsedJson).slice(0, 100) + "...";
+              const jsonPretty = JSON.stringify(parsedJson, null, 2);
 
               return (
                 <TableRow key={cv.id}>
-                  <TableCell>{index + 1}</TableCell>
                   <TableCell>{nombre}</TableCell>
                   <TableCell>
                     <pre
                       style={{
-                        fontSize: "0.8rem",
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                        margin: 0,
+                        maxHeight: 200,
+                        overflowY: "auto",
+                        fontSize: "0.75rem",
+                        background: "#f0f0f0",
+                        padding: "10px",
+                        borderRadius: 4,
                       }}
                     >
-                      {resumenJson}
+                      {jsonPretty}
                     </pre>
                   </TableCell>
                   <TableCell>
                     <Button
                       variant="contained"
-                      size="small"
+                      color="primary"
                       href={`https://tranform-cv.onrender.com/${cv.pdf_url}`}
                       target="_blank"
                     >
