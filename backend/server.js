@@ -55,7 +55,7 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
     const pdfUrl = `uploads/${pdfFilename}`;
 
     const rawData = fs.readFileSync(jsonPath, "utf-8");
-    const jsonData = JSON.stringify(JSON.parse(rawData)); // 👈 Asegura JSON limpio
+    const jsonData = JSON.stringify(JSON.parse(rawData));
     const timestamp = new Date().toISOString();
 
     await db.query(
@@ -88,7 +88,17 @@ app.get("/styles", (req, res) => {
   }
 });
 
-// GET: listar registros desde cv_files (json_data parseado)
+// ✅ Nueva ruta para descargar archivos directamente
+app.get("/download/:filename", (req, res) => {
+  const filePath = path.join(uploadsPath, req.params.filename);
+  if (fs.existsSync(filePath)) {
+    res.download(filePath); // fuerza la descarga
+  } else {
+    res.status(404).send("Archivo no encontrado");
+  }
+});
+
+// GET: listar registros desde cv_files
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
@@ -97,7 +107,7 @@ app.get("/cv/list", async (req, res) => {
 
     const parsed = result.rows.map((row) => ({
       id: row.id,
-      json: JSON.parse(row.json_data), // 👈 Ya viene parseado para el frontend
+      json: JSON.parse(row.json_data),
       pdf_url: row.pdf_url,
       created_at: row.created_at,
     }));

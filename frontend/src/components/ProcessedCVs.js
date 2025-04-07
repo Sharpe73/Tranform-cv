@@ -44,6 +44,7 @@ function ProcessedCVs() {
       {cvs.map((cv) => {
         const parsedJson = cv.json || { error: "JSON inválido" };
         const nombre = parsedJson?.informacion_personal?.nombre || "(Sin nombre)";
+        const filename = cv.pdf_url?.split("/").pop();
 
         return (
           <Card key={cv.id} sx={{ marginBottom: 3, padding: 2, background: "#f9f9f9" }}>
@@ -60,14 +61,22 @@ function ProcessedCVs() {
               <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
                 📦 JSON Parseado:
               </Typography>
-              <pre style={{ background: "#272822", color: "#f8f8f2", padding: "1rem", borderRadius: 6, overflowX: "auto" }}>
+              <pre
+                style={{
+                  background: "#272822",
+                  color: "#f8f8f2",
+                  padding: "1rem",
+                  borderRadius: 6,
+                  overflowX: "auto",
+                }}
+              >
                 {JSON.stringify(parsedJson, null, 2)}
               </pre>
 
               <Button
                 variant="contained"
                 color="primary"
-                href={`https://tranform-cv.onrender.com/${cv.pdf_url}`}
+                href={`https://tranform-cv.onrender.com/download/${filename}`}
                 target="_blank"
                 sx={{ marginTop: 2 }}
               >
