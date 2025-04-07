@@ -1,5 +1,10 @@
 const OpenAI = require("openai");
 
+console.log("🛠️ Verificando clave de OpenAI...");
+if (!process.env.OPENAI_API_KEY) {
+  console.error("❌ OPENAI_API_KEY no está definida. Verifica el archivo .env o las variables en Render.");
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -18,6 +23,8 @@ Extrae la información en JSON con los siguientes campos:
 }
 Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocimientos_informaticos", incluso si están bajo otras secciones como “herramientas”, “stack tecnológico”, “habilidades técnicas”, “software” o similares. Solo responde con el JSON, sin markdown ni comentarios.`;
 
+    console.log("🧠 Enviando solicitud a OpenAI...");
+
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -27,11 +34,15 @@ Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocim
     });
 
     let content = response.choices[0]?.message?.content?.trim();
+    console.log("📥 Respuesta bruta OpenAI:", content?.substring(0, 300)); // muestra solo los primeros caracteres
+
     if (content.startsWith("```")) {
       content = content.replace(/```(?:json)?/g, "").trim();
     }
 
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    console.log("✅ JSON estructurado generado correctamente");
+    return parsed;
   } catch (error) {
     console.error("❌ Error al analizar con OpenAI:", error.message);
     return null;

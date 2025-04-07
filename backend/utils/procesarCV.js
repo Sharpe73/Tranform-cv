@@ -26,7 +26,12 @@ async function procesarCV(rutaArchivo, opciones) {
       throw new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
     }
 
+    console.log("🔍 Texto extraído (primeros 300 caracteres):", textoExtraido.substring(0, 300));
+
     let datosEstructurados = await analizarConIA(textoExtraido);
+
+    console.log("🧠 Respuesta OpenAI:", datosEstructurados);
+
     if (!datosEstructurados) {
       throw new Error("No se pudo generar el JSON con OpenAI.");
     }
@@ -39,9 +44,7 @@ async function procesarCV(rutaArchivo, opciones) {
     const outputPathJSON = path.join(__dirname, "../uploads", `${nombreBase}.json`);
     fs.writeFileSync(outputPathJSON, JSON.stringify(datosEstructurados, null, 2));
 
-    // Forzar plantilla "tradicional"
     opciones.templateStyle = "tradicional";
-
     await generarPDF(datosEstructurados, nombreBase, opciones);
     return outputPathJSON;
   } catch (error) {
