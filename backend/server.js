@@ -87,13 +87,21 @@ app.get("/styles", (req, res) => {
   }
 });
 
-// GET: listar registros desde cv_files (con json_data incluido)
+// GET: listar registros desde cv_files (json_data parseado)
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
       "SELECT id, json_data, pdf_url, created_at FROM cv_files ORDER BY created_at DESC"
     );
-    res.json(result.rows);
+
+    const parsed = result.rows.map((row) => ({
+      id: row.id,
+      json: JSON.parse(row.json_data),
+      pdf_url: row.pdf_url,
+      created_at: row.created_at,
+    }));
+
+    res.json(parsed);
   } catch (error) {
     console.error("❌ Error al obtener CVs:", error.message);
     res.status(500).json({ message: "Error al obtener CVs desde la base de datos." });
