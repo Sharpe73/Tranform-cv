@@ -5,6 +5,7 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const { procesarCV } = require("./utils/procesarCV");
+const db = require("./database"); // <-- conexión a PostgreSQL
 
 const app = express();
 const PORT = 5000;
@@ -18,7 +19,7 @@ const uploadsPath = path.join(__dirname, "uploads");
 console.log("📂 Serviendo archivos estáticos desde:", uploadsPath);
 app.use("/uploads", express.static(uploadsPath));
 
-// Configuración de Multer para la subida de archivos
+// Configuración de Multer
 const storage = multer.diskStorage({
   destination: uploadsPath,
   filename: (req, file, cb) => {
@@ -27,10 +28,9 @@ const storage = multer.diskStorage({
     cb(null, `${name}-${Date.now()}${ext}`);
   },
 });
-
 const upload = multer({ storage });
 
-// Ruta para subir y procesar archivos
+// Ruta principal: subir y transformar CV
 app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (req, res) => {
   if (!req.files || !req.files["file"]) {
     return res.status(400).json({ message: "No se recibió ningún archivo." });
@@ -49,14 +49,23 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
     templateStyle: "tradicional", // forzado
   };
 
-  console.log(`📜 Opciones recibidas en /upload:`, opciones);
-
   try {
     const jsonPath = await procesarCV(filePath, opciones);
     const pdfFilename = path.basename(jsonPath.replace(".json", ".pdf"));
-
     const pdfUrl = `uploads/${pdfFilename}`;
-    console.log("🔗 PDF generado en:", pdfUrl);
+
+    // Leer JSON generado
+    const jsonData = fs.readFileSync(jsonPath, "utf-8");
+    const fileName = path.basename(filePath);
+    const timestamp = new Date().toISOString();
+
+    // Insertar en la base de datos PostgreSQL
+    await db.query(
+      `INSERT INTO cv_records (json_data, pdf_url, file_name, created_at) VALUES ($1, $2, $3, $4)`,
+      [jsonData, pdfUrl, fileName, timestamp]
+    );
+
+    console.log("✅ Datos guardados en la base de datos.");
 
     res.json({ message: "Archivo procesado con éxito.", pdfPath: pdfUrl });
   } catch (error) {
@@ -65,7 +74,7 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
   }
 });
 
-
+// Ruta para cargar estilos desde plantillas.json
 app.get("/styles", (req, res) => {
   const estilosPath = path.join(__dirname, "plantillas.json");
 
@@ -79,6 +88,19 @@ app.get("/styles", (req, res) => {
   } catch (error) {
     console.error("❌ Error cargando estilos:", error.message);
     res.status(500).json({ message: "Error al cargar estilos." });
+  }
+});
+
+// 🔍 Ruta para listar todos los CVs procesados
+app.get("/cv/list", async (req, res) => {
+  try {
+    const result = await db.query(
+      "SELECT id, file_name, pdf_url, created_at FROM cv_records ORDER BY created_at DESC"
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("❌ Error al obtener CVs:", error.message);
+    res.status(500).json({ message: "Error al obtener CVs desde la base de datos." });
   }
 });
 
