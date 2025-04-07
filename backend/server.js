@@ -54,7 +54,8 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
     const pdfFilename = path.basename(jsonPath.replace(".json", ".pdf"));
     const pdfUrl = `uploads/${pdfFilename}`;
 
-    const jsonData = fs.readFileSync(jsonPath, "utf-8");
+    const rawData = fs.readFileSync(jsonPath, "utf-8");
+    const jsonData = JSON.stringify(JSON.parse(rawData)); // 👈 Asegura JSON limpio
     const timestamp = new Date().toISOString();
 
     await db.query(
@@ -96,7 +97,7 @@ app.get("/cv/list", async (req, res) => {
 
     const parsed = result.rows.map((row) => ({
       id: row.id,
-      json: JSON.parse(row.json_data),
+      json: JSON.parse(row.json_data), // 👈 Ya viene parseado para el frontend
       pdf_url: row.pdf_url,
       created_at: row.created_at,
     }));
