@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Config from "./Config";
 import Transform from "./Transform";
+import ProcessedCVs from "./components/ProcessedCVs"; // 👈 Nueva importación
 import axios from "axios";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
@@ -41,6 +42,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Config config={config} setConfig={setConfig} />} />
               <Route path="/transform" element={<Transform config={config} />} />
+              <Route path="/procesados" element={<ProcessedCVs />} /> {/* 👈 Nueva ruta */}
             </Routes>
           </Box>
         </Box>

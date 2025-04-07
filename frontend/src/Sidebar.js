@@ -30,7 +30,6 @@ function Sidebar() {
 
   return (
     <>
-      {/* ✅ Ícono de menú hamburguesa correctamente posicionado */}
       <IconButton
         onClick={toggleDrawer(true)}
         sx={{
@@ -43,11 +42,8 @@ function Sidebar() {
         <MenuIcon sx={{ fontSize: 30, color: "black" }} />
       </IconButton>
 
-      {/* Drawer (Menú lateral) */}
       <Drawer anchor="left" open={isOpen} onClose={toggleDrawer(false)}>
         <Box sx={{ width: 250, bgcolor: "#f5f5f5", height: "100vh" }}>
-          
-          {/* ✅ ENCABEZADO "Opciones" con mejor posicionamiento */}
           <Box
             sx={{
               display: "flex",
@@ -77,7 +73,6 @@ function Sidebar() {
             </IconButton>
           </Box>
 
-          {/* Opciones del menú */}
           <List>
             <ListItem button onClick={() => handleNavigate("/")}>
               <ListItemIcon>
@@ -91,6 +86,14 @@ function Sidebar() {
                 <DescriptionIcon />
               </ListItemIcon>
               <ListItemText primary="Transformar Documento" />
+            </ListItem>
+
+            {/* ✅ Ruta corregida */}
+            <ListItem button onClick={() => handleNavigate("/procesados")}>
+              <ListItemIcon>
+                <DescriptionIcon />
+              </ListItemIcon>
+              <ListItemText primary="CVs Procesados" />
             </ListItem>
           </List>
         </Box>
