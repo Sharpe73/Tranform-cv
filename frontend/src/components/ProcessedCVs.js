@@ -44,7 +44,6 @@ function ProcessedCVs() {
       {cvs.map((cv) => {
         const parsedJson = cv.json || { error: "JSON inválido" };
         const nombre = parsedJson?.informacion_personal?.nombre || "(Sin nombre)";
-        const filename = cv.pdf_url?.split("/").pop();
 
         return (
           <Card key={cv.id} sx={{ marginBottom: 3, padding: 2, background: "#f9f9f9" }}>
@@ -76,7 +75,7 @@ function ProcessedCVs() {
               <Button
                 variant="contained"
                 color="primary"
-                href={`https://tranform-cv.onrender.com/download/${filename}`}
+                href={`https://tranform-cv.onrender.com/${cv.pdf_url}`} // ✅ esta ruta sí funciona
                 target="_blank"
                 sx={{ marginTop: 2 }}
               >
