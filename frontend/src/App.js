@@ -19,7 +19,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/styles")
+      .get("https://tranform-cv.onrender.com/styles")
       .then((response) => {
         if (response.data) {
           setConfig((prevConfig) => ({
@@ -34,9 +34,9 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router> {/* ✅ Mueve el Router arriba */}
+      <Router>
         <Box display="flex">
-          <Sidebar /> {/* ✅ Ahora Sidebar está dentro del Router */}
+          <Sidebar />
           <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
             <Routes>
               <Route path="/" element={<Config config={config} setConfig={setConfig} />} />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Paper, Typography,} from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import UploadSection from "./components/UploadSection";
 import ConfigCard from "./components/ConfigCard";
 import UploadActions from "./components/UploadActions";
@@ -52,10 +52,10 @@ function Transform() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/upload", formData);
+      const response = await axios.post("https://tranform-cv.onrender.com/upload", formData);
       setMessage("✅ Archivo procesado con éxito.");
       if (response.data?.pdfPath) {
-        setPdfLink(`http://localhost:5000/${response.data.pdfPath}`);
+        setPdfLink(`https://tranform-cv.onrender.com/${response.data.pdfPath}`);
       }
     } catch (error) {
       console.error("❌ Error al procesar el archivo:", error);
