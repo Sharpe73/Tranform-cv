@@ -55,7 +55,7 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
     const pdfUrl = `uploads/${pdfFilename}`;
 
     const rawData = fs.readFileSync(jsonPath, "utf-8");
-    const jsonData = JSON.stringify(JSON.parse(rawData));
+    const jsonData = JSON.stringify(JSON.parse(rawData)); // Asegura JSON limpio
     const timestamp = new Date().toISOString();
 
     await db.query(
@@ -98,7 +98,7 @@ app.get("/download/:filename", (req, res) => {
   }
 });
 
-// GET: listar registros desde cv_files
+// GET: listar registros desde cv_files (parseado)
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
