@@ -42,13 +42,7 @@ function ProcessedCVs() {
       </Typography>
 
       {cvs.map((cv) => {
-        let parsedJson;
-        try {
-          parsedJson = JSON.parse(cv.json_data);
-        } catch (error) {
-          parsedJson = { error: "JSON inválido" };
-        }
-
+        const parsedJson = cv.json || { error: "JSON inválido" };
         const nombre = parsedJson?.informacion_personal?.nombre || "(Sin nombre)";
 
         return (
