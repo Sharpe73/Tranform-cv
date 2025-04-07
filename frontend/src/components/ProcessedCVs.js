@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
-  Card,
-  CardContent,
-  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Button,
   CircularProgress,
+  Typography,
   Box,
-  Divider,
 } from "@mui/material";
 
 function ProcessedCVs() {
@@ -40,52 +44,56 @@ function ProcessedCVs() {
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>#</strong></TableCell>
+              <TableCell><strong>Nombre</strong></TableCell>
+              <TableCell><strong>JSON</strong></TableCell>
+              <TableCell><strong>PDF</strong></TableCell>
+              <TableCell><strong>Fecha</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {cvs.map((cv, index) => {
+              const parsedJson = cv.json || { error: "JSON inválido" };
+              const nombre = parsedJson?.informacion_personal?.nombre || "(Sin nombre)";
+              const resumenJson = JSON.stringify(parsedJson).slice(0, 100) + "...";
 
-      {cvs.map((cv) => {
-        const parsedJson = cv.json || { error: "JSON inválido" };
-        const nombre = parsedJson?.informacion_personal?.nombre || "(Sin nombre)";
-        const downloadUrl = `https://tranform-cv.onrender.com/${cv.pdf_url}`; // ✅ acceso directo a /uploads/...
-
-        return (
-          <Card key={cv.id} sx={{ marginBottom: 3, padding: 2, background: "#f9f9f9" }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                🧑 Nombre: {nombre}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                🗓️ Fecha: {new Date(cv.created_at).toLocaleString()}
-              </Typography>
-
-              <Divider sx={{ my: 2 }} />
-
-              <Typography variant="subtitle1" sx={{ marginBottom: 1 }}>
-                📦 JSON Parseado:
-              </Typography>
-              <pre
-                style={{
-                  background: "#272822",
-                  color: "#f8f8f2",
-                  padding: "1rem",
-                  borderRadius: 6,
-                  overflowX: "auto",
-                }}
-              >
-                {JSON.stringify(parsedJson, null, 2)}
-              </pre>
-
-              <Button
-                variant="contained"
-                color="primary"
-                href={downloadUrl}
-                target="_blank"
-                sx={{ marginTop: 2 }}
-              >
-                📥 Descargar PDF
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      })}
+              return (
+                <TableRow key={cv.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{nombre}</TableCell>
+                  <TableCell>
+                    <pre
+                      style={{
+                        fontSize: "0.8rem",
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        margin: 0,
+                      }}
+                    >
+                      {resumenJson}
+                    </pre>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      href={`https://tranform-cv.onrender.com/${cv.pdf_url}`}
+                      target="_blank"
+                    >
+                      Descargar
+                    </Button>
+                  </TableCell>
+                  <TableCell>{new Date(cv.created_at).toLocaleString()}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }
