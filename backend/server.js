@@ -14,10 +14,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Carpeta de uploads
 const uploadsPath = path.join(__dirname, "uploads");
 console.log("📂 Serviendo archivos estáticos desde:", uploadsPath);
 app.use("/uploads", express.static(uploadsPath));
 
+// Configuración de Multer
 const storage = multer.diskStorage({
   destination: uploadsPath,
   filename: (req, file, cb) => {
@@ -28,6 +30,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// POST: subir archivo y procesar
 app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (req, res) => {
   if (!req.files || !req.files["file"]) {
     return res.status(400).json({ message: "No se recibió ningún archivo." });
@@ -67,6 +70,7 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
   }
 });
 
+// GET: cargar estilos desde plantillas.json
 app.get("/styles", (req, res) => {
   const estilosPath = path.join(__dirname, "plantillas.json");
 
@@ -83,10 +87,11 @@ app.get("/styles", (req, res) => {
   }
 });
 
+// GET: listar registros desde cv_files
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
-      "SELECT id, json_data, pdf_url, created_at FROM cv_files ORDER BY created_at DESC"
+      "SELECT id, pdf_url, created_at FROM cv_files ORDER BY created_at DESC"
     );
     res.json(result.rows);
   } catch (error) {
