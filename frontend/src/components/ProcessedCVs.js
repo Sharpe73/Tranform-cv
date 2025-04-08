@@ -43,6 +43,22 @@ function ProcessedCVs() {
     URL.revokeObjectURL(url);
   };
 
+  const descargarPDF = (id) => {
+    fetch(`https://tranform-cv.onrender.com/cv/pdf/${id}`)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `cv_${id}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((err) => {
+        console.error("❌ Error al descargar PDF:", err);
+      });
+  };
+
   if (loading) {
     return (
       <Box mt={4} textAlign="center">
@@ -80,8 +96,7 @@ function ProcessedCVs() {
                       <Button
                         variant="contained"
                         color="primary"
-                        href={`https://tranform-cv.onrender.com/cv/pdf/${cv.id}`}
-                        target="_blank"
+                        onClick={() => descargarPDF(cv.id)}
                       >
                         PDF
                       </Button>

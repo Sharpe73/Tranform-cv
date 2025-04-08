@@ -57,7 +57,7 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
 
     const rawData = fs.readFileSync(jsonPath, "utf-8");
     const jsonData = JSON.stringify(JSON.parse(rawData));
-    const pdfBuffer = fs.readFileSync(pdfPath);
+    const pdfBuffer = fs.readFileSync(pdfPath); // ✅ Correcto
     const timestamp = new Date().toISOString();
 
     await db.query(
@@ -90,19 +90,22 @@ app.get("/styles", (req, res) => {
   }
 });
 
-// Ruta para descargar PDF desde base de datos
+// ✅ Nueva ruta para descargar archivos desde la base de datos
 app.get("/cv/pdf/:id", async (req, res) => {
   try {
-    const result = await db.query("SELECT pdf_data FROM cv_files WHERE id = $1", [req.params.id]);
-    if (result.rows.length === 0) {
-      return res.status(404).send("Archivo PDF no encontrado.");
+    const { id } = req.params;
+    const result = await db.query("SELECT pdf_data FROM cv_files WHERE id = $1", [id]);
+
+    if (result.rows.length === 0 || !result.rows[0].pdf_data) {
+      return res.status(404).send("Archivo no encontrado");
     }
 
+    const buffer = result.rows[0].pdf_data;
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=cv_${req.params.id}.pdf`);
-    res.send(result.rows[0].pdf_data);
+    res.setHeader("Content-Disposition", `attachment; filename=cv_${id}.pdf`);
+    res.send(buffer);
   } catch (error) {
-    console.error("❌ Error al descargar PDF:", error.message);
+    console.error("Error al descargar PDF:", error.message);
     res.status(500).send("Error al descargar PDF");
   }
 });
