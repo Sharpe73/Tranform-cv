@@ -12,11 +12,16 @@ import {
   Box,
   Button,
   Stack,
+  TablePagination,
+  TextField,
 } from "@mui/material";
 
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [search, setSearch] = useState("");
+  const rowsPerPage = 10;
 
   useEffect(() => {
     fetch("https://tranform-cv.onrender.com/cv/list")
@@ -59,6 +64,15 @@ function ProcessedCVs() {
       });
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const filteredCvs = cvs.filter((cv) => {
+    const nombre = cv.json?.informacion_personal?.nombre || "";
+    return nombre.toLowerCase().includes(search.toLowerCase());
+  });
+
   if (loading) {
     return (
       <Box mt={4} textAlign="center">
@@ -74,6 +88,15 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
+      <TextField
+        label="Buscar por nombre"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
@@ -84,7 +107,7 @@ function ProcessedCVs() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {cvs.map((cv) => {
+            {filteredCvs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((cv) => {
               const parsedJson = cv.json || { error: "JSON inválido" };
               const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
 
@@ -115,6 +138,14 @@ function ProcessedCVs() {
             })}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={filteredCvs.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[]}
+        />
       </TableContainer>
     </Box>
   );
