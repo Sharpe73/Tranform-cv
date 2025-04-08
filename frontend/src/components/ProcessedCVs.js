@@ -12,16 +12,18 @@ import {
   Box,
   Button,
   Stack,
-  TablePagination,
   TextField,
+  InputAdornment,
+  Pagination,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [search, setSearch] = useState("");
-  const rowsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetch("https://tranform-cv.onrender.com/cv/list")
@@ -64,14 +66,16 @@ function ProcessedCVs() {
       });
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
-    return nombre.toLowerCase().includes(search.toLowerCase());
+    return nombre.toLowerCase().includes(searchTerm.toLowerCase());
   });
+
+  const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
+  const paginatedCvs = filteredCvs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (loading) {
     return (
@@ -88,14 +92,23 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <TextField
-        label="Buscar por nombre"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <Box mb={2}>
+        <TextField
+          variant="outlined"
+          placeholder="Buscar por nombre"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
+          sx={{ width: 300 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
       <TableContainer component={Paper}>
         <Table>
@@ -107,7 +120,7 @@ function ProcessedCVs() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredCvs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((cv) => {
+            {paginatedCvs.map((cv) => {
               const parsedJson = cv.json || { error: "JSON inválido" };
               const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
 
@@ -127,7 +140,9 @@ function ProcessedCVs() {
                       <Button
                         variant="outlined"
                         color="secondary"
-                        onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                        onClick={() =>
+                          descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                        }
                       >
                         JSON
                       </Button>
@@ -138,15 +153,16 @@ function ProcessedCVs() {
             })}
           </TableBody>
         </Table>
-        <TablePagination
-          component="div"
-          count={filteredCvs.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[]}
-        />
       </TableContainer>
+
+      <Box mt={2} display="flex" justifyContent="center">
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(e, page) => setCurrentPage(page)}
+          color="primary"
+        />
+      </Box>
     </Box>
   );
 }
