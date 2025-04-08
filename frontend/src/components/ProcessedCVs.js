@@ -80,7 +80,7 @@ function ProcessedCVs() {
                       <Button
                         variant="contained"
                         color="primary"
-                        href={`https://tranform-cv.onrender.com/${cv.pdf_url}`}
+                        href={`https://tranform-cv.onrender.com/cv/pdf/${cv.id}`}
                         target="_blank"
                       >
                         PDF

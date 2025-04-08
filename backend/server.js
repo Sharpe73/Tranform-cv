@@ -52,15 +52,17 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
   try {
     const jsonPath = await procesarCV(filePath, opciones);
     const pdfFilename = path.basename(jsonPath.replace(".json", ".pdf"));
+    const pdfPath = path.join(uploadsPath, pdfFilename);
     const pdfUrl = `uploads/${pdfFilename}`;
 
     const rawData = fs.readFileSync(jsonPath, "utf-8");
-    const jsonData = JSON.stringify(JSON.parse(rawData)); // Asegura JSON limpio
+    const jsonData = JSON.stringify(JSON.parse(rawData));
+    const pdfBuffer = fs.readFileSync(pdfPath);
     const timestamp = new Date().toISOString();
 
     await db.query(
-      `INSERT INTO cv_files (json_data, pdf_url, created_at) VALUES ($1, $2, $3)`,
-      [jsonData, pdfUrl, timestamp]
+      `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at) VALUES ($1, $2, $3, $4)`,
+      [jsonData, pdfUrl, pdfBuffer, timestamp]
     );
 
     console.log("✅ Datos guardados en la base de datos.");
@@ -88,13 +90,20 @@ app.get("/styles", (req, res) => {
   }
 });
 
-// ✅ Nueva ruta para descargar archivos directamente
-app.get("/download/:filename", (req, res) => {
-  const filePath = path.join(uploadsPath, req.params.filename);
-  if (fs.existsSync(filePath)) {
-    res.download(filePath); // fuerza la descarga
-  } else {
-    res.status(404).send("Archivo no encontrado");
+// Ruta para descargar PDF desde base de datos
+app.get("/cv/pdf/:id", async (req, res) => {
+  try {
+    const result = await db.query("SELECT pdf_data FROM cv_files WHERE id = $1", [req.params.id]);
+    if (result.rows.length === 0) {
+      return res.status(404).send("Archivo PDF no encontrado.");
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=cv_${req.params.id}.pdf`);
+    res.send(result.rows[0].pdf_data);
+  } catch (error) {
+    console.error("❌ Error al descargar PDF:", error.message);
+    res.status(500).send("Error al descargar PDF");
   }
 });
 
