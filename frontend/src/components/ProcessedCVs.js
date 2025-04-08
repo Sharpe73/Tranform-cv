@@ -79,8 +79,8 @@ function ProcessedCVs() {
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
               <TableCell><strong>🧑 Nombre</strong></TableCell>
-              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
               <TableCell><strong>🗓️ Fecha</strong></TableCell>
+              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -91,6 +91,7 @@ function ProcessedCVs() {
               return (
                 <TableRow key={cv.id}>
                   <TableCell>{nombre}</TableCell>
+                  <TableCell>{new Date(cv.created_at).toLocaleString()}</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
                       <Button
@@ -109,7 +110,6 @@ function ProcessedCVs() {
                       </Button>
                     </Stack>
                   </TableCell>
-                  <TableCell>{new Date(cv.created_at).toLocaleString()}</TableCell>
                 </TableRow>
               );
             })}
