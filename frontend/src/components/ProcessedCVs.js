@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Box,
   Button,
+  Stack,
 } from "@mui/material";
 
 function ProcessedCVs() {
@@ -29,6 +30,18 @@ function ProcessedCVs() {
         setLoading(false);
       });
   }, []);
+
+  const descargarJSON = (json, nombre) => {
+    const blob = new Blob([JSON.stringify(json, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `CV_${nombre}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (loading) {
     return (
@@ -50,43 +63,42 @@ function ProcessedCVs() {
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
               <TableCell><strong>🧑 Nombre</strong></TableCell>
-              <TableCell><strong>📦 JSON Completo</strong></TableCell>
-              <TableCell><strong>📥 PDF</strong></TableCell>
+              <TableCell><strong>📦 JSON</strong></TableCell>
+              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
               <TableCell><strong>🗓️ Fecha</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {cvs.map((cv) => {
               const parsedJson = cv.json || { error: "JSON inválido" };
-              const nombre = parsedJson?.informacion_personal?.nombre || "(Sin nombre)";
-              const jsonPretty = JSON.stringify(parsedJson, null, 2);
+              const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
 
               return (
                 <TableRow key={cv.id}>
                   <TableCell>{nombre}</TableCell>
                   <TableCell>
-                    <pre
-                      style={{
-                        maxHeight: 200,
-                        overflowY: "auto",
-                        fontSize: "0.75rem",
-                        background: "#f0f0f0",
-                        padding: "10px",
-                        borderRadius: 4,
-                      }}
-                    >
-                      {jsonPretty}
-                    </pre>
+                    <code style={{ fontSize: "0.75rem", color: "#555" }}>
+                      {JSON.stringify(parsedJson).slice(0, 100)}...
+                    </code>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      href={`https://tranform-cv.onrender.com/${cv.pdf_url}`}
-                      target="_blank"
-                    >
-                      Descargar
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        href={`https://tranform-cv.onrender.com/${cv.pdf_url}`}
+                        target="_blank"
+                      >
+                        PDF
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                      >
+                        JSON
+                      </Button>
+                    </Stack>
                   </TableCell>
                   <TableCell>{new Date(cv.created_at).toLocaleString()}</TableCell>
                 </TableRow>
