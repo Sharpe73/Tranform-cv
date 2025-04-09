@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Config from "./Config";
+import Config from "./components/Config";
 import Transform from "./Transform";
 import ProcessedCVs from "./components/ProcessedCVs"; // 👈 Nueva importación
 import axios from "axios";
