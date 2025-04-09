@@ -13,6 +13,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DescriptionIcon from "@mui/icons-material/Description";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import CloseIcon from "@mui/icons-material/Close";
 
 function Sidebar() {
@@ -83,7 +84,7 @@ function Sidebar() {
 
             <ListItem button onClick={() => handleNavigate("/procesados")}>
               <ListItemIcon>
-                <DescriptionIcon />
+                <AssignmentIcon />
               </ListItemIcon>
               <ListItemText primary="CVs Procesados" />
             </ListItem>
