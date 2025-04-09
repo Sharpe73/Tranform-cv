@@ -139,10 +139,18 @@ function ProcessedCVs() {
                       </Button>
                       <Button
                         variant="outlined"
-                        color="secondary"
                         onClick={() =>
                           descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
                         }
+                        sx={{
+                          color: "#f29111",
+                          borderColor: "#f29111",
+                          fontWeight: "bold",
+                          "&:hover": {
+                            backgroundColor: "#f29111",
+                            color: "#fff",
+                          },
+                        }}
                       >
                         JSON
                       </Button>
