@@ -1,3 +1,5 @@
+import CodeIcon from "@mui/icons-material/Code";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -133,12 +135,14 @@ function ProcessedCVs() {
                       <Button
                         variant="contained"
                         color="primary"
+                        startIcon={<PictureAsPdfIcon />}
                         onClick={() => descargarPDF(cv.id)}
                       >
                         PDF
                       </Button>
                       <Button
                         variant="outlined"
+                        startIcon={<CodeIcon />}
                         onClick={() =>
                           descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
                         }
