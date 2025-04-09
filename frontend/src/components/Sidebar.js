@@ -74,13 +74,6 @@ function Sidebar() {
           </Box>
 
           <List>
-            <ListItem button onClick={() => handleNavigate("/")}>
-              <ListItemIcon>
-                <SettingsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Configuración" />
-            </ListItem>
-
             <ListItem button onClick={() => handleNavigate("/transform")}>
               <ListItemIcon>
                 <DescriptionIcon />
@@ -88,12 +81,18 @@ function Sidebar() {
               <ListItemText primary="Transformar Documento" />
             </ListItem>
 
-            {/* ✅ Ruta corregida */}
             <ListItem button onClick={() => handleNavigate("/procesados")}>
               <ListItemIcon>
                 <DescriptionIcon />
               </ListItemIcon>
               <ListItemText primary="CVs Procesados" />
+            </ListItem>
+
+            <ListItem button onClick={() => handleNavigate("/")}>
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Configuración" />
             </ListItem>
           </List>
         </Box>
