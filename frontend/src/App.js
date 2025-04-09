@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "./components/Sidebar";
 import Config from "./components/Config";
-import Transform from "./Transform";
-import ProcessedCVs from "./components/ProcessedCVs"; // 👈 Nueva importación
+import Transform from "./components/Transform";
+import ProcessedCVs from "./components/ProcessedCVs";
 import axios from "axios";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
