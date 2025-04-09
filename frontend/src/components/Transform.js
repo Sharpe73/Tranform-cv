@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Box, Paper, Typography } from "@mui/material";
-import UploadSection from "./components/UploadSection";
-import ConfigCard from "./components/ConfigCard";
-import UploadActions from "./components/UploadActions";
-import MessageDisplay from "./components/MessageDisplay";
-import DownloadLink from "./components/DownloadLink";
+import UploadSection from "./UploadSection";
+import ConfigCard from "./ConfigCard";
+import UploadActions from "./UploadActions";
+import MessageDisplay from "./MessageDisplay";
+import DownloadLink from "./DownloadLink";
 
 function Transform() {
   const [file, setFile] = useState(null);
