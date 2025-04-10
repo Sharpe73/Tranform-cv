@@ -1,4 +1,3 @@
-// src/components/UploadProgress.js
 import React from "react";
 import { LinearProgress, Box } from "@mui/material";
 

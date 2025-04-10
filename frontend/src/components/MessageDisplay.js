@@ -1,5 +1,3 @@
-// src/components/MessageDisplay.js
-
 import React from "react";
 import { Box, Alert } from "@mui/material";
 

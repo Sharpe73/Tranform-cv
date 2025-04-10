@@ -1,4 +1,3 @@
-// 📄 components/UploadActions.js
 import React from "react";
 import { Box, Button, LinearProgress } from "@mui/material";
 
