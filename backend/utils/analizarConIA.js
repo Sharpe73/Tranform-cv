@@ -48,16 +48,16 @@ Extrae la información en JSON con los siguientes campos:
   "conocimientos_informaticos": []
 }
 
-🔹 En "educacion", incluye todos los niveles: básica, media, técnica, profesional, diplomados y postgrados (o "post grado").
-🔹 NO incluyas postgrados en "certificaciones", deben ir solo en "educacion".
-🔹 En "certificaciones", agrega cursos, talleres, seminarios, y similares si aparecen en el texto.
+🔹 La sección "educacion" debe incluir TODOS los niveles: básica, media, técnica, profesional, postgrados y similares. No omitas ninguno.
+🔹 Los postgrados o post grados deben incluirse solo en la sección de educación, no en certificaciones.
 🔹 Si una formación o experiencia no tiene fecha de término, incluye solo la fecha de inicio.
-🔹 Si solo tiene fecha de término, incluye solo esa fecha.
-🔹 Si no tiene ninguna fecha, omítelas por completo.
-🔹 Si el texto indica que el empleo aún está vigente (por ejemplo: "a la fecha", "presente", "actualidad", "actual"), entonces en "fecha_fin" coloca: "En la actualidad".
-🔹 En "conocimientos_informaticos", incluye tecnologías, herramientas, software, lenguajes y frameworks que aparezcan, incluso si están bajo secciones como “stack tecnológico”, “habilidades técnicas” o similares.
+🔹 Si solo hay fecha de término, incluye solo esa fecha.
+🔹 Si ambas fechas están ausentes, omítelas.
+🔹 Si un trabajo sigue vigente, escribe "En la actualidad" como fecha_fin.
+🔹 En la sección "certificaciones", incluye también los cursos, talleres y seminarios (detectados como tales).
+🔹 En "conocimientos_informaticos" incluye tecnologías, software, herramientas y frameworks que aparezcan, incluso si están en otras secciones como “stack tecnológico”, “habilidades técnicas”, “herramientas” o similares.
 
-Devuelve únicamente el JSON. No incluyas markdown, explicaciones ni comentarios.
+Devuelve únicamente el JSON sin markdown, sin explicaciones ni comentarios.
 `;
 
     console.log("🧠 Enviando solicitud a OpenAI...");
