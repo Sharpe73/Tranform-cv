@@ -34,7 +34,7 @@ Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocim
     });
 
     let content = response.choices[0]?.message?.content?.trim();
-    console.log("📥 Respuesta bruta OpenAI:", content?.substring(0, 300)); // muestra solo los primeros caracteres
+    console.log("📥 Respuesta bruta OpenAI:", content?.substring(0, 300)); 
 
     if (content.startsWith("```")) {
       content = content.replace(/```(?:json)?/g, "").trim();
