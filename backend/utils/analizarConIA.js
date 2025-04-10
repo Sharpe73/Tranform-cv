@@ -21,7 +21,12 @@ Extrae la información en JSON con los siguientes campos:
   "idiomas": [{ "idioma": "", "nivel": "" }],
   "conocimientos_informaticos": []
 }
-Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocimientos_informaticos", incluso si están bajo otras secciones como “herramientas”, “stack tecnológico”, “habilidades técnicas”, “software” o similares. Solo responde con el JSON, sin markdown ni comentarios.`;
+
+✅ Agrega todos los cursos, talleres, diplomados, capacitaciones, bootcamps o programas similares en la sección "certificaciones", incluso si están listados en otras secciones del CV.
+
+✅ Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocimientos_informaticos", incluso si aparecen bajo nombres distintos como “herramientas”, “stack tecnológico”, “habilidades técnicas”, “software” o similares.
+
+Solo responde con el JSON, sin markdown ni comentarios.`;
 
     console.log("🧠 Enviando solicitud a OpenAI...");
 
@@ -34,7 +39,7 @@ Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocim
     });
 
     let content = response.choices[0]?.message?.content?.trim();
-    console.log("📥 Respuesta bruta OpenAI:", content?.substring(0, 300)); // muestra solo los primeros caracteres
+    console.log("📥 Respuesta bruta OpenAI:", content?.substring(0, 300));
 
     if (content.startsWith("```")) {
       content = content.replace(/```(?:json)?/g, "").trim();

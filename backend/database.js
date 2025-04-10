@@ -8,7 +8,7 @@ const pool = new Pool({
   },
 });
 
-// Crear tabla correcta si no existe
+
 const createTableQuery = `
   CREATE TABLE IF NOT EXISTS cv_files (
     id SERIAL PRIMARY KEY,

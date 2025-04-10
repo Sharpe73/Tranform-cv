@@ -57,7 +57,7 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
 
     const rawData = fs.readFileSync(jsonPath, "utf-8");
     const jsonData = JSON.stringify(JSON.parse(rawData));
-    const pdfBuffer = fs.readFileSync(pdfPath); // ✅ Correcto
+    const pdfBuffer = fs.readFileSync(pdfPath); 
     const timestamp = new Date().toISOString();
 
     await db.query(
