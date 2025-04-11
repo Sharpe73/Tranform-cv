@@ -12,7 +12,7 @@ function cargarEstilos(plantilla) {
 }
 
 function corregirTexto(texto) {
-  if (!texto || typeof texto !== "string") return "No especificado";
+  if (!texto || typeof texto !== "string") return "";
   if (texto.length <= 4 && texto === texto.toUpperCase()) return texto; // sigla
   if (texto === texto.toUpperCase()) return texto.charAt(0) + texto.slice(1).toLowerCase();
   return texto;
@@ -153,13 +153,15 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   function formatearEducacionConFechas(lista) {
     const ordenada = ordenarPorFecha(lista, true);
     return ordenada.map(item => {
+      const fecha_inicio = item.fecha_inicio || "";
+      const fecha_fin = item.fecha_fin || "";
       let fecha = "";
-      if (item.fecha_inicio && item.fecha_fin) {
-        fecha = `${item.fecha_inicio} - ${item.fecha_fin}`;
-      } else if (item.fecha_inicio) {
-        fecha = item.fecha_inicio;
-      } else if (item.fecha_fin) {
-        fecha = item.fecha_fin;
+      if (fecha_inicio && fecha_fin) {
+        fecha = `${fecha_inicio} - ${fecha_fin}`;
+      } else if (fecha_inicio) {
+        fecha = fecha_inicio;
+      } else if (fecha_fin) {
+        fecha = fecha_fin;
       }
       const detalle = `${corregirTexto(item.carrera)}${item.institucion ? ", " + corregirTexto(item.institucion) : ""}`;
       return `${fecha}    ${detalle}`;
@@ -175,13 +177,15 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   function formatearListaConViñetas(lista, ...campos) {
     const ordenada = ordenarPorFecha(lista);
     return ordenada.map(item => {
+      const fecha_inicio = item[campos[2]] || "";
+      const fecha_fin = item[campos[3]] || "";
       let fechas = "";
-      if (item[campos[2]] && item[campos[3]]) {
-        fechas = `${item[campos[2]]} - ${item[campos[3]]}`;
-      } else if (item[campos[2]]) {
-        fechas = item[campos[2]];
-      } else if (item[campos[3]]) {
-        fechas = item[campos[3]];
+      if (fecha_inicio && fecha_fin) {
+        fechas = `${fecha_inicio} - ${fecha_fin}`;
+      } else if (fecha_inicio) {
+        fechas = fecha_inicio;
+      } else if (fecha_fin) {
+        fechas = fecha_fin;
       }
       const encabezado = `${corregirTexto(item[campos[0]])} en ${corregirTexto(item[campos[1]])}${fechas ? " (" + fechas + ")" : ""}`;
       const funciones = (Array.isArray(item[campos[4]]) ? item[campos[4]].map(funcion => `- ${corregirTexto(funcion)}`).join("\n") : "No especificado");
