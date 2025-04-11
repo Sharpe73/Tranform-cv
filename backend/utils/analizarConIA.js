@@ -12,7 +12,7 @@ const openai = new OpenAI({
 async function analizarConIA(texto) {
   try {
     const instrucciones = `
-Extrae la información en JSON con los siguientes campos:
+Extrae la información en formato JSON con los siguientes campos:
 {
   "informacion_personal": { "nombre": "", "telefono": "", "correo": "", "direccion": "", "linkedin": "" },
   "educacion": [{ "carrera": "", "institucion": "", "fecha_inicio": "", "fecha_fin": "" }],
@@ -21,7 +21,14 @@ Extrae la información en JSON con los siguientes campos:
   "idiomas": [{ "idioma": "", "nivel": "" }],
   "conocimientos_informaticos": []
 }
-Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocimientos_informaticos", incluso si están bajo otras secciones como “herramientas”, “stack tecnológico”, “habilidades técnicas”, “software” o similares. Solo responde con el JSON, sin markdown ni comentarios.`;
+
+Reglas importantes:
+- Todo el contenido debe estar formateado con el tamaño de letra definido por el usuario (por ejemplo: 12). No uses el tamaño del documento original.
+- Si una palabra o título viene completamente en mayúsculas (como INFORMÁTICA o EXPERIENCIA LABORAL), debes corregirlo. Usa mayúscula solo en la primera letra si corresponde. Ejemplo: "Informática", "Experiencia laboral".
+- Respeta las siglas reales (como QA, HTML, SQL), manteniéndolas completamente en mayúscula.
+- Cualquier texto relacionado con "certificados", "certificaciones", "diplomas" o "diplomados" debe ir en la sección "certificaciones", sin importar en qué parte del CV aparezca.
+- Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocimientos_informaticos", incluso si están bajo otras secciones como “herramientas”, “stack tecnológico”, “habilidades técnicas”, “software” o similares.
+- Solo responde con el JSON, sin markdown ni comentarios.`;
 
     console.log("🧠 Enviando solicitud a OpenAI...");
 
@@ -34,7 +41,7 @@ Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocim
     });
 
     let content = response.choices[0]?.message?.content?.trim();
-    console.log("📥 Respuesta bruta OpenAI:", content?.substring(0, 300)); 
+    console.log("📥 Respuesta bruta OpenAI:", content?.substring(0, 300));
 
     if (content.startsWith("```")) {
       content = content.replace(/```(?:json)?/g, "").trim();

@@ -11,6 +11,28 @@ function cargarEstilos(plantilla) {
   return estilos[plantilla] || estilos["tradicional"] || {};
 }
 
+function corregirTexto(texto) {
+  if (!texto || typeof texto !== "string") return "No especificado";
+  if (texto.length <= 4 && texto === texto.toUpperCase()) return texto; // sigla
+  if (texto === texto.toUpperCase()) return texto.charAt(0) + texto.slice(1).toLowerCase();
+  return texto;
+}
+
+function aplicarCorreccionesALista(lista) {
+  return (lista || []).map(item => {
+    if (typeof item === "string") return corregirTexto(item);
+    const corregido = {};
+    for (const key in item) {
+      if (Array.isArray(item[key])) {
+        corregido[key] = item[key].map(val => corregirTexto(val));
+      } else {
+        corregido[key] = corregirTexto(item[key]);
+      }
+    }
+    return corregido;
+  });
+}
+
 async function generarPDF(datos, nombreArchivo, opciones) {
   const plantillaSeleccionada = opciones.templateStyle || "tradicional";
   const pdfPath = path.join(__dirname, "../uploads", `${nombreArchivo}.pdf`);
@@ -70,7 +92,6 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     const x = doc.page.width - doc.page.margins.right - width;
     const logoAlignedY = titleY - (height - titleSize) / 2 - 20;
 
-   
     if (estilos.backgroundColor) {
       doc.save();
       doc.rect(0, 0, doc.page.width, doc.page.height).fill(estilos.backgroundColor);
@@ -109,7 +130,7 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     const anchoTexto = doc.page.width - doc.page.margins.left - doc.page.margins.right;
 
     doc.moveDown(1);
-    doc.font(fontHeader).fillColor(colorHeader).fontSize(fontSize + 2).text(titulo, {
+    doc.font(fontHeader).fillColor(colorHeader).fontSize(fontSize + 2).text(corregirTexto(titulo), {
       underline: true,
       width: anchoTexto,
     });
@@ -132,35 +153,58 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   function formatearEducacionConFechas(lista) {
     const ordenada = ordenarPorFecha(lista, true);
     return ordenada.map(item => {
-      const fecha = `${item.fecha_inicio || "N/A"} - ${item.fecha_fin || "N/A"}`;
-      const detalle = `${item.carrera || "No especificado"}, ${item.institucion || "No especificado"}`;
+      let fecha = "";
+      if (item.fecha_inicio && item.fecha_fin) {
+        fecha = `${item.fecha_inicio} - ${item.fecha_fin}`;
+      } else if (item.fecha_inicio) {
+        fecha = item.fecha_inicio;
+      } else if (item.fecha_fin) {
+        fecha = item.fecha_fin;
+      }
+      const detalle = `${corregirTexto(item.carrera)}${item.institucion ? ", " + corregirTexto(item.institucion) : ""}`;
       return `${fecha}    ${detalle}`;
     }).join("\n");
   }
 
   function formatearListaConFormato(lista, ...campos) {
-    return (lista || []).map(item => campos.map(campo => item[campo] || "No especificado").join(" - ")).join("\n");
+    return (lista || []).map(item =>
+      campos.map(campo => corregirTexto(item[campo])).join(" - ")
+    ).join("\n");
   }
 
   function formatearListaConViñetas(lista, ...campos) {
     const ordenada = ordenarPorFecha(lista);
     return ordenada.map(item => {
-      const encabezado = `${item[campos[0]] || "No especificado"} en ${item[campos[1]] || "No especificado"} (${item[campos[2]] || "N/A"} - ${item[campos[3]] || "N/A"})`;
-      const funciones = (Array.isArray(item[campos[4]]) ? item[campos[4]].map(funcion => `- ${funcion}`).join("\n") : "No especificado");
+      let fechas = "";
+      if (item[campos[2]] && item[campos[3]]) {
+        fechas = `${item[campos[2]]} - ${item[campos[3]]}`;
+      } else if (item[campos[2]]) {
+        fechas = item[campos[2]];
+      } else if (item[campos[3]]) {
+        fechas = item[campos[3]];
+      }
+      const encabezado = `${corregirTexto(item[campos[0]])} en ${corregirTexto(item[campos[1]])}${fechas ? " (" + fechas + ")" : ""}`;
+      const funciones = (Array.isArray(item[campos[4]]) ? item[campos[4]].map(funcion => `- ${corregirTexto(funcion)}`).join("\n") : "No especificado");
       return `${encabezado}\nFunciones:\n${funciones}`;
     }).join("\n\n");
   }
 
   function formatearConocimientos(lista) {
-    return lista && Array.isArray(lista) && lista.length > 0 ? lista.join(", ") : "No especificado";
+    return lista && Array.isArray(lista) && lista.length > 0 ? lista.map(corregirTexto).join(", ") : "No especificado";
   }
 
   function formatearCertificaciones(lista) {
     const ordenada = ordenarPorFecha(lista);
-    return ordenada.map(cert => `${cert}`).join("\n");
+    return ordenada.map(cert => corregirTexto(cert)).join("\n");
   }
 
-  agregarSeccion("Información Personal", `Nombre: ${datos.informacion_personal?.nombre || "No especificado"}`);
+  datos.certificaciones = aplicarCorreccionesALista(datos.certificaciones);
+  datos.educacion = aplicarCorreccionesALista(datos.educacion);
+  datos.experiencia_laboral = aplicarCorreccionesALista(datos.experiencia_laboral);
+  datos.idiomas = aplicarCorreccionesALista(datos.idiomas);
+  datos.conocimientos_informaticos = datos.conocimientos_informaticos?.map(corregirTexto);
+
+  agregarSeccion("Información Personal", `Nombre: ${corregirTexto(datos.informacion_personal?.nombre)}`);
   agregarSeccion("Educación", formatearEducacionConFechas(datos.educacion));
   if (datos.certificaciones && datos.certificaciones.length > 0) {
     agregarSeccion("Certificaciones", formatearCertificaciones(datos.certificaciones));
