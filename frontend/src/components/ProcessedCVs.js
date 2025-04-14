@@ -75,9 +75,7 @@ function ProcessedCVs() {
   };
 
   const eliminarTodos = async () => {
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer."
-    );
+    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer.");
     if (!confirmacion) return;
 
     const pin = prompt("Ingresa el PIN de seguridad:");
@@ -125,22 +123,20 @@ function ProcessedCVs() {
   }
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box sx={{ padding: 4, maxWidth: "1200px", margin: "auto" }}>
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
 
-      {/* Contenedor centrado y compacto */}
       <Box
-        mb={3}
+        mb={2}
         sx={{
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
-          justifyContent: "space-between",
           alignItems: { xs: "stretch", sm: "center" },
+          justifyContent: "space-between",
           gap: 2,
-          maxWidth: "1000px",
-          margin: "0 auto",
+          mt: { sm: 1 },
         }}
       >
         <TextField
@@ -149,9 +145,7 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{
-            width: { xs: "100%", sm: "300px" },
-          }}
+          sx={{ width: { xs: "100%", sm: "300px" } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -163,15 +157,16 @@ function ProcessedCVs() {
 
         <Button
           variant="contained"
-          color="error"
           startIcon={<DeleteIcon />}
           onClick={eliminarTodos}
           sx={{
-            width: { xs: "100%", sm: "auto" },
-            minWidth: "200px",
+            backgroundColor: "#d32f2f",
             fontWeight: "bold",
-            fontSize: { xs: "0.9rem", sm: "1rem" },
-            paddingY: { xs: 1.2, sm: 1.4 },
+            width: { xs: "100%", sm: "180px" },
+            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            "&:hover": {
+              backgroundColor: "#b71c1c",
+            },
           }}
         >
           ELIMINAR TODOS LOS CVS
@@ -215,9 +210,7 @@ function ProcessedCVs() {
                       <Button
                         variant="outlined"
                         startIcon={<CodeIcon />}
-                        onClick={() =>
-                          descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
-                        }
+                        onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
                         sx={{
                           color: "#f29111",
                           borderColor: "#f29111",
@@ -239,7 +232,7 @@ function ProcessedCVs() {
         </Table>
       </TableContainer>
 
-      <Box mt={3} display="flex" justifyContent="center">
+      <Box mt={2} display="flex" justifyContent="center">
         <Pagination
           count={totalPages}
           page={currentPage}
