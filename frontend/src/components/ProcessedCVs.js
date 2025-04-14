@@ -75,7 +75,9 @@ function ProcessedCVs() {
   };
 
   const eliminarTodos = async () => {
-    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer.");
+    const confirmacion = window.confirm(
+      "¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer."
+    );
     if (!confirmacion) return;
 
     const pin = prompt("Ingresa el PIN de seguridad:");
@@ -85,8 +87,8 @@ function ProcessedCVs() {
       const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
         method: "POST",
         headers: {
-          "x-admin-secret": pin
-        }
+          "x-admin-secret": pin,
+        },
       });
 
       const data = await res.json();
@@ -128,14 +130,23 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box mb={2} display="flex" justifyContent="space-between">
+      <Box
+        mb={2}
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          justifyContent: "space-between",
+          gap: 2,
+        }}
+      >
         <TextField
           variant="outlined"
           placeholder="Buscar por nombre"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{ width: 300 }}
+          sx={{ width: { xs: "100%", sm: 300 } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -149,6 +160,10 @@ function ProcessedCVs() {
           color="error"
           startIcon={<DeleteIcon />}
           onClick={eliminarTodos}
+          sx={{
+            width: { xs: "100%", sm: "auto" },
+            fontWeight: "bold",
+          }}
         >
           Eliminar todos los CVs
         </Button>
@@ -158,9 +173,15 @@ function ProcessedCVs() {
         <Table>
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell><strong>🧑 Nombre</strong></TableCell>
-              <TableCell><strong>🗓️ Fecha</strong></TableCell>
-              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
+              <TableCell>
+                <strong>🧑 Nombre</strong>
+              </TableCell>
+              <TableCell>
+                <strong>🗓️ Fecha</strong>
+              </TableCell>
+              <TableCell>
+                <strong>📥 PDF / JSON</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
