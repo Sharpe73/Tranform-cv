@@ -130,14 +130,16 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
+      {/* Buscador y botón rojo adaptado para desktop y móvil */}
       <Box
         mb={2}
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "stretch", sm: "center" },
-          justifyContent: { xs: "center", sm: "flex-start" },
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: "center",
+          justifyContent: "space-between",
           gap: 2,
+          flexWrap: "wrap",
         }}
       >
         <TextField
@@ -146,10 +148,7 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{
-            width: { xs: "100%", sm: "300px" },
-            fontSize: { xs: "0.85rem", sm: "1rem" },
-          }}
+          sx={{ width: { xs: "100%", md: "300px" } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -165,12 +164,10 @@ function ProcessedCVs() {
           startIcon={<DeleteIcon />}
           onClick={eliminarTodos}
           sx={{
-            width: { xs: "100%", sm: "200px" },
+            width: { xs: "100%", md: "fit-content" },
             fontWeight: "bold",
-            fontSize: { xs: "0.85rem", sm: "1rem" },
-            padding: { xs: "6px 10px", sm: "8px 16px" },
-            boxShadow: 2,
             whiteSpace: "nowrap",
+            padding: "8px 20px",
           }}
         >
           ELIMINAR TODOS LOS CVS
@@ -200,7 +197,9 @@ function ProcessedCVs() {
               return (
                 <TableRow key={cv.id}>
                   <TableCell>{nombre}</TableCell>
-                  <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                  <TableCell>
+                    {new Date(cv.created_at).toLocaleString("es-CL")}
+                  </TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
                       <Button
