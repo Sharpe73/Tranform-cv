@@ -130,16 +130,17 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      {/* Buscador y botón rojo adaptado para desktop y móvil */}
+      {/* Contenedor centrado y compacto */}
       <Box
-        mb={2}
+        mb={3}
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
+          alignItems: { xs: "stretch", sm: "center" },
           gap: 2,
-          flexWrap: "wrap",
+          maxWidth: "1000px",
+          margin: "0 auto",
         }}
       >
         <TextField
@@ -148,7 +149,9 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{ width: { xs: "100%", md: "300px" } }}
+          sx={{
+            width: { xs: "100%", sm: "300px" },
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -164,10 +167,11 @@ function ProcessedCVs() {
           startIcon={<DeleteIcon />}
           onClick={eliminarTodos}
           sx={{
-            width: { xs: "100%", md: "fit-content" },
+            width: { xs: "100%", sm: "auto" },
+            minWidth: "200px",
             fontWeight: "bold",
-            whiteSpace: "nowrap",
-            padding: "8px 20px",
+            fontSize: { xs: "0.9rem", sm: "1rem" },
+            paddingY: { xs: 1.2, sm: 1.4 },
           }}
         >
           ELIMINAR TODOS LOS CVS
@@ -197,9 +201,7 @@ function ProcessedCVs() {
               return (
                 <TableRow key={cv.id}>
                   <TableCell>{nombre}</TableCell>
-                  <TableCell>
-                    {new Date(cv.created_at).toLocaleString("es-CL")}
-                  </TableCell>
+                  <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={1}>
                       <Button
@@ -237,7 +239,7 @@ function ProcessedCVs() {
         </Table>
       </TableContainer>
 
-      <Box mt={2} display="flex" justifyContent="center">
+      <Box mt={3} display="flex" justifyContent="center">
         <Pagination
           count={totalPages}
           page={currentPage}
