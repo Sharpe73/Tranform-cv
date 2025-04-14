@@ -18,6 +18,7 @@ import {
   TextField,
   InputAdornment,
   Pagination,
+  useMediaQuery,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -27,6 +28,8 @@ function ProcessedCVs() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const cargarCVs = () => {
     setLoading(true);
@@ -75,9 +78,7 @@ function ProcessedCVs() {
   };
 
   const eliminarTodos = async () => {
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer."
-    );
+    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer.");
     if (!confirmacion) return;
 
     const pin = prompt("Ingresa el PIN de seguridad:");
@@ -162,10 +163,9 @@ function ProcessedCVs() {
           onClick={eliminarTodos}
           sx={{
             width: { xs: "100%", sm: "auto" },
+            fontSize: isMobile ? "0.85rem" : "1rem",
+            padding: isMobile ? "6px 12px" : "8px 18px",
             fontWeight: "bold",
-            fontSize: { xs: "0.85rem", sm: "1rem" },
-            padding: { xs: "6px 10px", sm: "8px 16px" },
-            borderRadius: { xs: "6px", sm: "4px" },
           }}
         >
           Eliminar todos los CVs
@@ -176,15 +176,9 @@ function ProcessedCVs() {
         <Table>
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell>
-                <strong>🧑 Nombre</strong>
-              </TableCell>
-              <TableCell>
-                <strong>🗓️ Fecha</strong>
-              </TableCell>
-              <TableCell>
-                <strong>📥 PDF / JSON</strong>
-              </TableCell>
+              <TableCell><strong>🧑 Nombre</strong></TableCell>
+              <TableCell><strong>🗓️ Fecha</strong></TableCell>
+              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -197,15 +191,19 @@ function ProcessedCVs() {
                   <TableCell>{nombre}</TableCell>
                   <TableCell>{new Date(cv.created_at).toLocaleString()}</TableCell>
                   <TableCell>
-                    <Stack direction="row" spacing={1}>
+                    <Stack
+                      direction={isMobile ? "column" : "row"}
+                      spacing={1}
+                      alignItems={isMobile ? "stretch" : "center"}
+                    >
                       <Button
                         variant="contained"
                         color="primary"
                         startIcon={<PictureAsPdfIcon />}
                         onClick={() => descargarPDF(cv.id)}
                         sx={{
-                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                          padding: { xs: "4px 8px", sm: "6px 12px" },
+                          fontSize: isMobile ? "0.75rem" : "0.875rem",
+                          padding: isMobile ? "4px 8px" : "6px 12px",
                         }}
                       >
                         PDF
@@ -217,8 +215,8 @@ function ProcessedCVs() {
                           descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
                         }
                         sx={{
-                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
-                          padding: { xs: "4px 8px", sm: "6px 12px" },
+                          fontSize: isMobile ? "0.75rem" : "0.875rem",
+                          padding: isMobile ? "4px 8px" : "6px 12px",
                           color: "#f29111",
                           borderColor: "#f29111",
                           fontWeight: "bold",
