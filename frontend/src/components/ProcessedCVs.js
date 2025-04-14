@@ -18,7 +18,6 @@ import {
   TextField,
   InputAdornment,
   Pagination,
-  useMediaQuery,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -28,8 +27,6 @@ function ProcessedCVs() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
-  const isMobile = useMediaQuery("(max-width:600px)");
 
   const cargarCVs = () => {
     setLoading(true);
@@ -78,7 +75,9 @@ function ProcessedCVs() {
   };
 
   const eliminarTodos = async () => {
-    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer.");
+    const confirmacion = window.confirm(
+      "¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer."
+    );
     if (!confirmacion) return;
 
     const pin = prompt("Ingresa el PIN de seguridad:");
@@ -147,7 +146,9 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{ width: { xs: "100%", sm: 300 } }}
+          sx={{
+            width: { xs: "100%", sm: "300px" },
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -156,19 +157,18 @@ function ProcessedCVs() {
             ),
           }}
         />
+
         <Button
           variant="contained"
           color="error"
           startIcon={<DeleteIcon />}
           onClick={eliminarTodos}
           sx={{
-            width: { xs: "100%", sm: "auto" },
-            fontSize: isMobile ? "0.85rem" : "1rem",
-            padding: isMobile ? "6px 12px" : "8px 18px",
+            width: { xs: "100%", sm: "180px" },
             fontWeight: "bold",
           }}
         >
-          Eliminar todos los CVs
+          ELIMINAR TODOS LOS CVS
         </Button>
       </Box>
 
@@ -176,9 +176,15 @@ function ProcessedCVs() {
         <Table>
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell><strong>🧑 Nombre</strong></TableCell>
-              <TableCell><strong>🗓️ Fecha</strong></TableCell>
-              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
+              <TableCell>
+                <strong>🧑 Nombre</strong>
+              </TableCell>
+              <TableCell>
+                <strong>🗓️ Fecha</strong>
+              </TableCell>
+              <TableCell>
+                <strong>📥 PDF / JSON</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -189,22 +195,14 @@ function ProcessedCVs() {
               return (
                 <TableRow key={cv.id}>
                   <TableCell>{nombre}</TableCell>
-                  <TableCell>{new Date(cv.created_at).toLocaleString()}</TableCell>
+                  <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                   <TableCell>
-                    <Stack
-                      direction={isMobile ? "column" : "row"}
-                      spacing={1}
-                      alignItems={isMobile ? "stretch" : "center"}
-                    >
+                    <Stack direction="row" spacing={1}>
                       <Button
                         variant="contained"
                         color="primary"
                         startIcon={<PictureAsPdfIcon />}
                         onClick={() => descargarPDF(cv.id)}
-                        sx={{
-                          fontSize: isMobile ? "0.75rem" : "0.875rem",
-                          padding: isMobile ? "4px 8px" : "6px 12px",
-                        }}
                       >
                         PDF
                       </Button>
@@ -215,8 +213,6 @@ function ProcessedCVs() {
                           descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
                         }
                         sx={{
-                          fontSize: isMobile ? "0.75rem" : "0.875rem",
-                          padding: isMobile ? "4px 8px" : "6px 12px",
                           color: "#f29111",
                           borderColor: "#f29111",
                           fontWeight: "bold",
@@ -250,3 +246,4 @@ function ProcessedCVs() {
 }
 
 export default ProcessedCVs;
+
