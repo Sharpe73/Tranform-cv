@@ -130,6 +130,7 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
+      {/* Estilo mejorado solo en móviles */}
       <Box
         mb={2}
         sx={{
@@ -146,7 +147,10 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{ width: { xs: "100%", sm: 300 } }}
+          sx={{
+            width: { xs: "100%", sm: 300 },
+            fontSize: { xs: "0.85rem", sm: "1rem" },
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -163,6 +167,8 @@ function ProcessedCVs() {
           sx={{
             width: { xs: "100%", sm: "auto" },
             fontWeight: "bold",
+            fontSize: { xs: "0.85rem", sm: "1rem" },
+            padding: { xs: "6px 10px", sm: "8px 16px" },
           }}
         >
           Eliminar todos los CVs
