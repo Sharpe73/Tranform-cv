@@ -131,8 +131,13 @@ app.get("/cv/list", async (req, res) => {
   }
 });
 
-
+// ✅ Ruta protegida con PIN para eliminar todos los CVs
 app.post("/admin/limpiar-cvs", async (req, res) => {
+  const pin = req.headers["x-admin-secret"];
+  if (pin !== process.env.ADMIN_SECRET) {
+    return res.status(403).json({ mensaje: "Acceso no autorizado" });
+  }
+
   try {
     await db.query("TRUNCATE TABLE cv_files RESTART IDENTITY");
     await db.query("VACUUM FULL cv_files");
