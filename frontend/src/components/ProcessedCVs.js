@@ -78,13 +78,24 @@ function ProcessedCVs() {
     const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer.");
     if (!confirmacion) return;
 
+    const pin = prompt("Ingresa el PIN de seguridad:");
+    if (!pin) return;
+
     try {
       const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
         method: "POST",
+        headers: {
+          "x-admin-secret": pin
+        }
       });
+
       const data = await res.json();
-      alert(data.mensaje || "CVs eliminados correctamente");
-      cargarCVs();
+      if (res.status === 200) {
+        alert(data.mensaje || "CVs eliminados correctamente");
+        cargarCVs();
+      } else {
+        alert("❌ PIN incorrecto");
+      }
     } catch (err) {
       alert("❌ Error al eliminar los CVs");
       console.error(err);
