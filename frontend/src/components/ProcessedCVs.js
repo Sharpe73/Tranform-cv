@@ -123,7 +123,7 @@ function ProcessedCVs() {
   }
 
   return (
-    <Box sx={{ padding: 4, maxWidth: "1200px", margin: "auto" }}>
+    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto" }}>
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
@@ -133,10 +133,9 @@ function ProcessedCVs() {
         sx={{
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
-          alignItems: { xs: "stretch", sm: "center" },
+          alignItems: "center",
           justifyContent: "space-between",
           gap: 2,
-          mt: { sm: 1 },
         }}
       >
         <TextField
@@ -145,7 +144,7 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{ width: { xs: "100%", sm: "300px" } }}
+          sx={{ width: { xs: "100%", sm: 300 } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -162,8 +161,10 @@ function ProcessedCVs() {
           sx={{
             backgroundColor: "#d32f2f",
             fontWeight: "bold",
-            width: { xs: "100%", sm: "180px" },
-            boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+            width: { xs: "100%", sm: "auto" },
+            px: 3,
+            py: 1.2,
+            boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
             "&:hover": {
               backgroundColor: "#b71c1c",
             },
@@ -177,15 +178,9 @@ function ProcessedCVs() {
         <Table>
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
-              <TableCell>
-                <strong>🧑 Nombre</strong>
-              </TableCell>
-              <TableCell>
-                <strong>🗓️ Fecha</strong>
-              </TableCell>
-              <TableCell>
-                <strong>📥 PDF / JSON</strong>
-              </TableCell>
+              <TableCell><strong>🧑 Nombre</strong></TableCell>
+              <TableCell><strong>🗓️ Fecha</strong></TableCell>
+              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -210,7 +205,9 @@ function ProcessedCVs() {
                       <Button
                         variant="outlined"
                         startIcon={<CodeIcon />}
-                        onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                        onClick={() =>
+                          descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                        }
                         sx={{
                           color: "#f29111",
                           borderColor: "#f29111",
