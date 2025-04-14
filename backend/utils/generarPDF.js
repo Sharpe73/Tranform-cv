@@ -50,7 +50,7 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   };
 
   const fontHeader = fuentes[opciones.fontHeader] || "Helvetica";
-  const fontParagraph = fuentes[opciones.fontParagraph] || "Helvetica";
+  const fontParagraph = fuentes[opciones.fontParagraph] || "Times New Roman";
   const fontSize = opciones.fontSize ? parseInt(opciones.fontSize) : 12;
   const colorHeader = opciones.colorHeader || "#000000";
   const colorParagraph = opciones.colorParagraph || "#000000";
