@@ -136,7 +136,7 @@ function ProcessedCVs() {
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
           alignItems: { xs: "stretch", sm: "center" },
-          justifyContent: "space-between",
+          justifyContent: { xs: "center", sm: "flex-start" },
           gap: 2,
         }}
       >
@@ -148,6 +148,7 @@ function ProcessedCVs() {
           size="small"
           sx={{
             width: { xs: "100%", sm: "300px" },
+            fontSize: { xs: "0.85rem", sm: "1rem" },
           }}
           InputProps={{
             startAdornment: (
@@ -164,8 +165,12 @@ function ProcessedCVs() {
           startIcon={<DeleteIcon />}
           onClick={eliminarTodos}
           sx={{
-            width: { xs: "100%", sm: "180px" },
+            width: { xs: "100%", sm: "200px" },
             fontWeight: "bold",
+            fontSize: { xs: "0.85rem", sm: "1rem" },
+            padding: { xs: "6px 10px", sm: "8px 16px" },
+            boxShadow: 2,
+            whiteSpace: "nowrap",
           }}
         >
           ELIMINAR TODOS LOS CVS
@@ -246,4 +251,3 @@ function ProcessedCVs() {
 }
 
 export default ProcessedCVs;
-
