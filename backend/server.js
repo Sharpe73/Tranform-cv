@@ -14,12 +14,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Carpeta de uploads
 const uploadsPath = path.join(__dirname, "uploads");
 console.log("📂 Serviendo archivos estáticos desde:", uploadsPath);
 app.use("/uploads", express.static(uploadsPath));
 
-// Configuración de Multer
 const storage = multer.diskStorage({
   destination: uploadsPath,
   filename: (req, file, cb) => {
@@ -30,7 +28,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// POST: subir archivo y procesar
 app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (req, res) => {
   if (!req.files || !req.files["file"]) {
     return res.status(400).json({ message: "No se recibió ningún archivo." });
@@ -73,7 +70,6 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
   }
 });
 
-// GET: cargar estilos desde plantillas.json
 app.get("/styles", (req, res) => {
   const estilosPath = path.join(__dirname, "plantillas.json");
 
@@ -90,7 +86,6 @@ app.get("/styles", (req, res) => {
   }
 });
 
-// ✅ Nueva ruta para descargar archivos desde la base de datos
 app.get("/cv/pdf/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -110,7 +105,6 @@ app.get("/cv/pdf/:id", async (req, res) => {
   }
 });
 
-// GET: listar registros desde cv_files (parseado)
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
@@ -131,16 +125,19 @@ app.get("/cv/list", async (req, res) => {
   }
 });
 
-// ✅ Ruta protegida con PIN para eliminar todos los CVs
+
 app.post("/admin/limpiar-cvs", async (req, res) => {
   const pin = req.headers["x-admin-secret"];
+
   if (pin !== process.env.ADMIN_SECRET) {
-    return res.status(403).json({ mensaje: "Acceso no autorizado" });
+    console.warn("⛔ PIN incorrecto al intentar eliminar CVs.");
+    return res.status(403).json({ mensaje: "PIN incorrecto" });
   }
 
   try {
     await db.query("TRUNCATE TABLE cv_files RESTART IDENTITY");
     await db.query("VACUUM FULL cv_files");
+    console.log("✅ CVs eliminados correctamente por solicitud autorizada.");
     res.status(200).json({ mensaje: "Todos los CVs fueron eliminados correctamente y el espacio fue liberado." });
   } catch (error) {
     console.error("❌ Error al limpiar los CVs:", error.message);
