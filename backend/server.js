@@ -131,6 +131,18 @@ app.get("/cv/list", async (req, res) => {
   }
 });
 
+
+app.post("/admin/limpiar-cvs", async (req, res) => {
+  try {
+    await db.query("TRUNCATE TABLE cv_files RESTART IDENTITY");
+    await db.query("VACUUM FULL cv_files");
+    res.status(200).json({ mensaje: "Todos los CVs fueron eliminados correctamente y el espacio fue liberado." });
+  } catch (error) {
+    console.error("❌ Error al limpiar los CVs:", error.message);
+    res.status(500).json({ mensaje: "Error al limpiar los CVs." });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
