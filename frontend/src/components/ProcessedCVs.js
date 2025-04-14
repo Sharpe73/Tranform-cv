@@ -1,5 +1,6 @@
 import CodeIcon from "@mui/icons-material/Code";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -27,7 +28,8 @@ function ProcessedCVs() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  useEffect(() => {
+  const cargarCVs = () => {
+    setLoading(true);
     fetch("https://tranform-cv.onrender.com/cv/list")
       .then((res) => res.json())
       .then((data) => {
@@ -38,6 +40,10 @@ function ProcessedCVs() {
         console.error("Error al obtener CVs:", err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    cargarCVs();
   }, []);
 
   const descargarJSON = (json, nombre) => {
@@ -68,6 +74,23 @@ function ProcessedCVs() {
       });
   };
 
+  const eliminarTodos = async () => {
+    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar TODOS los CVs procesados? Esta acción no se puede deshacer.");
+    if (!confirmacion) return;
+
+    try {
+      const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
+        method: "POST",
+      });
+      const data = await res.json();
+      alert(data.mensaje || "CVs eliminados correctamente");
+      cargarCVs();
+    } catch (err) {
+      alert("❌ Error al eliminar los CVs");
+      console.error(err);
+    }
+  };
+
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     return nombre.toLowerCase().includes(searchTerm.toLowerCase());
@@ -94,7 +117,7 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box mb={2}>
+      <Box mb={2} display="flex" justifyContent="space-between">
         <TextField
           variant="outlined"
           placeholder="Buscar por nombre"
@@ -110,6 +133,14 @@ function ProcessedCVs() {
             ),
           }}
         />
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<DeleteIcon />}
+          onClick={eliminarTodos}
+        >
+          Eliminar todos los CVs
+        </Button>
       </Box>
 
       <TableContainer component={Paper}>
