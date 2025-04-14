@@ -130,7 +130,6 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      {/* Estilo mejorado solo en móviles */}
       <Box
         mb={2}
         sx={{
@@ -147,10 +146,7 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{
-            width: { xs: "100%", sm: 300 },
-            fontSize: { xs: "0.85rem", sm: "1rem" },
-          }}
+          sx={{ width: { xs: "100%", sm: 300 } }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -169,6 +165,7 @@ function ProcessedCVs() {
             fontWeight: "bold",
             fontSize: { xs: "0.85rem", sm: "1rem" },
             padding: { xs: "6px 10px", sm: "8px 16px" },
+            borderRadius: { xs: "6px", sm: "4px" },
           }}
         >
           Eliminar todos los CVs
@@ -206,6 +203,10 @@ function ProcessedCVs() {
                         color="primary"
                         startIcon={<PictureAsPdfIcon />}
                         onClick={() => descargarPDF(cv.id)}
+                        sx={{
+                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                          padding: { xs: "4px 8px", sm: "6px 12px" },
+                        }}
                       >
                         PDF
                       </Button>
@@ -216,6 +217,8 @@ function ProcessedCVs() {
                           descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
                         }
                         sx={{
+                          fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                          padding: { xs: "4px 8px", sm: "6px 12px" },
                           color: "#f29111",
                           borderColor: "#f29111",
                           fontWeight: "bold",
