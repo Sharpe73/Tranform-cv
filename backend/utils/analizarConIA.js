@@ -12,23 +12,24 @@ const openai = new OpenAI({
 async function analizarConIA(texto) {
   try {
     const instrucciones = `
-Extrae la información en formato JSON con los siguientes campos:
+Extrae la información en formato JSON con los siguientes campos si están presentes:
 {
   "informacion_personal": { "nombre": "", "telefono": "", "correo": "", "direccion": "", "linkedin": "" },
   "educacion": [{ "carrera": "", "institucion": "", "fecha_inicio": "", "fecha_fin": "" }],
-  "certificaciones": [],
+  "certificaciones": [], // OMITIR si no se encuentran datos relevantes
   "experiencia_laboral": [{ "empresa": "", "cargo": "", "fecha_inicio": "", "fecha_fin": "", "funciones": [] }],
   "idiomas": [{ "idioma": "", "nivel": "" }],
   "conocimientos_informaticos": []
 }
 
 Reglas importantes:
+- Si no se encuentra información relacionada con certificaciones (como certificados, certificaciones, diplomas, diplomados), OMITE el campo "certificaciones" del JSON completamente.
 - Todo el contenido debe estar formateado con el tamaño de letra definido por el usuario (por ejemplo: 12). No uses el tamaño del documento original.
-- Si una palabra o título viene completamente en mayúsculas (como INFORMÁTICA o EXPERIENCIA LABORAL), debes corregirlo. Usa mayúscula solo en la primera letra si corresponde. Ejemplo: "Informática", "Experiencia laboral".
-- Respeta las siglas reales (como QA, HTML, SQL), manteniéndolas completamente en mayúscula.
-- Cualquier texto relacionado con "certificados", "certificaciones", "diplomas" o "diplomados" debe ir en la sección "certificaciones", sin importar en qué parte del CV aparezca.
-- Incluye herramientas tecnológicas, lenguajes, frameworks y software en "conocimientos_informaticos", incluso si están bajo otras secciones como “herramientas”, “stack tecnológico”, “habilidades técnicas”, “software” o similares.
-- Solo responde con el JSON, sin markdown ni comentarios.`;
+- Corrige palabras totalmente en mayúsculas como "EXPERIENCIA LABORAL" → "Experiencia laboral". Mantén siglas como QA o HTML completamente en mayúscula.
+- Cualquier texto relacionado con "certificados", "certificaciones", "diplomas" o "diplomados" debe ir en "certificaciones", incluso si aparece en otra sección del CV.
+- Herramientas tecnológicas, lenguajes, frameworks o software deben ir en "conocimientos_informaticos", incluso si están bajo otras secciones como “herramientas”, “stack tecnológico”, “habilidades técnicas”, “software” o similares.
+- Solo responde con el JSON, sin markdown ni comentarios.
+`;
 
     console.log("🧠 Enviando solicitud a OpenAI...");
 
