@@ -110,10 +110,10 @@ function ProcessedCVs() {
         alert(data.mensaje || "CVs eliminados correctamente");
         cargarCVs();
       } else {
-        setPinError("❌ PIN incorrecto");
+        setPinError("\u274c PIN incorrecto");
       }
     } catch (err) {
-      setPinError("❌ Error al eliminar los CVs");
+      setPinError("\u274c Error al eliminar los CVs");
       console.error(err);
     }
   };
@@ -213,60 +213,62 @@ function ProcessedCVs() {
         </DialogActions>
       </Dialog>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-            <TableRow>
-              <TableCell><strong>🧑 Nombre</strong></TableCell>
-              <TableCell><strong>🗓️ Fecha</strong></TableCell>
-              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedCvs.map((cv) => {
-              const parsedJson = cv.json || { error: "JSON inválido" };
-              const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
+      <Box sx={{ width: "100%", overflowX: "auto" }}>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 600 }}>
+            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableRow>
+                <TableCell><strong>🧑 Nombre</strong></TableCell>
+                <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                <TableCell><strong>📥 PDF / JSON</strong></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paginatedCvs.map((cv) => {
+                const parsedJson = cv.json || { error: "JSON inválido" };
+                const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
 
-              return (
-                <TableRow key={cv.id}>
-                  <TableCell>{nombre}</TableCell>
-                  <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<PictureAsPdfIcon />}
-                        onClick={() => descargarPDF(cv.id)}
-                      >
-                        PDF
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        startIcon={<CodeIcon />}
-                        onClick={() =>
-                          descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
-                        }
-                        sx={{
-                          color: "#f29111",
-                          borderColor: "#f29111",
-                          fontWeight: "bold",
-                          "&:hover": {
-                            backgroundColor: "#f29111",
-                            color: "#fff",
-                          },
-                        }}
-                      >
-                        JSON
-                      </Button>
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                return (
+                  <TableRow key={cv.id}>
+                    <TableCell>{nombre}</TableCell>
+                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<PictureAsPdfIcon />}
+                          size="small"
+                          onClick={() => descargarPDF(cv.id)}
+                        >
+                          PDF
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<CodeIcon />}
+                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                          sx={{
+                            color: "#f29111",
+                            borderColor: "#f29111",
+                            fontWeight: "bold",
+                            "&:hover": {
+                              backgroundColor: "#f29111",
+                              color: "#fff",
+                            },
+                          }}
+                        >
+                          JSON
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
 
       <Box mt={2} display="flex" justifyContent="center">
         <Pagination
