@@ -122,7 +122,12 @@ function ProcessedCVs() {
 
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
-    return nombre.toLowerCase().includes(searchTerm.toLowerCase());
+    const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
+    const search = searchTerm.toLowerCase();
+    return (
+      nombre.toLowerCase().includes(search) ||
+      conocimientos.toLowerCase().includes(search)
+    );
   });
 
   const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
@@ -158,7 +163,7 @@ function ProcessedCVs() {
       >
         <TextField
           variant="outlined"
-          placeholder="Buscar por nombre"
+          placeholder="Buscar por nombre o tag (ej: Java)"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
@@ -225,7 +230,12 @@ function ProcessedCVs() {
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
                 <Typography sx={{ mb: 1 }}>🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
                 <Stack direction="row" spacing={1}>
-                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<PictureAsPdfIcon />}
+                    onClick={() => descargarPDF(cv.id)}
+                  >
                     PDF
                   </Button>
                   <Button
@@ -269,7 +279,12 @@ function ProcessedCVs() {
                     <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<PictureAsPdfIcon />}
+                          onClick={() => descargarPDF(cv.id)}
+                        >
                           PDF
                         </Button>
                         <Button
