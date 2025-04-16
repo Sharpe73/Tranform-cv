@@ -145,8 +145,8 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Stack direction="row" spacing={1}>
+      <Box display="flex" flexDirection={isMobile ? "column" : "row"} justifyContent="space-between" alignItems={isMobile ? "stretch" : "center"} gap={2} mb={2}>
+        <Stack direction="row" spacing={1} justifyContent={isMobile ? "center" : "flex-start"}>
           <Button
             onClick={() => setTabValue("nombre")}
             variant={tabValue === "nombre" ? "contained" : "text"}
@@ -165,7 +165,7 @@ function ProcessedCVs() {
           variant="contained"
           startIcon={<DeleteIcon />}
           onClick={handleOpenDialog}
-          sx={{ backgroundColor: "#d32f2f", fontWeight: "bold", px: 3, py: 1.2, boxShadow: 2, "&:hover": { backgroundColor: "#b71c1c" } }}
+          sx={{ backgroundColor: "#d32f2f", fontWeight: "bold", px: 3, py: 1.2, boxShadow: 2, width: isMobile ? "100%" : "auto", alignSelf: isMobile ? "center" : "auto", "&:hover": { backgroundColor: "#b71c1c" } }}
         >
           ELIMINAR TODOS LOS CVS
         </Button>
@@ -182,7 +182,7 @@ function ProcessedCVs() {
           sx={{ mb: 2 }}
         />
       ) : (
-        <>
+        <Box sx={{ mb: 2 }}>
           <TextField
             variant="outlined"
             placeholder="Presiona Enter para agregar un tag (ej: Java)"
@@ -196,21 +196,18 @@ function ProcessedCVs() {
               }
             }}
             fullWidth
-            sx={{ mb: 2 }}
           />
-          <Stack direction="row" spacing={1} mb={2}>
+          <Stack direction="row" spacing={1} mt={1} flexWrap="wrap">
             {searchTags.map((tag, index) => (
               <Chip
                 key={index}
                 label={tag}
-                onDelete={() =>
-                  setSearchTags(searchTags.filter((_, i) => i !== index))
-                }
+                onDelete={() => setSearchTags(searchTags.filter((_, i) => i !== index))}
                 color="primary"
               />
             ))}
           </Stack>
-        </>
+        </Box>
       )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
