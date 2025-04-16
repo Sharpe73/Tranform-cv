@@ -141,7 +141,7 @@ function ProcessedCVs() {
   }
 
   return (
-    <Box sx={{ px: 2, py: 4, pb: 8, minHeight: "100vh", maxWidth: "1200px", mx: "auto" }}>
+    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto", minHeight: "100vh", pb: 8 }}>
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
@@ -223,7 +223,7 @@ function ProcessedCVs() {
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
-                <Typography sx={{ mb: 1 }}>📅 {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
+                <Typography sx={{ mb: 1 }}>🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
                 <Stack direction="row" spacing={1}>
                   <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
                     PDF
@@ -256,7 +256,7 @@ function ProcessedCVs() {
               <TableRow>
                 <TableCell><strong>🧑 Nombre</strong></TableCell>
                 <TableCell><strong>🗓️ Fecha</strong></TableCell>
-                <TableCell><strong>📥 PDF / JSON</strong></TableCell>
+                <TableCell><strong>📅 PDF / JSON</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
