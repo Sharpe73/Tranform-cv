@@ -23,13 +23,15 @@ import {
   TextField,
   Typography,
   useMediaQuery,
+  Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [tags, setTags] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDialog, setOpenDialog] = useState(false);
   const [pin, setPin] = useState("");
@@ -120,14 +122,24 @@ function ProcessedCVs() {
     }
   };
 
+  const handleTagInputKeyDown = (e) => {
+    if ((e.key === "Enter" || e.key === ",") && searchInput.trim()) {
+      e.preventDefault();
+      if (!tags.includes(searchInput.trim().toLowerCase())) {
+        setTags([...tags, searchInput.trim().toLowerCase()]);
+      }
+      setSearchInput("");
+    }
+  };
+
+  const handleDeleteTag = (tagToDelete) => {
+    setTags(tags.filter((tag) => tag !== tagToDelete));
+  };
+
   const filteredCvs = cvs.filter((cv) => {
-    const nombre = cv.json?.informacion_personal?.nombre || "";
-    const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
-    const search = searchTerm.toLowerCase();
-    return (
-      nombre.toLowerCase().includes(search) ||
-      conocimientos.toLowerCase().includes(search)
-    );
+    const nombre = cv.json?.informacion_personal?.nombre?.toLowerCase() || "";
+    const conocimientos = cv.json?.conocimientos_informaticos?.join(" ").toLowerCase() || "";
+    return tags.every((tag) => nombre.includes(tag) || conocimientos.includes(tag));
   });
 
   const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
@@ -151,31 +163,36 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box
-        mb={2}
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-        }}
-      >
-        <TextField
-          variant="outlined"
-          placeholder="Buscar por nombre o tag (ej: Java)"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          size="small"
-          sx={{ width: { xs: "100%", sm: 300 } }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
+      <Box mb={2} sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+        <Box sx={{ width: { xs: "100%", sm: 400 } }}>
+          <TextField
+            variant="outlined"
+            placeholder="Buscar por nombre o tag (ej: Java)"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={handleTagInputKeyDown}
+            size="small"
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Stack direction="row" spacing={1} mt={1} flexWrap="wrap">
+            {tags.map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                onDelete={() => handleDeleteTag(tag)}
+                color="primary"
+                variant="outlined"
+              />
+            ))}
+          </Stack>
+        </Box>
 
         <Button
           variant="contained"
@@ -230,12 +247,7 @@ function ProcessedCVs() {
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
                 <Typography sx={{ mb: 1 }}>🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
                 <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<PictureAsPdfIcon />}
-                    onClick={() => descargarPDF(cv.id)}
-                  >
+                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
                     PDF
                   </Button>
                   <Button
@@ -279,12 +291,7 @@ function ProcessedCVs() {
                     <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          startIcon={<PictureAsPdfIcon />}
-                          onClick={() => descargarPDF(cv.id)}
-                        >
+                        <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
                           PDF
                         </Button>
                         <Button
