@@ -30,7 +30,7 @@ import SearchIcon from "@mui/icons-material/Search";
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchInput, setSearchInput] = useState("");
+  const [searchName, setSearchName] = useState("");
   const [tags, setTags] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDialog, setOpenDialog] = useState(false);
@@ -56,6 +56,21 @@ function ProcessedCVs() {
   useEffect(() => {
     cargarCVs();
   }, []);
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === "Enter" && e.target.value.trim()) {
+      const value = e.target.value.trim().toLowerCase();
+      if (!tags.includes(value)) {
+        setTags([...tags, value]);
+      }
+      e.target.value = "";
+      e.preventDefault();
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
 
   const descargarJSON = (json, nombre) => {
     const blob = new Blob([JSON.stringify(json, null, 2)], {
@@ -97,15 +112,11 @@ function ProcessedCVs() {
 
   const confirmarEliminacion = async () => {
     if (!pin) return;
-
     try {
       const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
         method: "POST",
-        headers: {
-          "x-admin-secret": pin,
-        },
+        headers: { "x-admin-secret": pin },
       });
-
       const data = await res.json();
       if (res.status === 200) {
         setOpenDialog(false);
@@ -122,24 +133,15 @@ function ProcessedCVs() {
     }
   };
 
-  const handleTagInputKeyDown = (e) => {
-    if ((e.key === "Enter" || e.key === ",") && searchInput.trim()) {
-      e.preventDefault();
-      if (!tags.includes(searchInput.trim().toLowerCase())) {
-        setTags([...tags, searchInput.trim().toLowerCase()]);
-      }
-      setSearchInput("");
-    }
-  };
-
-  const handleDeleteTag = (tagToDelete) => {
-    setTags(tags.filter((tag) => tag !== tagToDelete));
-  };
-
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre?.toLowerCase() || "";
-    const conocimientos = cv.json?.conocimientos_informaticos?.join(" ").toLowerCase() || "";
-    return tags.every((tag) => nombre.includes(tag) || conocimientos.includes(tag));
+    const conocimientos = (cv.json?.conocimientos_informaticos || [])
+      .map((c) => c.toLowerCase());
+
+    const nameMatch = nombre.includes(searchName.toLowerCase());
+    const tagMatch = tags.every((tag) => conocimientos.includes(tag));
+
+    return nameMatch && tagMatch;
   });
 
   const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
@@ -163,36 +165,40 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box mb={2} sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, alignItems: "center", justifyContent: "space-between", gap: 2 }}>
-        <Box sx={{ width: { xs: "100%", sm: 400 } }}>
-          <TextField
-            variant="outlined"
-            placeholder="Buscar por nombre o tag (ej: Java)"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={handleTagInputKeyDown}
-            size="small"
-            fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Stack direction="row" spacing={1} mt={1} flexWrap="wrap">
-            {tags.map((tag, index) => (
-              <Chip
-                key={index}
-                label={tag}
-                onDelete={() => handleDeleteTag(tag)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
-          </Stack>
-        </Box>
+      <Box mb={2} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <TextField
+          variant="outlined"
+          placeholder="Buscar por nombre"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          size="small"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <TextField
+          variant="outlined"
+          placeholder="Presiona Enter para agregar un tag (ej: Java)"
+          onKeyDown={handleTagKeyDown}
+          size="small"
+        />
+
+        <Stack direction="row" spacing={1} flexWrap="wrap">
+          {tags.map((tag) => (
+            <Chip
+              key={tag}
+              label={tag}
+              onDelete={() => removeTag(tag)}
+              color="primary"
+              variant="outlined"
+            />
+          ))}
+        </Stack>
 
         <Button
           variant="contained"
@@ -240,7 +246,7 @@ function ProcessedCVs() {
       {isMobile ? (
         <Stack spacing={2}>
           {paginatedCvs.map((cv) => {
-            const parsedJson = cv.json || { error: "JSON inválido" };
+            const parsedJson = cv.json || {};
             const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
@@ -283,7 +289,7 @@ function ProcessedCVs() {
             </TableHead>
             <TableBody>
               {paginatedCvs.map((cv) => {
-                const parsedJson = cv.json || { error: "JSON inválido" };
+                const parsedJson = cv.json || {};
                 const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
                 return (
                   <TableRow key={cv.id}>
