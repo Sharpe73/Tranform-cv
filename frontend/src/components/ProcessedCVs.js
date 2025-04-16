@@ -22,10 +22,10 @@ import {
   TableRow,
   TextField,
   Typography,
-  useMediaQuery,
   Chip,
   ToggleButton,
   ToggleButtonGroup,
+  useMediaQuery,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -35,15 +35,16 @@ function ProcessedCVs() {
   const [searchName, setSearchName] = useState("");
   const [searchTags, setSearchTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
+  const [searchMode, setSearchMode] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
   const [openDialog, setOpenDialog] = useState(false);
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
-  const [searchMode, setSearchMode] = useState("name");
   const isMobile = useMediaQuery("(max-width:600px)");
   const itemsPerPage = 10;
 
-  useEffect(() => {
+  const cargarCVs = () => {
+    setLoading(true);
     fetch("https://tranform-cv.onrender.com/cv/list")
       .then((res) => res.json())
       .then((data) => {
@@ -54,6 +55,10 @@ function ProcessedCVs() {
         console.error("Error al obtener CVs:", err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    cargarCVs();
   }, []);
 
   const descargarJSON = (json, nombre) => {
@@ -90,22 +95,28 @@ function ProcessedCVs() {
     setOpenDialog(true);
   };
 
-  const handleCloseDialog = () => setOpenDialog(false);
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   const confirmarEliminacion = async () => {
     if (!pin) return;
+
     try {
       const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
         method: "POST",
-        headers: { "x-admin-secret": pin },
+        headers: {
+          "x-admin-secret": pin,
+        },
       });
+
       const data = await res.json();
       if (res.status === 200) {
         setOpenDialog(false);
         setPin("");
         setPinError("");
         alert(data.mensaje || "CVs eliminados correctamente");
-        window.location.reload();
+        cargarCVs();
       } else {
         setPinError("❌ PIN incorrecto");
       }
@@ -115,30 +126,19 @@ function ProcessedCVs() {
     }
   };
 
-  const handleTagKeyDown = (e) => {
-    if (e.key === "Enter" && tagInput.trim()) {
-      setSearchTags([...searchTags, tagInput.trim().toLowerCase()]);
-      setTagInput("");
-      e.preventDefault();
-    }
-  };
-
-  const removeTag = (tagToRemove) => {
-    setSearchTags(searchTags.filter((tag) => tag !== tagToRemove));
-  };
-
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
-    const conocimientos = (cv.json?.conocimientos_informaticos || []).join(" ").toLowerCase();
-
-    const matchName = nombre.toLowerCase().includes(searchName.toLowerCase());
-    const matchTags = searchTags.every((tag) => conocimientos.includes(tag));
-
-    return searchMode === "name" ? matchName : matchTags;
+    const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
+    const nameMatch = nombre.toLowerCase().includes(searchName.toLowerCase());
+    const tagMatch = searchTags.every((tag) => conocimientos.toLowerCase().includes(tag.toLowerCase()));
+    return searchMode === "name" ? nameMatch : tagMatch;
   });
 
   const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
-  const paginatedCvs = filteredCvs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const paginatedCvs = filteredCvs.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (loading) {
     return (
@@ -150,24 +150,29 @@ function ProcessedCVs() {
   }
 
   return (
-    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto", minHeight: "100vh", pb: 8 }}>
-      <Typography variant="h4" gutterBottom>📄 CVs Procesados</Typography>
+    <Box sx={{ px: 2, py: 4, maxWidth: "1000px", mx: "auto", minHeight: "100vh", pb: 8 }}>
+      <Typography variant="h4" gutterBottom>
+        📄 CVs Procesados
+      </Typography>
 
       <ToggleButtonGroup
         value={searchMode}
         exclusive
-        onChange={(e, newMode) => newMode && setSearchMode(newMode)}
+        onChange={(e, newValue) => newValue && setSearchMode(newValue)}
         sx={{ mb: 2 }}
       >
-        <ToggleButton value="name">Buscar por Nombre</ToggleButton>
-        <ToggleButton value="tags">Buscar por Tags</ToggleButton>
+        <ToggleButton value="name">BUSCAR POR NOMBRE</ToggleButton>
+        <ToggleButton value="tags">BUSCAR POR TAGS</ToggleButton>
       </ToggleButtonGroup>
 
       {searchMode === "name" ? (
         <TextField
+          fullWidth
+          variant="outlined"
           placeholder="Buscar por nombre"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
+          size="small"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -175,37 +180,54 @@ function ProcessedCVs() {
               </InputAdornment>
             ),
           }}
-          fullWidth
-          size="small"
-          sx={{ mb: 2 }}
         />
       ) : (
-        <Box sx={{ mb: 2 }}>
-          <TextField
-            placeholder="Presiona Enter para agregar un tag (ej: Java)"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={handleTagKeyDown}
-            fullWidth
-            size="small"
-          />
-          <Stack direction="row" spacing={1} mt={1} flexWrap="wrap">
-            {searchTags.map((tag) => (
-              <Chip key={tag} label={tag} onDelete={() => removeTag(tag)} color="primary" />
-            ))}
-          </Stack>
-        </Box>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Presiona Enter para agregar un tag (ej: Java)"
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && tagInput.trim()) {
+              e.preventDefault();
+              if (!searchTags.includes(tagInput.trim().toLowerCase())) {
+                setSearchTags([...searchTags, tagInput.trim().toLowerCase()]);
+              }
+              setTagInput("");
+            }
+          }}
+          size="small"
+        />
       )}
 
-      <Button
-        variant="contained"
-        startIcon={<DeleteIcon />}
-        onClick={handleOpenDialog}
-        fullWidth
-        sx={{ backgroundColor: "#d32f2f", fontWeight: "bold", px: 3, py: 1.5, boxShadow: 2, "&:hover": { backgroundColor: "#b71c1c" } }}
-      >
-        ELIMINAR TODOS LOS CVS
-      </Button>
+      {searchMode === "tags" && (
+        <Stack direction="row" spacing={1} mt={1} flexWrap="wrap">
+          {searchTags.map((tag, index) => (
+            <Chip
+              key={index}
+              label={tag}
+              onDelete={() => setSearchTags(searchTags.filter((_, i) => i !== index))}
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+          ))}
+        </Stack>
+      )}
+
+      <Box mt={2} mb={3}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="error"
+          onClick={handleOpenDialog}
+          startIcon={<DeleteIcon />}
+          sx={{ py: 1.2, fontWeight: "bold" }}
+        >
+          ELIMINAR TODOS LOS CVS
+        </Button>
+      </Box>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Ingresa el PIN de seguridad</DialogTitle>
@@ -231,42 +253,85 @@ function ProcessedCVs() {
       </Dialog>
 
       {isMobile ? (
-        <Stack spacing={2} mt={4}>
+        <Stack spacing={2}>
           {paginatedCvs.map((cv) => {
-            const nombre = cv.json?.informacion_personal?.nombre || "Desconocido";
+            const parsedJson = cv.json || { error: "JSON inválido" };
+            const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
                 <Typography sx={{ mb: 1 }}>🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
                 <Stack direction="row" spacing={1}>
-                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>PDF</Button>
-                  <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(cv.json, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
+                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
+                    PDF
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<CodeIcon />}
+                    onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                    sx={{
+                      color: "#f29111",
+                      borderColor: "#f29111",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: "#f29111",
+                        color: "#fff",
+                      },
+                    }}
+                  >
+                    JSON
+                  </Button>
                 </Stack>
               </Paper>
             );
           })}
         </Stack>
       ) : (
-        <TableContainer component={Paper} sx={{ mt: 4 }}>
+        <TableContainer component={Paper}>
           <Table>
             <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
               <TableRow>
                 <TableCell><strong>🧑 Nombre</strong></TableCell>
                 <TableCell><strong>🗓️ Fecha</strong></TableCell>
-                <TableCell><strong>📥 PDF / JSON</strong></TableCell>
+                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedCvs.map((cv) => {
-                const nombre = cv.json?.informacion_personal?.nombre || "Desconocido";
+                const parsedJson = cv.json || { error: "JSON inválido" };
+                const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
                 return (
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
                     <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>PDF</Button>
-                        <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(cv.json, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<PictureAsPdfIcon />}
+                          onClick={() => descargarPDF(cv.id)}
+                          size="small"
+                        >
+                          PDF
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<CodeIcon />}
+                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                          sx={{
+                            color: "#f29111",
+                            borderColor: "#f29111",
+                            fontWeight: "bold",
+                            "&:hover": {
+                              backgroundColor: "#f29111",
+                              color: "#fff",
+                            },
+                          }}
+                          size="small"
+                        >
+                          JSON
+                        </Button>
                       </Stack>
                     </TableCell>
                   </TableRow>
