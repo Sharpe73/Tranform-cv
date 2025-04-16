@@ -3,25 +3,26 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableContainer,
-  Paper,
-  Typography,
-  CircularProgress,
   Box,
   Button,
-  Stack,
-  TextField,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   InputAdornment,
   Pagination,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  useMediaQuery,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -33,6 +34,7 @@ function ProcessedCVs() {
   const [openDialog, setOpenDialog] = useState(false);
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
+  const isMobile = useMediaQuery("(max-width:600px)");
   const itemsPerPage = 10;
 
   const cargarCVs = () => {
@@ -213,68 +215,97 @@ function ProcessedCVs() {
         </DialogActions>
       </Dialog>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-            <TableRow>
-              <TableCell><strong>🧑 Nombre</strong></TableCell>
-              <TableCell><strong>🗓️ Fecha</strong></TableCell>
-              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedCvs.map((cv) => {
-              const parsedJson = cv.json || { error: "JSON inválido" };
-              const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
-
-              return (
-                <TableRow key={cv.id}>
-                  <TableCell>{nombre}</TableCell>
-                  <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<PictureAsPdfIcon />}
-                        onClick={() => descargarPDF(cv.id)}
-                      >
-                        PDF
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        startIcon={<CodeIcon />}
-                        onClick={() =>
-                          descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
-                        }
-                        sx={{
-                          color: "#f29111",
-                          borderColor: "#f29111",
-                          fontWeight: "bold",
-                          "&:hover": {
-                            backgroundColor: "#f29111",
-                            color: "#fff",
-                          },
-                        }}
-                      >
-                        JSON
-                      </Button>
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {isMobile ? (
+        <Stack spacing={2}>
+          {paginatedCvs.map((cv) => {
+            const parsedJson = cv.json || { error: "JSON inválido" };
+            const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
+            return (
+              <Paper key={cv.id} sx={{ p: 2 }}>
+                <Typography fontWeight="bold">🧑 {nombre}</Typography>
+                <Typography sx={{ mb: 1 }}>📅 {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
+                <Stack direction="row" spacing={1}>
+                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
+                    PDF
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<CodeIcon />}
+                    onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                    sx={{
+                      color: "#f29111",
+                      borderColor: "#f29111",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: "#f29111",
+                        color: "#fff",
+                      },
+                    }}
+                  >
+                    JSON
+                  </Button>
+                </Stack>
+              </Paper>
+            );
+          })}
+        </Stack>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableRow>
+                <TableCell>
+                  <strong>🧑 Nombre</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>🗓️ Fecha</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>📥 PDF / JSON</strong>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paginatedCvs.map((cv) => {
+                const parsedJson = cv.json || { error: "JSON inválido" };
+                const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
+                return (
+                  <TableRow key={cv.id}>
+                    <TableCell>{nombre}</TableCell>
+                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
+                          PDF
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<CodeIcon />}
+                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                          sx={{
+                            color: "#f29111",
+                            borderColor: "#f29111",
+                            fontWeight: "bold",
+                            "&:hover": {
+                              backgroundColor: "#f29111",
+                              color: "#fff",
+                            },
+                          }}
+                        >
+                          JSON
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Box mt={2} display="flex" justifyContent="center">
-        <Pagination
-          count={totalPages}
-          page={currentPage}
-          onChange={(e, page) => setCurrentPage(page)}
-          color="primary"
-        />
+        <Pagination count={totalPages} page={currentPage} onChange={(e, page) => setCurrentPage(page)} color="primary" />
       </Box>
     </Box>
   );
