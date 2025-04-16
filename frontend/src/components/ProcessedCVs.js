@@ -22,6 +22,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -34,6 +36,9 @@ function ProcessedCVs() {
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
   const itemsPerPage = 10;
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const cargarCVs = () => {
     setLoading(true);
@@ -110,10 +115,10 @@ function ProcessedCVs() {
         alert(data.mensaje || "CVs eliminados correctamente");
         cargarCVs();
       } else {
-        setPinError("\u274c PIN incorrecto");
+        setPinError("❌ PIN incorrecto");
       }
     } catch (err) {
-      setPinError("\u274c Error al eliminar los CVs");
+      setPinError("❌ Error al eliminar los CVs");
       console.error(err);
     }
   };
@@ -149,7 +154,7 @@ function ProcessedCVs() {
         sx={{
           display: "flex",
           flexDirection: { xs: "column", sm: "row" },
-          alignItems: "center",
+          alignItems: { xs: "stretch", sm: "center" },
           justifyContent: "space-between",
           gap: 2,
         }}
@@ -160,7 +165,7 @@ function ProcessedCVs() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
-          sx={{ width: { xs: "100%", sm: 300 } }}
+          fullWidth={isMobile}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -180,6 +185,7 @@ function ProcessedCVs() {
             width: { xs: "100%", sm: "auto" },
             px: 3,
             py: 1.2,
+            mt: { xs: 1, sm: 0 },
             boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
             "&:hover": {
               backgroundColor: "#b71c1c",
@@ -190,7 +196,7 @@ function ProcessedCVs() {
         </Button>
       </Box>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth>
         <DialogTitle>Ingresa el PIN de seguridad</DialogTitle>
         <DialogContent>
           <TextField
@@ -213,62 +219,62 @@ function ProcessedCVs() {
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ width: "100%", overflowX: "auto" }}>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 600 }}>
-            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableRow>
-                <TableCell><strong>🧑 Nombre</strong></TableCell>
-                <TableCell><strong>🗓️ Fecha</strong></TableCell>
-                <TableCell><strong>📥 PDF / JSON</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedCvs.map((cv) => {
-                const parsedJson = cv.json || { error: "JSON inválido" };
-                const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
+      <TableContainer component={Paper} sx={{ overflowX: "auto" }}>
+        <Table size={isMobile ? "small" : "medium"}>
+          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+            <TableRow>
+              <TableCell><strong>🧑 Nombre</strong></TableCell>
+              <TableCell><strong>🗓️ Fecha</strong></TableCell>
+              <TableCell><strong>📥 PDF / JSON</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedCvs.map((cv) => {
+              const parsedJson = cv.json || { error: "JSON inválido" };
+              const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
 
-                return (
-                  <TableRow key={cv.id}>
-                    <TableCell>{nombre}</TableCell>
-                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          startIcon={<PictureAsPdfIcon />}
-                          size="small"
-                          onClick={() => descargarPDF(cv.id)}
-                        >
-                          PDF
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<CodeIcon />}
-                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                          sx={{
-                            color: "#f29111",
-                            borderColor: "#f29111",
-                            fontWeight: "bold",
-                            "&:hover": {
-                              backgroundColor: "#f29111",
-                              color: "#fff",
-                            },
-                          }}
-                        >
-                          JSON
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+              return (
+                <TableRow key={cv.id}>
+                  <TableCell>{nombre}</TableCell>
+                  <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size={isMobile ? "small" : "medium"}
+                        startIcon={<PictureAsPdfIcon />}
+                        onClick={() => descargarPDF(cv.id)}
+                      >
+                        PDF
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        startIcon={<CodeIcon />}
+                        size={isMobile ? "small" : "medium"}
+                        onClick={() =>
+                          descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                        }
+                        sx={{
+                          color: "#f29111",
+                          borderColor: "#f29111",
+                          fontWeight: "bold",
+                          "&:hover": {
+                            backgroundColor: "#f29111",
+                            color: "#fff",
+                          },
+                        }}
+                      >
+                        JSON
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Box mt={2} display="flex" justifyContent="center">
         <Pagination
