@@ -1,6 +1,4 @@
-import CodeIcon from "@mui/icons-material/Code";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import DeleteIcon from "@mui/icons-material/Delete";
+// src/components/ProcessedCVs.js
 import React, { useEffect, useState } from "react";
 import {
   Box,
@@ -10,9 +8,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Pagination,
+  InputAdornment,
   Paper,
   Stack,
+  Tab,
+  Tabs,
   Table,
   TableBody,
   TableCell,
@@ -21,29 +21,27 @@ import {
   TableRow,
   TextField,
   Typography,
-  ToggleButton,
-  ToggleButtonGroup,
   useMediaQuery,
   Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import CodeIcon from "@mui/icons-material/Code";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchMode, setSearchMode] = useState("name");
+  const [searchMode, setSearchMode] = useState("nombre");
   const [searchName, setSearchName] = useState("");
-  const [searchTags, setSearchTags] = useState([]);
+  const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [openDialog, setOpenDialog] = useState(false);
   const [pin, setPin] = useState("");
   const [pinError, setPinError] = useState("");
   const isMobile = useMediaQuery("(max-width:600px)");
-  const itemsPerPage = 10;
 
-  const cargarCVs = () => {
-    setLoading(true);
+  useEffect(() => {
     fetch("https://tranform-cv.onrender.com/cv/list")
       .then((res) => res.json())
       .then((data) => {
@@ -54,10 +52,6 @@ function ProcessedCVs() {
         console.error("Error al obtener CVs:", err);
         setLoading(false);
       });
-  };
-
-  useEffect(() => {
-    cargarCVs();
   }, []);
 
   const descargarJSON = (json, nombre) => {
@@ -88,24 +82,12 @@ function ProcessedCVs() {
       });
   };
 
-  const handleOpenDialog = () => {
-    setPin("");
-    setPinError("");
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
   const confirmarEliminacion = async () => {
     if (!pin) return;
     try {
       const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
         method: "POST",
-        headers: {
-          "x-admin-secret": pin,
-        },
+        headers: { "x-admin-secret": pin },
       });
       const data = await res.json();
       if (res.status === 200) {
@@ -113,39 +95,26 @@ function ProcessedCVs() {
         setPin("");
         setPinError("");
         alert(data.mensaje || "CVs eliminados correctamente");
-        cargarCVs();
+        window.location.reload();
       } else {
         setPinError("❌ PIN incorrecto");
       }
     } catch (err) {
       setPinError("❌ Error al eliminar los CVs");
-      console.error(err);
     }
   };
 
-  const handleAddTag = (e) => {
-    if (e.key === "Enter" && tagInput.trim()) {
-      setSearchTags([...searchTags, tagInput.trim().toLowerCase()]);
-      setTagInput("");
-    }
+  const filtrarCVs = () => {
+    return cvs.filter((cv) => {
+      const nombre = cv.json?.informacion_personal?.nombre || "";
+      const conocimientos = (cv.json?.conocimientos_informaticos || []).join(" ");
+      const coincideNombre = nombre.toLowerCase().includes(searchName.toLowerCase());
+      const coincideTags = tags.every((tag) =>
+        conocimientos.toLowerCase().includes(tag.toLowerCase())
+      );
+      return searchMode === "nombre" ? coincideNombre : coincideTags;
+    });
   };
-
-  const handleDeleteTag = (tagToDelete) => {
-    setSearchTags(searchTags.filter((tag) => tag !== tagToDelete));
-  };
-
-  const filteredCvs = cvs.filter((cv) => {
-    const nombre = cv.json?.informacion_personal?.nombre || "";
-    const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
-    if (searchMode === "name") {
-      return nombre.toLowerCase().includes(searchName.toLowerCase());
-    } else {
-      return searchTags.every((tag) => conocimientos.toLowerCase().includes(tag));
-    }
-  });
-
-  const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
-  const paginatedCvs = filteredCvs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   if (loading) {
     return (
@@ -156,70 +125,75 @@ function ProcessedCVs() {
     );
   }
 
+  const cvsFiltrados = filtrarCVs();
+
   return (
-    <Box sx={{ px: 2, py: 4, maxWidth: "1000px", mx: "auto", minHeight: "100vh", pb: 8 }}>
-      <Typography variant="h4" gutterBottom>📄 CVs Procesados</Typography>
+    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto", minHeight: "100vh" }}>
+      <Typography variant="h4" gutterBottom>
+        📄 CVs Procesados
+      </Typography>
 
-      <Box mb={2}>
-        <ToggleButtonGroup
-          value={searchMode}
-          exclusive
-          onChange={(e, value) => value && setSearchMode(value)}
-          sx={{ mb: 1, justifyContent: "center", display: "flex" }}
-        >
-          <ToggleButton value="name">BUSCAR POR NOMBRE</ToggleButton>
-          <ToggleButton value="tags">BUSCAR POR TAGS</ToggleButton>
-        </ToggleButtonGroup>
+      <Tabs
+        value={searchMode}
+        onChange={(e, val) => {
+          setSearchMode(val);
+          setSearchName("");
+          setTags([]);
+        }}
+        sx={{ mb: 1 }}
+      >
+        <Tab label="BUSCAR POR NOMBRE" value="nombre" />
+        <Tab label="BUSCAR POR TAGS" value="tags" />
+      </Tabs>
 
-        {searchMode === "name" ? (
+      {searchMode === "nombre" ? (
+        <TextField
+          fullWidth
+          placeholder="Buscar por nombre"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }}
+          sx={{ mb: 2 }}
+        />
+      ) : (
+        <Box sx={{ mb: 2 }}>
           <TextField
-            variant="outlined"
-            placeholder="Buscar por nombre"
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
             fullWidth
-            size="small"
-            InputProps={{ startAdornment: <SearchIcon sx={{ mr: 1 }} /> }}
-            sx={{ mb: 2 }}
+            placeholder="Presiona Enter para agregar un tag (ej: Java)"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && tagInput.trim()) {
+                setTags([...tags, tagInput.trim()]);
+                setTagInput("");
+              }
+            }}
           />
-        ) : (
-          <>
-            <TextField
-              variant="outlined"
-              placeholder="Presiona Enter para agregar un tag (ej: Java)"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleAddTag}
-              fullWidth
-              size="small"
-              sx={{ mb: 1 }}
-            />
-            <Stack direction="row" spacing={1} flexWrap="wrap" mb={2}>
-              {searchTags.map((tag, i) => (
-                <Chip key={i} label={tag} onDelete={() => handleDeleteTag(tag)} color="primary" />
-              ))}
-            </Stack>
-          </>
-        )}
+          <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {tags.map((tag, idx) => (
+              <Chip
+                key={idx}
+                label={tag}
+                onDelete={() => setTags(tags.filter((_, i) => i !== idx))}
+                color="primary"
+              />
+            ))}
+          </Box>
+        </Box>
+      )}
 
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Button
           variant="contained"
+          color="error"
           startIcon={<DeleteIcon />}
-          onClick={handleOpenDialog}
-          sx={{
-            backgroundColor: "#d32f2f",
-            fontWeight: "bold",
-            width: "100%",
-            py: 1.4,
-            boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
-            "&:hover": { backgroundColor: "#b71c1c" },
-          }}
+          onClick={() => setOpenDialog(true)}
         >
           ELIMINAR TODOS LOS CVS
         </Button>
       </Box>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Ingresa el PIN de seguridad</DialogTitle>
         <DialogContent>
           <TextField
@@ -231,27 +205,28 @@ function ProcessedCVs() {
             error={Boolean(pinError)}
             helperText={pinError}
             autoFocus
-            sx={{ mt: 1 }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancelar</Button>
-          <Button onClick={confirmarEliminacion} variant="contained" color="error">Confirmar</Button>
+          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
+          <Button onClick={confirmarEliminacion} variant="contained" color="error">
+            Confirmar
+          </Button>
         </DialogActions>
       </Dialog>
 
       {isMobile ? (
         <Stack spacing={2}>
-          {paginatedCvs.map((cv) => {
-            const json = cv.json;
-            const nombre = json?.informacion_personal?.nombre || "Desconocido";
+          {cvsFiltrados.map((cv) => {
+            const parsedJson = cv.json || { error: "JSON inválido" };
+            const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
-                <Typography sx={{ mb: 1 }}>🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
+                <Typography sx={{ mb: 1 }}>📅 {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
                 <Stack direction="row" spacing={1}>
                   <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>PDF</Button>
-                  <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(json, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
+                  <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", '&:hover': { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
                 </Stack>
               </Paper>
             );
@@ -260,17 +235,17 @@ function ProcessedCVs() {
       ) : (
         <TableContainer component={Paper}>
           <Table>
-            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+            <TableHead>
               <TableRow>
                 <TableCell><strong>🧑 Nombre</strong></TableCell>
-                <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                <TableCell><strong>📅 Fecha</strong></TableCell>
                 <TableCell><strong>📄 PDF / JSON</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedCvs.map((cv) => {
-                const json = cv.json;
-                const nombre = json?.informacion_personal?.nombre || "Desconocido";
+              {cvsFiltrados.map((cv) => {
+                const parsedJson = cv.json || { error: "JSON inválido" };
+                const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
                 return (
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
@@ -278,7 +253,7 @@ function ProcessedCVs() {
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>PDF</Button>
-                        <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(json, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
+                        <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", '&:hover': { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
                       </Stack>
                     </TableCell>
                   </TableRow>
@@ -288,10 +263,6 @@ function ProcessedCVs() {
           </Table>
         </TableContainer>
       )}
-
-      <Box mt={2} display="flex" justifyContent="center">
-        <Pagination count={totalPages} page={currentPage} onChange={(e, page) => setCurrentPage(page)} color="primary" />
-      </Box>
     </Box>
   );
 }
