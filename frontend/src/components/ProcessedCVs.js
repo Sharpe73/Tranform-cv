@@ -141,7 +141,7 @@ function ProcessedCVs() {
   }
 
   return (
-    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto" }}>
+    <Box sx={{ px: 2, py: 4, pb: 8, minHeight: "100vh", maxWidth: "1200px", mx: "auto" }}>
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
@@ -254,15 +254,9 @@ function ProcessedCVs() {
           <Table>
             <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
               <TableRow>
-                <TableCell>
-                  <strong>🧑 Nombre</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>🗓️ Fecha</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>📥 PDF / JSON</strong>
-                </TableCell>
+                <TableCell><strong>🧑 Nombre</strong></TableCell>
+                <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                <TableCell><strong>📥 PDF / JSON</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
