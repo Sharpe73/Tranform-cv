@@ -19,22 +19,22 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  Chip,
-  useMediaQuery,
-  Tabs,
-  Tab,
   TextField,
+  Typography,
+  ToggleButton,
+  ToggleButtonGroup,
+  useMediaQuery,
+  Chip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchMode, setSearchMode] = useState("name");
   const [searchName, setSearchName] = useState("");
   const [searchTags, setSearchTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
-  const [tab, setTab] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDialog, setOpenDialog] = useState(false);
   const [pin, setPin] = useState("");
@@ -42,7 +42,7 @@ function ProcessedCVs() {
   const isMobile = useMediaQuery("(max-width:600px)");
   const itemsPerPage = 10;
 
-  useEffect(() => {
+  const cargarCVs = () => {
     setLoading(true);
     fetch("https://tranform-cv.onrender.com/cv/list")
       .then((res) => res.json())
@@ -54,6 +54,10 @@ function ProcessedCVs() {
         console.error("Error al obtener CVs:", err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    cargarCVs();
   }, []);
 
   const descargarJSON = (json, nombre) => {
@@ -84,12 +88,24 @@ function ProcessedCVs() {
       });
   };
 
+  const handleOpenDialog = () => {
+    setPin("");
+    setPinError("");
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   const confirmarEliminacion = async () => {
     if (!pin) return;
     try {
       const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
         method: "POST",
-        headers: { "x-admin-secret": pin },
+        headers: {
+          "x-admin-secret": pin,
+        },
       });
       const data = await res.json();
       if (res.status === 200) {
@@ -97,13 +113,7 @@ function ProcessedCVs() {
         setPin("");
         setPinError("");
         alert(data.mensaje || "CVs eliminados correctamente");
-        setLoading(true);
-        fetch("https://tranform-cv.onrender.com/cv/list")
-          .then((res) => res.json())
-          .then((data) => {
-            setCvs(data);
-            setLoading(false);
-          });
+        cargarCVs();
       } else {
         setPinError("❌ PIN incorrecto");
       }
@@ -113,21 +123,29 @@ function ProcessedCVs() {
     }
   };
 
+  const handleAddTag = (e) => {
+    if (e.key === "Enter" && tagInput.trim()) {
+      setSearchTags([...searchTags, tagInput.trim().toLowerCase()]);
+      setTagInput("");
+    }
+  };
+
+  const handleDeleteTag = (tagToDelete) => {
+    setSearchTags(searchTags.filter((tag) => tag !== tagToDelete));
+  };
+
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
-    const matchName = nombre.toLowerCase().includes(searchName.toLowerCase());
-    const matchTags = searchTags.every((tag) =>
-      conocimientos.toLowerCase().includes(tag.toLowerCase())
-    );
-    return tab === 0 ? matchName : matchTags;
+    if (searchMode === "name") {
+      return nombre.toLowerCase().includes(searchName.toLowerCase());
+    } else {
+      return searchTags.every((tag) => conocimientos.toLowerCase().includes(tag));
+    }
   });
 
   const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
-  const paginatedCvs = filteredCvs.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedCvs = filteredCvs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   if (loading) {
     return (
@@ -139,69 +157,69 @@ function ProcessedCVs() {
   }
 
   return (
-    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto", minHeight: "100vh", pb: 8 }}>
-      <Typography variant="h4" gutterBottom>
-        📄 CVs Procesados
-      </Typography>
+    <Box sx={{ px: 2, py: 4, maxWidth: "1000px", mx: "auto", minHeight: "100vh", pb: 8 }}>
+      <Typography variant="h4" gutterBottom>📄 CVs Procesados</Typography>
 
-      <Box sx={{ mb: 2 }}>
-        <Tabs value={tab} onChange={(e, newValue) => setTab(newValue)} variant="fullWidth">
-          <Tab label="BUSCAR POR NOMBRE" />
-          <Tab label="BUSCAR POR TAGS" />
-        </Tabs>
+      <Box mb={2}>
+        <ToggleButtonGroup
+          value={searchMode}
+          exclusive
+          onChange={(e, value) => value && setSearchMode(value)}
+          sx={{ mb: 1, justifyContent: "center", display: "flex" }}
+        >
+          <ToggleButton value="name">BUSCAR POR NOMBRE</ToggleButton>
+          <ToggleButton value="tags">BUSCAR POR TAGS</ToggleButton>
+        </ToggleButtonGroup>
 
-        {tab === 0 ? (
+        {searchMode === "name" ? (
           <TextField
+            variant="outlined"
             placeholder="Buscar por nombre"
-            fullWidth
-            size="small"
-            margin="dense"
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
-            InputProps={{ startAdornment: <SearchIcon /> }}
+            fullWidth
+            size="small"
+            InputProps={{ startAdornment: <SearchIcon sx={{ mr: 1 }} /> }}
+            sx={{ mb: 2 }}
           />
         ) : (
-          <Box sx={{ mt: 1 }}>
+          <>
             <TextField
-              fullWidth
-              size="small"
+              variant="outlined"
               placeholder="Presiona Enter para agregar un tag (ej: Java)"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && tagInput.trim()) {
-                  setSearchTags([...searchTags, tagInput.trim()]);
-                  setTagInput("");
-                  e.preventDefault();
-                }
-              }}
+              onKeyDown={handleAddTag}
+              fullWidth
+              size="small"
+              sx={{ mb: 1 }}
             />
-            <Stack direction="row" spacing={1} mt={1} flexWrap="wrap">
-              {searchTags.map((tag, index) => (
-                <Chip
-                  key={index}
-                  label={tag}
-                  onDelete={() => {
-                    setSearchTags(searchTags.filter((_, i) => i !== index));
-                  }}
-                />
+            <Stack direction="row" spacing={1} flexWrap="wrap" mb={2}>
+              {searchTags.map((tag, i) => (
+                <Chip key={i} label={tag} onDelete={() => handleDeleteTag(tag)} color="primary" />
               ))}
             </Stack>
-          </Box>
+          </>
         )}
+
+        <Button
+          variant="contained"
+          startIcon={<DeleteIcon />}
+          onClick={handleOpenDialog}
+          sx={{
+            backgroundColor: "#d32f2f",
+            fontWeight: "bold",
+            width: "100%",
+            py: 1.4,
+            boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
+            "&:hover": { backgroundColor: "#b71c1c" },
+          }}
+        >
+          ELIMINAR TODOS LOS CVS
+        </Button>
       </Box>
 
-      <Button
-        fullWidth
-        variant="contained"
-        startIcon={<DeleteIcon />}
-        onClick={() => setOpenDialog(true)}
-        sx={{ backgroundColor: "#d32f2f", fontWeight: "bold", py: 1.5, "&:hover": { backgroundColor: "#b71c1c" } }}
-      >
-        ELIMINAR TODOS LOS CVS
-      </Button>
-
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Ingresa el PIN de seguridad</DialogTitle>
         <DialogContent>
           <TextField
@@ -217,42 +235,31 @@ function ProcessedCVs() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
-          <Button onClick={confirmarEliminacion} variant="contained" color="error">
-            Confirmar
-          </Button>
+          <Button onClick={handleCloseDialog}>Cancelar</Button>
+          <Button onClick={confirmarEliminacion} variant="contained" color="error">Confirmar</Button>
         </DialogActions>
       </Dialog>
 
       {isMobile ? (
-        <Stack spacing={2} mt={4}>
+        <Stack spacing={2}>
           {paginatedCvs.map((cv) => {
-            const json = cv.json || {};
-            const nombre = json.informacion_personal?.nombre || "Desconocido";
+            const json = cv.json;
+            const nombre = json?.informacion_personal?.nombre || "Desconocido";
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
-                <Typography sx={{ mb: 1 }}>📅 {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
+                <Typography sx={{ mb: 1 }}>🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
                 <Stack direction="row" spacing={1}>
-                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
-                    PDF
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<CodeIcon />}
-                    onClick={() => descargarJSON(json, nombre.replace(/\s/g, "_"))}
-                    sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}
-                  >
-                    JSON
-                  </Button>
+                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>PDF</Button>
+                  <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(json, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
                 </Stack>
               </Paper>
             );
           })}
         </Stack>
       ) : (
-        <TableContainer component={Paper} sx={{ mt: 4 }}>
-          <Table size="small">
+        <TableContainer component={Paper}>
+          <Table>
             <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
               <TableRow>
                 <TableCell><strong>🧑 Nombre</strong></TableCell>
@@ -262,26 +269,16 @@ function ProcessedCVs() {
             </TableHead>
             <TableBody>
               {paginatedCvs.map((cv) => {
-                const json = cv.json || {};
-                const nombre = json.informacion_personal?.nombre || "Desconocido";
+                const json = cv.json;
+                const nombre = json?.informacion_personal?.nombre || "Desconocido";
                 return (
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
                     <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button variant="contained" color="primary" size="small" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
-                          PDF
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<CodeIcon />}
-                          onClick={() => descargarJSON(json, nombre.replace(/\s/g, "_"))}
-                          sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}
-                        >
-                          JSON
-                        </Button>
+                        <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>PDF</Button>
+                        <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => descargarJSON(json, nombre.replace(/\s/g, "_"))} sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}>JSON</Button>
                       </Stack>
                     </TableCell>
                   </TableRow>
