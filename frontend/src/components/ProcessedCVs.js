@@ -30,7 +30,8 @@ import SearchIcon from "@mui/icons-material/Search";
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchName, setSearchName] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [openDialog, setOpenDialog] = useState(false);
@@ -56,21 +57,6 @@ function ProcessedCVs() {
   useEffect(() => {
     cargarCVs();
   }, []);
-
-  const handleTagKeyDown = (e) => {
-    if (e.key === "Enter" && e.target.value.trim()) {
-      const value = e.target.value.trim().toLowerCase();
-      if (!tags.includes(value)) {
-        setTags([...tags, value]);
-      }
-      e.target.value = "";
-      e.preventDefault();
-    }
-  };
-
-  const removeTag = (tagToRemove) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-  };
 
   const descargarJSON = (json, nombre) => {
     const blob = new Blob([JSON.stringify(json, null, 2)], {
@@ -112,11 +98,15 @@ function ProcessedCVs() {
 
   const confirmarEliminacion = async () => {
     if (!pin) return;
+
     try {
       const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
         method: "POST",
-        headers: { "x-admin-secret": pin },
+        headers: {
+          "x-admin-secret": pin,
+        },
       });
+
       const data = await res.json();
       if (res.status === 200) {
         setOpenDialog(false);
@@ -133,15 +123,20 @@ function ProcessedCVs() {
     }
   };
 
+  const handleDeleteTag = (index) => {
+    const newTags = [...tags];
+    newTags.splice(index, 1);
+    setTags(newTags);
+  };
+
   const filteredCvs = cvs.filter((cv) => {
-    const nombre = cv.json?.informacion_personal?.nombre?.toLowerCase() || "";
-    const conocimientos = (cv.json?.conocimientos_informaticos || [])
-      .map((c) => c.toLowerCase());
-
-    const nameMatch = nombre.includes(searchName.toLowerCase());
-    const tagMatch = tags.every((tag) => conocimientos.includes(tag));
-
-    return nameMatch && tagMatch;
+    const nombre = cv.json?.informacion_personal?.nombre || "";
+    const conocimientos = cv.json?.conocimientos_informaticos || [];
+    const searchMatch = nombre.toLowerCase().includes(searchTerm.toLowerCase());
+    const tagsMatch = tags.every((tag) =>
+      conocimientos.some((con) => con.toLowerCase().includes(tag))
+    );
+    return searchMatch && tagsMatch;
   });
 
   const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
@@ -165,13 +160,23 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box mb={2} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box
+        mb={2}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+          width: "100%",
+        }}
+      >
         <TextField
           variant="outlined"
           placeholder="Buscar por nombre"
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           size="small"
+          sx={{ maxWidth: 600, width: "100%" }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -184,18 +189,27 @@ function ProcessedCVs() {
         <TextField
           variant="outlined"
           placeholder="Presiona Enter para agregar un tag (ej: Java)"
-          onKeyDown={handleTagKeyDown}
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && tagInput.trim()) {
+              e.preventDefault();
+              setTags([...tags, tagInput.trim().toLowerCase()]);
+              setTagInput("");
+            }
+          }}
           size="small"
+          sx={{ maxWidth: 600, width: "100%" }}
         />
 
-        <Stack direction="row" spacing={1} flexWrap="wrap">
-          {tags.map((tag) => (
+        <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", maxWidth: 600 }}>
+          {tags.map((tag, index) => (
             <Chip
-              key={tag}
+              key={index}
               label={tag}
-              onDelete={() => removeTag(tag)}
+              onDelete={() => handleDeleteTag(index)}
               color="primary"
-              variant="outlined"
+              sx={{ mb: 1 }}
             />
           ))}
         </Stack>
@@ -207,7 +221,8 @@ function ProcessedCVs() {
           sx={{
             backgroundColor: "#d32f2f",
             fontWeight: "bold",
-            width: { xs: "100%", sm: "auto" },
+            width: "100%",
+            maxWidth: 600,
             px: 3,
             py: 1.2,
             boxShadow: "0 3px 6px rgba(0,0,0,0.2)",
@@ -246,7 +261,7 @@ function ProcessedCVs() {
       {isMobile ? (
         <Stack spacing={2}>
           {paginatedCvs.map((cv) => {
-            const parsedJson = cv.json || {};
+            const parsedJson = cv.json || { error: "JSON inválido" };
             const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
@@ -289,7 +304,7 @@ function ProcessedCVs() {
             </TableHead>
             <TableBody>
               {paginatedCvs.map((cv) => {
-                const parsedJson = cv.json || {};
+                const parsedJson = cv.json || { error: "JSON inválido" };
                 const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
                 return (
                   <TableRow key={cv.id}>
