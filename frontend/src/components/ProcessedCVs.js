@@ -20,6 +20,7 @@ import {
   TextField,
   Typography,
   useMediaQuery,
+  Chip,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
@@ -181,21 +182,35 @@ function ProcessedCVs() {
           sx={{ mb: 2 }}
         />
       ) : (
-        <TextField
-          variant="outlined"
-          placeholder="Presiona Enter para agregar un tag (ej: Java)"
-          value={tagInput}
-          onChange={(e) => setTagInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && tagInput.trim() !== "") {
-              setSearchTags([...searchTags, tagInput.trim()]);
-              setTagInput("");
-              e.preventDefault();
-            }
-          }}
-          fullWidth
-          sx={{ mb: 2 }}
-        />
+        <>
+          <TextField
+            variant="outlined"
+            placeholder="Presiona Enter para agregar un tag (ej: Java)"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && tagInput.trim() !== "") {
+                setSearchTags([...searchTags, tagInput.trim()]);
+                setTagInput("");
+                e.preventDefault();
+              }
+            }}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          <Stack direction="row" spacing={1} mb={2}>
+            {searchTags.map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                onDelete={() =>
+                  setSearchTags(searchTags.filter((_, i) => i !== index))
+                }
+                color="primary"
+              />
+            ))}
+          </Stack>
+        </>
       )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
