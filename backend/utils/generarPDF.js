@@ -93,11 +93,14 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     doc.moveDown(0.5); // espacio mínimo si no hay logo
   }
 
+  // Título centrado
   doc.fontSize(titleSize).fillColor(colorHeader).font(fontHeader).text(title, {
     align: "center",
     oblique: true,
   });
-  doc.moveDown(1);
+
+  // ✅ Ajuste manual para evitar acumulación de espacio innecesario
+  doc.y = doc.y + 10;
 
   function aplicarEstilosPagina() {
     if (estilos.backgroundColor) {
