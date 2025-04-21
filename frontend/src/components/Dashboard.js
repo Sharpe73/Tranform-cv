@@ -26,10 +26,10 @@ function Dashboard() {
     fetch(`${API_BASE_URL}/cv/consumo`)
       .then((res) => res.json())
       .then((data) => {
-        setConsumo(data.total || 0);
+        setConsumo(data?.total || 0);
       })
       .catch((error) => {
-        console.error("Error al obtener consumo:", error);
+        console.error("❌ Error al obtener consumo:", error);
       });
   }, []);
 
