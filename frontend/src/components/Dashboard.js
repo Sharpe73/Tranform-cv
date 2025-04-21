@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import API_BASE_URL from "../apiConfig";
 
 const CONSUMO_MAXIMO = 500;
 const COLORS = ["#1976d2", "#e0e0e0"];
@@ -22,7 +23,7 @@ function Dashboard() {
   const [consumo, setConsumo] = useState(0);
 
   useEffect(() => {
-    fetch("https://tranform-cv.onrender.com/cv/consumo")
+    fetch(`${API_BASE_URL}/cv/consumo`)
       .then((res) => res.json())
       .then((data) => {
         setConsumo(data.total || 0);

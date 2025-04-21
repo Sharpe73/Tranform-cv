@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { CloudUpload, PhotoCamera, Close } from "@mui/icons-material";
 
+
 function Config({ setConfig }) {
   const storedConfig = JSON.parse(localStorage.getItem("cvConfig")) || {};
 

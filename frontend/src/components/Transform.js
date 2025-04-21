@@ -6,6 +6,7 @@ import ConfigCard from "./ConfigCard";
 import UploadActions from "./UploadActions";
 import MessageDisplay from "./MessageDisplay";
 import DownloadLink from "./DownloadLink";
+import API_BASE_URL from "../apiConfig";
 
 function Transform() {
   const [file, setFile] = useState(null);
@@ -52,10 +53,10 @@ function Transform() {
     }
 
     try {
-      const response = await axios.post("https://tranform-cv.onrender.com/upload", formData);
+      const response = await axios.post(`${API_BASE_URL}/upload`, formData);
       setMessage("✅ Archivo procesado con éxito.");
       if (response.data?.pdfPath) {
-        setPdfLink(`https://tranform-cv.onrender.com/${response.data.pdfPath}`);
+        setPdfLink(`${API_BASE_URL}/${response.data.pdfPath}`);
       }
     } catch (error) {
       console.error("❌ Error al procesar el archivo:", error);

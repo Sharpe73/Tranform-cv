@@ -26,6 +26,7 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
+import API_BASE_URL from "../apiConfig"; // ✅ usamos constante
 
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
@@ -43,7 +44,7 @@ function ProcessedCVs() {
 
   const cargarCVs = () => {
     setLoading(true);
-    fetch("https://tranform-cv.onrender.com/cv/list")
+    fetch(`${API_BASE_URL}/cv/list`)
       .then((res) => res.json())
       .then((data) => {
         setCvs(data);
@@ -72,7 +73,7 @@ function ProcessedCVs() {
   };
 
   const descargarPDF = (id) => {
-    fetch(`https://tranform-cv.onrender.com/cv/pdf/${id}`)
+    fetch(`${API_BASE_URL}/cv/pdf/${id}`)
       .then((res) => res.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);
@@ -101,7 +102,7 @@ function ProcessedCVs() {
     if (!pin) return;
 
     try {
-      const res = await fetch("https://tranform-cv.onrender.com/admin/limpiar-cvs", {
+      const res = await fetch(`${API_BASE_URL}/admin/limpiar-cvs`, {
         method: "POST",
         headers: {
           "x-admin-secret": pin,
@@ -145,7 +146,14 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box display="flex" flexDirection={isMobile ? "column" : "row"} justifyContent="space-between" alignItems={isMobile ? "stretch" : "center"} gap={2} mb={2}>
+      <Box
+        display="flex"
+        flexDirection={isMobile ? "column" : "row"}
+        justifyContent="space-between"
+        alignItems={isMobile ? "stretch" : "center"}
+        gap={2}
+        mb={2}
+      >
         <Stack direction="row" spacing={1} justifyContent={isMobile ? "center" : "flex-start"}>
           <Button
             onClick={() => setTabValue("nombre")}
@@ -165,7 +173,16 @@ function ProcessedCVs() {
           variant="contained"
           startIcon={<DeleteIcon />}
           onClick={handleOpenDialog}
-          sx={{ backgroundColor: "#d32f2f", fontWeight: "bold", px: 3, py: 1.2, boxShadow: 2, width: isMobile ? "100%" : "auto", alignSelf: isMobile ? "center" : "auto", "&:hover": { backgroundColor: "#b71c1c" } }}
+          sx={{
+            backgroundColor: "#d32f2f",
+            fontWeight: "bold",
+            px: 3,
+            py: 1.2,
+            boxShadow: 2,
+            width: isMobile ? "100%" : "auto",
+            alignSelf: isMobile ? "center" : "auto",
+            "&:hover": { backgroundColor: "#b71c1c" },
+          }}
         >
           ELIMINAR TODOS LOS CVS
         </Button>
@@ -178,7 +195,13 @@ function ProcessedCVs() {
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
           fullWidth
-          InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
           sx={{ mb: 2 }}
         />
       ) : (
@@ -202,7 +225,9 @@ function ProcessedCVs() {
               <Chip
                 key={index}
                 label={tag}
-                onDelete={() => setSearchTags(searchTags.filter((_, i) => i !== index))}
+                onDelete={() =>
+                  setSearchTags(searchTags.filter((_, i) => i !== index))
+                }
                 color="primary"
               />
             ))}
@@ -246,16 +271,33 @@ function ProcessedCVs() {
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
-                <Typography sx={{ mb: 1 }}>🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}</Typography>
+                <Typography sx={{ mb: 1 }}>
+                  🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}
+                </Typography>
                 <Stack direction="row" spacing={1}>
-                  <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<PictureAsPdfIcon />}
+                    onClick={() => descargarPDF(cv.id)}
+                  >
                     PDF
                   </Button>
                   <Button
                     variant="outlined"
                     startIcon={<CodeIcon />}
-                    onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                    sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}
+                    onClick={() =>
+                      descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                    }
+                    sx={{
+                      color: "#f29111",
+                      borderColor: "#f29111",
+                      fontWeight: "bold",
+                      "&:hover": {
+                        backgroundColor: "#f29111",
+                        color: "#fff",
+                      },
+                    }}
                   >
                     JSON
                   </Button>
@@ -269,9 +311,15 @@ function ProcessedCVs() {
           <Table>
             <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
               <TableRow>
-                <TableCell><strong>🧑 Nombre</strong></TableCell>
-                <TableCell><strong>🗓️ Fecha</strong></TableCell>
-                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
+                <TableCell>
+                  <strong>🧑 Nombre</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>🗓️ Fecha</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>📄 PDF / JSON</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -281,17 +329,34 @@ function ProcessedCVs() {
                 return (
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
-                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                    <TableCell>
+                      {new Date(cv.created_at).toLocaleString("es-CL")}
+                    </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button variant="contained" color="primary" startIcon={<PictureAsPdfIcon />} onClick={() => descargarPDF(cv.id)}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<PictureAsPdfIcon />}
+                          onClick={() => descargarPDF(cv.id)}
+                        >
                           PDF
                         </Button>
                         <Button
                           variant="outlined"
                           startIcon={<CodeIcon />}
-                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                          sx={{ color: "#f29111", borderColor: "#f29111", fontWeight: "bold", "&:hover": { backgroundColor: "#f29111", color: "#fff" } }}
+                          onClick={() =>
+                            descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                          }
+                          sx={{
+                            color: "#f29111",
+                            borderColor: "#f29111",
+                            fontWeight: "bold",
+                            "&:hover": {
+                              backgroundColor: "#f29111",
+                              color: "#fff",
+                            },
+                          }}
                         >
                           JSON
                         </Button>
@@ -306,7 +371,12 @@ function ProcessedCVs() {
       )}
 
       <Box mt={2} display="flex" justifyContent="center">
-        <Pagination count={totalPages} page={currentPage} onChange={(e, page) => setCurrentPage(page)} color="primary" />
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={(e, page) => setCurrentPage(page)}
+          color="primary"
+        />
       </Box>
     </Box>
   );

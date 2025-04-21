@@ -10,6 +10,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
+import API_BASE_URL from "./apiConfig";
 
 function App() {
   const [config, setConfig] = useState({
@@ -21,7 +22,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("https://tranform-cv.onrender.com/styles")
+      .get(`${API_BASE_URL}/styles`)
       .then((response) => {
         if (response.data) {
           setConfig((prevConfig) => ({
