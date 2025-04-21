@@ -17,7 +17,9 @@ import {
 import API_BASE_URL from "../apiConfig";
 
 const CONSUMO_MAXIMO = 500;
-const COLORS = ["#1976d2", "#e0e0e0"];
+
+
+const COLORS = ["#1976d2", "#ffb74d"];
 
 function Dashboard() {
   const [consumo, setConsumo] = useState(0);
@@ -42,12 +44,32 @@ function Dashboard() {
   ];
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box
+      sx={{
+        p: 4,
+        minHeight: "100vh",
+        backgroundColor: "#f9fafc",
+      }}
+    >
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ textAlign: "center", fontWeight: "bold", color: "#1976d2" }}
+      >
         📊 Consumo de CVs Transformados
       </Typography>
 
-      <Paper elevation={4} sx={{ p: 3, maxWidth: 600, margin: "auto" }}>
+      <Paper
+        elevation={4}
+        sx={{
+          p: 3,
+          maxWidth: 600,
+          margin: "auto",
+          borderRadius: 4,
+          backgroundColor: "#ffffff", 
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
@@ -57,19 +79,26 @@ function Dashboard() {
               cx="50%"
               cy="50%"
               outerRadius={100}
-              label
+              label={({ name, value }) => `${name}: ${value}`}
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
             <Tooltip />
-            <Legend />
+            <Legend
+              verticalAlign="bottom"
+              iconType="circle"
+              wrapperStyle={{ marginTop: 20 }}
+            />
           </PieChart>
         </ResponsiveContainer>
 
         <Box mt={3}>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="subtitle1" gutterBottom sx={{ textAlign: "center" }}>
             Progreso mensual: {consumo} de {CONSUMO_MAXIMO} CVs ({porcentaje}%)
           </Typography>
           <MuiTooltip title={`${porcentaje}% utilizado`} arrow>
@@ -79,7 +108,7 @@ function Dashboard() {
               sx={{
                 height: 12,
                 borderRadius: 5,
-                backgroundColor: "#e0e0e0",
+                backgroundColor: "#eee",
                 "& .MuiLinearProgress-bar": {
                   backgroundColor: "#1976d2",
                 },
