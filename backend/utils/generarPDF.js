@@ -56,6 +56,9 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   doc.on("pageAdded", aplicarEstilosPagina);
   aplicarEstilosPagina();
 
+  const title = "CURRICULUM VITAE";
+  const titleSize = fontSize + 8;
+
   // Logo
   let logoBuffer;
   let width = 0;
@@ -72,23 +75,25 @@ async function generarPDF(datos, nombreArchivo, opciones) {
       width = Math.round(width * scaleFactor);
       height = Math.round(height * scaleFactor);
     }
-  }
 
-  if (logoBuffer) {
     const x = doc.page.width - doc.page.margins.right - width;
-    const logoY = doc.y;
+    const logoY = doc.y - (height - titleSize) / 2 - 20;
+
     if (estilos.backgroundColor) {
       doc.save();
       doc.rect(0, 0, doc.page.width, doc.page.height).fill(estilos.backgroundColor);
       doc.restore();
     }
+
     doc.image(logoBuffer, x, logoY, { width, height });
     console.log("✅ Logo insertado correctamente");
+
+    doc.moveDown(2); // solo si hay logo
+  } else {
+    doc.moveDown(0.5); // espacio mínimo si no hay logo
   }
 
-  // Título
-  const title = "CURRICULUM VITAE";
-  doc.fontSize(fontSize + 8).fillColor(colorHeader).font(fontHeader).text(title, {
+  doc.fontSize(titleSize).fillColor(colorHeader).font(fontHeader).text(title, {
     align: "center",
     oblique: true,
   });
