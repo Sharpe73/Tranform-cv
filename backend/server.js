@@ -10,11 +10,11 @@ const db = require("./database");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS configurado para permitir solo desde el frontend desplegado
+
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  methods: ["GET", "POST"],
+  credentials: true,
 }));
 
 app.use(express.json());
@@ -131,6 +131,7 @@ app.get("/cv/list", async (req, res) => {
   }
 });
 
+// 📊 Nueva ruta para consumo mensual
 app.get("/cv/consumo", async (req, res) => {
   try {
     const result = await db.query(`
@@ -139,7 +140,6 @@ app.get("/cv/consumo", async (req, res) => {
       WHERE DATE_PART('month', created_at) = DATE_PART('month', CURRENT_DATE)
         AND DATE_PART('year', created_at) = DATE_PART('year', CURRENT_DATE)
     `);
-
     res.json({ total: parseInt(result.rows[0].total, 10) });
   } catch (error) {
     console.error("❌ Error al obtener consumo mensual:", error.message);
