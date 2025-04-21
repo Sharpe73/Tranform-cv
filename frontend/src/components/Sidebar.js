@@ -14,8 +14,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import CloseIcon from "@mui/icons-material/Close";
-import BarChartIcon from "@mui/icons-material/BarChart"; // 👈 Ícono para Dashboard
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -76,6 +76,13 @@ function Sidebar() {
           </Box>
 
           <List>
+            <ListItem button onClick={() => handleNavigate("/dashboard")}>
+              <ListItemIcon>
+                <BarChartIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+            </ListItem>
+
             <ListItem button onClick={() => handleNavigate("/transform")}>
               <ListItemIcon>
                 <DescriptionIcon />
@@ -88,13 +95,6 @@ function Sidebar() {
                 <AssignmentIcon />
               </ListItemIcon>
               <ListItemText primary="CVs Procesados" />
-            </ListItem>
-
-            <ListItem button onClick={() => handleNavigate("/dashboard")}>
-              <ListItemIcon>
-                <BarChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
             </ListItem>
 
             <ListItem button onClick={() => handleNavigate("/")}>
