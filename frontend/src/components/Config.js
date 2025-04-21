@@ -21,7 +21,7 @@ function Config({ setConfig }) {
   const [logoBase64, setLogoBase64] = useState(storedConfig.logo || null);
   const [logoFileName, setLogoFileName] = useState(storedConfig.logoName || "No definido");
   const [fontHeader, setFontHeader] = useState(storedConfig.fontHeader || "Helvetica");
-  const [fontParagraph, setFontParagraph] = useState(storedConfig.fontParagraph || "Helvetica");
+  const [fontParagraph, setFontParagraph] = useState(storedConfig.fontParagraph || "Times New Roman");
   const [fontSize, setFontSize] = useState(storedConfig.fontSize || 12);
   const [colorHeader, setColorHeader] = useState(storedConfig.colorHeader || "#000000");
   const [colorParagraph, setColorParagraph] = useState(storedConfig.colorParagraph || "#000000");
@@ -108,7 +108,7 @@ function Config({ setConfig }) {
           🖼️ Logo
         </Typography>
         <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-        archivo <strong>PNG</strong> o <strong>SVG</strong>
+          archivo <strong>PNG</strong> o <strong>SVG</strong>
         </Typography>
 
         <Box
