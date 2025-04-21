@@ -16,14 +16,15 @@ Extrae la información en formato JSON con los siguientes campos si están prese
 {
   "informacion_personal": { "nombre": "", "telefono": "", "correo": "", "direccion": "", "linkedin": "" },
   "educacion": [{ "carrera": "", "institucion": "", "fecha_inicio": "", "fecha_fin": "" }],
-  "certificaciones": [], // OMITIR si no se encuentran datos relevantes
+  "certificaciones": [], // Incluye cualquier curso, diploma, certificado o certificación encontrado en el texto.
   "experiencia_laboral": [{ "empresa": "", "cargo": "", "fecha_inicio": "", "fecha_fin": "", "funciones": [] }],
   "idiomas": [{ "idioma": "", "nivel": "" }],
   "conocimientos_informaticos": []
 }
 
 Reglas importantes:
-- Si no se encuentra información relacionada con certificaciones (como certificados, certificaciones, diplomas, diplomados), OMITE el campo "certificaciones" del JSON completamente.
+- Si se encuentran textos que mencionen "certificado", "certificación", "certificaciones", "diploma", "diplomado", "curso" o "formación complementaria", inclúyelos en el campo "certificaciones" como elementos individuales. Si no se encuentra nada relevante, puedes dejar el array vacío.
+- No ignores la sección si el título contiene palabras como "certificaciones y cursos", "formación complementaria", "formación adicional", "cursos realizados", etc.
 - Todo el contenido debe estar formateado con el tamaño de letra definido por el usuario (por ejemplo: 12). No uses el tamaño del documento original.
 - Corrige palabras totalmente en mayúsculas como "EXPERIENCIA LABORAL" → "Experiencia laboral". Mantén siglas como QA o HTML completamente en mayúscula.
 - Cualquier texto relacionado con "certificados", "certificaciones", "diplomas" o "diplomados" debe ir en "certificaciones", incluso si aparece en otra sección del CV.
