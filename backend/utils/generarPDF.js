@@ -99,8 +99,10 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     oblique: true,
   });
 
-  // ✅ Ajuste manual para evitar acumulación de espacio innecesario
-  doc.y = doc.y + 10;
+  
+  if (doc.y > 200) {
+    doc.y = 120;
+  }
 
   function aplicarEstilosPagina() {
     if (estilos.backgroundColor) {
