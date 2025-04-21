@@ -26,7 +26,7 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
-import API_BASE_URL from "../apiConfig"; // ✅ usamos constante
+import API_BASE_URL from "../apiConfig";
 
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
