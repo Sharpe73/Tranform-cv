@@ -10,7 +10,6 @@ const db = require("./database");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
   methods: ["GET", "POST"],
@@ -131,15 +130,21 @@ app.get("/cv/list", async (req, res) => {
   }
 });
 
-// 📊 Nueva ruta para consumo mensual
+// 📊 Ruta actualizada para consumo mensual
 app.get("/cv/consumo", async (req, res) => {
   try {
-    const result = await db.query(`
-      SELECT COUNT(*) AS total
-      FROM cv_files
-      WHERE DATE_PART('month', created_at) = DATE_PART('month', CURRENT_DATE)
-        AND DATE_PART('year', created_at) = DATE_PART('year', CURRENT_DATE)
-    `);
+    const inicioMes = new Date();
+    inicioMes.setUTCDate(1);
+    inicioMes.setUTCHours(0, 0, 0, 0);
+
+    const finMes = new Date(inicioMes);
+    finMes.setUTCMonth(finMes.getUTCMonth() + 1);
+
+    const result = await db.query(
+      `SELECT COUNT(*) AS total FROM cv_files WHERE created_at >= $1 AND created_at < $2`,
+      [inicioMes.toISOString(), finMes.toISOString()]
+    );
+
     res.json({ total: parseInt(result.rows[0].total, 10) });
   } catch (error) {
     console.error("❌ Error al obtener consumo mensual:", error.message);
