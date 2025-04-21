@@ -1,3 +1,4 @@
+
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
@@ -85,8 +86,6 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     }
 
     doc.image(logoBuffer, x, logoY, { width, height });
-    console.log("✅ Logo insertado correctamente");
-
     doc.moveDown(2);
   } else {
     doc.moveDown(0.5);
@@ -97,9 +96,7 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     oblique: true,
   });
 
-  if (doc.y > 200) {
-    doc.y = 120;
-  }
+  if (doc.y > 200) doc.y = 120;
 
   function aplicarEstilosPagina() {
     if (estilos.backgroundColor) {
@@ -109,32 +106,54 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     doc.y = doc.page.margins.top;
   }
 
-  function agregarSeccion(titulo, contenido) {
+  function agregarSeccionSimple(titulo, contenido) {
     const anchoTexto = doc.page.width - doc.page.margins.left - doc.page.margins.right;
-
-    // Primero imprimimos el título, asegurándonos de que no se pierda
-    doc.moveDown(1);
-    doc.font(fontHeader).fillColor(colorHeader).fontSize(fontSize + 2).text(corregirTexto(titulo), {
-      underline: true,
-      width: anchoTexto,
-    });
-    doc.moveDown(0.5);
-
-    // Ahora evaluamos si hay suficiente espacio para el contenido, no para el título
     const alturaTexto = doc.heightOfString(contenido || "No especificado", {
       width: anchoTexto,
       align: "justify",
     });
+    const espacioRequerido = alturaTexto + 3 * (fontSize + 4);
     const espacioDisponible = doc.page.height - doc.y - doc.page.margins.bottom;
+    if (espacioDisponible < espacioRequerido) doc.addPage();
 
-    if (espacioDisponible < alturaTexto) {
-      doc.addPage();
-    }
-
+    doc.moveDown(1);
+    doc.font(fontHeader).fillColor(colorHeader).fontSize(fontSize + 2).text(corregirTexto(titulo), {
+      underline: true,
+    });
+    doc.moveDown(0.5);
     doc.font(fontParagraph).fontSize(fontSize).fillColor(colorParagraph).text(contenido || "No especificado", {
       align: "justify",
       width: anchoTexto,
     });
+    doc.moveDown(1);
+  }
+
+  function agregarExperienciaLaboral(titulo, lista) {
+    const anchoTexto = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+    doc.moveDown(1);
+    doc.font(fontHeader).fillColor(colorHeader).fontSize(fontSize + 2).text(corregirTexto(titulo), {
+      underline: true,
+    });
+    doc.moveDown(0.5);
+    doc.font(fontParagraph).fontSize(fontSize).fillColor(colorParagraph);
+
+    ordenarPorFecha(lista).forEach(item => {
+      const fecha_inicio = item.fecha_inicio || "";
+      const fecha_fin = item.fecha_fin || "";
+      const fechas = fecha_inicio && fecha_fin ? `${fecha_inicio} - ${fecha_fin}` : fecha_inicio || fecha_fin;
+      const encabezado = `${corregirTexto(item.cargo)} en ${corregirTexto(item.empresa)}${fechas ? " (" + fechas + ")" : ""}`;
+      const funciones = Array.isArray(item.funciones)
+        ? item.funciones.map(f => `- ${corregirTexto(f)}`).join("\n")
+        : "No especificado";
+      const bloque = `${encabezado}\nFunciones:\n${funciones}\n\n`;
+
+      const altura = doc.heightOfString(bloque, { width: anchoTexto, align: "justify" });
+      const disponible = doc.page.height - doc.y - doc.page.margins.bottom;
+      if (disponible < altura) doc.addPage();
+
+      doc.text(bloque, { width: anchoTexto, align: "justify" });
+    });
+
     doc.moveDown(1);
   }
 
@@ -150,7 +169,7 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     return ordenarPorFecha(lista, true).map(item => {
       const fecha_inicio = item.fecha_inicio || "";
       const fecha_fin = item.fecha_fin || "";
-      let fecha = fecha_inicio && fecha_fin ? `${fecha_inicio} - ${fecha_fin}` : fecha_inicio || fecha_fin;
+      const fecha = fecha_inicio && fecha_fin ? `${fecha_inicio} - ${fecha_fin}` : fecha_inicio || fecha_fin;
       const detalle = `${corregirTexto(item.carrera)}${item.institucion ? ", " + corregirTexto(item.institucion) : ""}`;
       return `${fecha}    ${detalle}`;
     }).join("\n");
@@ -158,17 +177,6 @@ async function generarPDF(datos, nombreArchivo, opciones) {
 
   function formatearListaConFormato(lista, ...campos) {
     return (lista || []).map(item => campos.map(campo => corregirTexto(item[campo])).join(" - ")).join("\n");
-  }
-
-  function formatearListaConViñetas(lista, ...campos) {
-    return ordenarPorFecha(lista).map(item => {
-      const fecha_inicio = item[campos[2]] || "";
-      const fecha_fin = item[campos[3]] || "";
-      let fechas = fecha_inicio && fecha_fin ? `${fecha_inicio} - ${fecha_fin}` : fecha_inicio || fecha_fin;
-      const encabezado = `${corregirTexto(item[campos[0]])} en ${corregirTexto(item[campos[1]])}${fechas ? " (" + fechas + ")" : ""}`;
-      const funciones = Array.isArray(item[campos[4]]) ? item[campos[4]].map(f => `- ${corregirTexto(f)}`).join("\n") : "No especificado";
-      return `${encabezado}\nFunciones:\n${funciones}`;
-    }).join("\n\n");
   }
 
   function formatearConocimientos(lista) {
@@ -185,14 +193,14 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   datos.idiomas = aplicarCorreccionesALista(datos.idiomas);
   datos.conocimientos_informaticos = datos.conocimientos_informaticos?.map(corregirTexto);
 
-  agregarSeccion("Información Personal", `Nombre: ${corregirTexto(datos.informacion_personal?.nombre)}`);
-  agregarSeccion("Educación", formatearEducacionConFechas(datos.educacion));
+  agregarSeccionSimple("Información Personal", `Nombre: ${corregirTexto(datos.informacion_personal?.nombre)}`);
+  agregarSeccionSimple("Educación", formatearEducacionConFechas(datos.educacion));
   if (datos.certificaciones && datos.certificaciones.length > 0) {
-    agregarSeccion("Certificaciones", formatearCertificaciones(datos.certificaciones));
+    agregarSeccionSimple("Certificaciones", formatearCertificaciones(datos.certificaciones));
   }
-  agregarSeccion("Experiencia Laboral", formatearListaConViñetas(datos.experiencia_laboral, "cargo", "empresa", "fecha_inicio", "fecha_fin", "funciones"));
-  agregarSeccion("Idiomas", formatearListaConFormato(datos.idiomas, "idioma", "nivel"));
-  agregarSeccion("Conocimientos Informáticos", formatearConocimientos(datos.conocimientos_informaticos));
+  agregarExperienciaLaboral("Experiencia Laboral", datos.experiencia_laboral);
+  agregarSeccionSimple("Idiomas", formatearListaConFormato(datos.idiomas, "idioma", "nivel"));
+  agregarSeccionSimple("Conocimientos Informáticos", formatearConocimientos(datos.conocimientos_informaticos));
 
   doc.end();
   return new Promise(resolve => writeStream.on("finish", () => resolve(pdfPath)));
