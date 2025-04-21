@@ -56,10 +56,7 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   doc.on("pageAdded", aplicarEstilosPagina);
   aplicarEstilosPagina();
 
-  doc.moveDown(1);
-  const logoY = doc.y;
-  const titleSize = fontSize + 8;
-
+  // Logo
   let logoBuffer;
   let width = 0;
   let height = 0;
@@ -77,29 +74,25 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     }
   }
 
-  const title = "CURRICULUM VITAE";
-  const titleY = logoY + 10;
-
   if (logoBuffer) {
     const x = doc.page.width - doc.page.margins.right - width;
-    const logoAlignedY = titleY - (height - titleSize) / 2 - 20;
+    const logoY = doc.y;
     if (estilos.backgroundColor) {
       doc.save();
       doc.rect(0, 0, doc.page.width, doc.page.height).fill(estilos.backgroundColor);
       doc.restore();
     }
-    doc.image(logoBuffer, x, logoAlignedY, { width, height });
+    doc.image(logoBuffer, x, logoY, { width, height });
     console.log("✅ Logo insertado correctamente");
   }
 
-  doc.fontSize(titleSize).fillColor(colorHeader).font(fontHeader).text(title, {
+  // Título
+  const title = "CURRICULUM VITAE";
+  doc.fontSize(fontSize + 8).fillColor(colorHeader).font(fontHeader).text(title, {
     align: "center",
     oblique: true,
   });
   doc.moveDown(1);
-
-  
-  doc.y = Math.max(doc.y, logoBuffer ? titleY + height + 10 : doc.y);
 
   function aplicarEstilosPagina() {
     if (estilos.backgroundColor) {
@@ -118,12 +111,8 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     const espacioRequerido = alturaTexto + 3 * (fontSize + 4);
     const espacioDisponible = doc.page.height - doc.y - doc.page.margins.bottom;
 
-    
-    const umbralMinimo = 100; 
     if (espacioDisponible < espacioRequerido) {
-      if (!(espacioDisponible > umbralMinimo && espacioRequerido < 250)) {
-        doc.addPage();
-      }
+      doc.addPage();
     }
 
     doc.moveDown(1);
