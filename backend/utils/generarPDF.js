@@ -59,7 +59,6 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   const title = "CURRICULUM VITAE";
   const titleSize = fontSize + 8;
 
-  // Logo
   let logoBuffer;
   let width = 0;
   let height = 0;
@@ -88,18 +87,16 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     doc.image(logoBuffer, x, logoY, { width, height });
     console.log("✅ Logo insertado correctamente");
 
-    doc.moveDown(2); // solo si hay logo
+    doc.moveDown(2);
   } else {
-    doc.moveDown(0.5); // espacio mínimo si no hay logo
+    doc.moveDown(0.5);
   }
 
-  // Título centrado
   doc.fontSize(titleSize).fillColor(colorHeader).font(fontHeader).text(title, {
     align: "center",
     oblique: true,
   });
 
-  
   if (doc.y > 200) {
     doc.y = 120;
   }
@@ -114,23 +111,26 @@ async function generarPDF(datos, nombreArchivo, opciones) {
 
   function agregarSeccion(titulo, contenido) {
     const anchoTexto = doc.page.width - doc.page.margins.left - doc.page.margins.right;
-    const alturaTexto = doc.heightOfString(contenido || "No especificado", {
-      width: anchoTexto,
-      align: "justify",
-    });
-    const espacioRequerido = alturaTexto + 3 * (fontSize + 4);
-    const espacioDisponible = doc.page.height - doc.y - doc.page.margins.bottom;
 
-    if (espacioDisponible < espacioRequerido) {
-      doc.addPage();
-    }
-
+    // Primero imprimimos el título, asegurándonos de que no se pierda
     doc.moveDown(1);
     doc.font(fontHeader).fillColor(colorHeader).fontSize(fontSize + 2).text(corregirTexto(titulo), {
       underline: true,
       width: anchoTexto,
     });
     doc.moveDown(0.5);
+
+    // Ahora evaluamos si hay suficiente espacio para el contenido, no para el título
+    const alturaTexto = doc.heightOfString(contenido || "No especificado", {
+      width: anchoTexto,
+      align: "justify",
+    });
+    const espacioDisponible = doc.page.height - doc.y - doc.page.margins.bottom;
+
+    if (espacioDisponible < alturaTexto) {
+      doc.addPage();
+    }
+
     doc.font(fontParagraph).fontSize(fontSize).fillColor(colorParagraph).text(contenido || "No especificado", {
       align: "justify",
       width: anchoTexto,
