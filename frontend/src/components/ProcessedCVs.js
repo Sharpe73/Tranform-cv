@@ -44,7 +44,9 @@ function ProcessedCVs() {
 
   const cargarCVs = () => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/cv/list`)
+    fetch(`${API_BASE_URL}/cv/list`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         setCvs(data);
@@ -73,7 +75,9 @@ function ProcessedCVs() {
   };
 
   const descargarPDF = (id) => {
-    fetch(`${API_BASE_URL}/cv/pdf/${id}`)
+    fetch(`${API_BASE_URL}/cv/pdf/${id}`, {
+      credentials: "include",
+    })
       .then((res) => res.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);
@@ -107,6 +111,7 @@ function ProcessedCVs() {
         headers: {
           "x-admin-secret": pin,
         },
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -225,9 +230,7 @@ function ProcessedCVs() {
               <Chip
                 key={index}
                 label={tag}
-                onDelete={() =>
-                  setSearchTags(searchTags.filter((_, i) => i !== index))
-                }
+                onDelete={() => setSearchTags(searchTags.filter((_, i) => i !== index))}
                 color="primary"
               />
             ))}
@@ -286,9 +289,7 @@ function ProcessedCVs() {
                   <Button
                     variant="outlined"
                     startIcon={<CodeIcon />}
-                    onClick={() =>
-                      descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
-                    }
+                    onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
                     sx={{
                       color: "#f29111",
                       borderColor: "#f29111",
@@ -311,15 +312,9 @@ function ProcessedCVs() {
           <Table>
             <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
               <TableRow>
-                <TableCell>
-                  <strong>🧑 Nombre</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>🗓️ Fecha</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>📄 PDF / JSON</strong>
-                </TableCell>
+                <TableCell><strong>🧑 Nombre</strong></TableCell>
+                <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -329,9 +324,7 @@ function ProcessedCVs() {
                 return (
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
-                    <TableCell>
-                      {new Date(cv.created_at).toLocaleString("es-CL")}
-                    </TableCell>
+                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <Button
@@ -345,9 +338,7 @@ function ProcessedCVs() {
                         <Button
                           variant="outlined"
                           startIcon={<CodeIcon />}
-                          onClick={() =>
-                            descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
-                          }
+                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
                           sx={{
                             color: "#f29111",
                             borderColor: "#f29111",

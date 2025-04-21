@@ -22,7 +22,9 @@ function App() {
 
   useEffect(() => {
     axios
-      .get(`${API_BASE_URL}/styles`)
+      .get(`${API_BASE_URL}/styles`, {
+        withCredentials: true, // ✅ Solución CORS: incluir credenciales
+      })
       .then((response) => {
         if (response.data) {
           setConfig((prevConfig) => ({

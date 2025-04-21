@@ -53,7 +53,9 @@ function Transform() {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/upload`, formData);
+      const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
+        withCredentials: true, // ✅ Solución CORS: incluir credenciales en la subida
+      });
       setMessage("✅ Archivo procesado con éxito.");
       if (response.data?.pdfPath) {
         setPdfLink(`${API_BASE_URL}/${response.data.pdfPath}`);

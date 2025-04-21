@@ -17,15 +17,15 @@ import {
 import API_BASE_URL from "../apiConfig";
 
 const CONSUMO_MAXIMO = 500;
-
-
 const COLORS = ["#1976d2", "#ffb74d"];
 
 function Dashboard() {
   const [consumo, setConsumo] = useState(0);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/cv/consumo`)
+    fetch(`${API_BASE_URL}/cv/consumo`, {
+      credentials: "include", // ✅ importante para evitar error CORS
+    })
       .then((res) => res.json())
       .then((data) => {
         setConsumo(data?.total || 0);
@@ -66,7 +66,7 @@ function Dashboard() {
           maxWidth: 600,
           margin: "auto",
           borderRadius: 4,
-          backgroundColor: "#ffffff", 
+          backgroundColor: "#ffffff",
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         }}
       >
