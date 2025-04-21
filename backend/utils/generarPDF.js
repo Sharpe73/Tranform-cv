@@ -98,6 +98,9 @@ async function generarPDF(datos, nombreArchivo, opciones) {
   });
   doc.moveDown(1);
 
+  
+  doc.y = Math.max(doc.y, logoBuffer ? titleY + height + 10 : doc.y);
+
   function aplicarEstilosPagina() {
     if (estilos.backgroundColor) {
       doc.rect(0, 0, doc.page.width, doc.page.height).fill(estilos.backgroundColor);
@@ -114,7 +117,14 @@ async function generarPDF(datos, nombreArchivo, opciones) {
     });
     const espacioRequerido = alturaTexto + 3 * (fontSize + 4);
     const espacioDisponible = doc.page.height - doc.y - doc.page.margins.bottom;
-    if (espacioDisponible < espacioRequerido) doc.addPage();
+
+    
+    const umbralMinimo = 100; 
+    if (espacioDisponible < espacioRequerido) {
+      if (!(espacioDisponible > umbralMinimo && espacioRequerido < 250)) {
+        doc.addPage();
+      }
+    }
 
     doc.moveDown(1);
     doc.font(fontHeader).fillColor(colorHeader).fontSize(fontSize + 2).text(corregirTexto(titulo), {
