@@ -10,7 +10,13 @@ const db = require("./database");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// ✅ CORS configurado para permitir solo desde el frontend desplegado
+app.use(cors({
+  origin: "https://tranform-cv.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -54,7 +60,7 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
 
     const rawData = fs.readFileSync(jsonPath, "utf-8");
     const jsonData = JSON.stringify(JSON.parse(rawData));
-    const pdfBuffer = fs.readFileSync(pdfPath); 
+    const pdfBuffer = fs.readFileSync(pdfPath);
     const timestamp = new Date().toISOString();
 
     await db.query(
@@ -124,7 +130,6 @@ app.get("/cv/list", async (req, res) => {
     res.status(500).json({ message: "Error al obtener CVs desde la base de datos." });
   }
 });
-
 
 app.get("/cv/consumo", async (req, res) => {
   try {
