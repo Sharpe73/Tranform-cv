@@ -126,6 +126,22 @@ app.get("/cv/list", async (req, res) => {
 });
 
 
+app.get("/cv/consumo", async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT COUNT(*) AS total
+      FROM cv_files
+      WHERE DATE_PART('month', created_at) = DATE_PART('month', CURRENT_DATE)
+        AND DATE_PART('year', created_at) = DATE_PART('year', CURRENT_DATE)
+    `);
+
+    res.json({ total: parseInt(result.rows[0].total, 10) });
+  } catch (error) {
+    console.error("❌ Error al obtener consumo mensual:", error.message);
+    res.status(500).json({ error: "Error al obtener consumo mensual" });
+  }
+});
+
 app.post("/admin/limpiar-cvs", async (req, res) => {
   const pin = req.headers["x-admin-secret"];
 

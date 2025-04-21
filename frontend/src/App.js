@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar";
 import Config from "./components/Config";
 import Transform from "./components/Transform";
 import ProcessedCVs from "./components/ProcessedCVs";
+import Dashboard from "./components/Dashboard";
 import axios from "axios";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
@@ -42,7 +43,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Config config={config} setConfig={setConfig} />} />
               <Route path="/transform" element={<Transform config={config} />} />
-              <Route path="/procesados" element={<ProcessedCVs />} /> {/* 👈 Nueva ruta */}
+              <Route path="/procesados" element={<ProcessedCVs />} />
+              <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </Box>
         </Box>
