@@ -54,7 +54,7 @@ function Transform() {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
-        withCredentials: true, // ✅ Solución CORS: incluir credenciales en la subida
+        withCredentials: true,
       });
       setMessage("✅ Archivo procesado con éxito.");
       if (response.data?.pdfPath) {
@@ -62,7 +62,12 @@ function Transform() {
       }
     } catch (error) {
       console.error("❌ Error al procesar el archivo:", error);
-      setMessage("❌ Hubo un error al procesar el archivo. Inténtalo nuevamente.");
+
+      if (error.response?.status === 404) {
+        setMessage("⚠️ Este archivo no contiene texto reconocible. Asegúrate de subir un CV en formato texto, no escaneado como imagen.");
+      } else {
+        setMessage("❌ Hubo un error al procesar el archivo. Inténtalo nuevamente.");
+      }
     } finally {
       setIsUploading(false);
     }
