@@ -1,4 +1,3 @@
-
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
@@ -15,7 +14,13 @@ function cargarEstilos(plantilla) {
 function corregirTexto(texto) {
   if (!texto || typeof texto !== "string") return "";
   if (texto.length <= 4 && texto === texto.toUpperCase()) return texto;
-  if (texto === texto.toUpperCase()) return texto.charAt(0) + texto.slice(1).toLowerCase();
+  if (texto === texto.toUpperCase()) {
+    return texto
+      .toLowerCase()
+      .split(" ")
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(" ");
+  }
   return texto;
 }
 
