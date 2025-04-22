@@ -28,6 +28,19 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import API_BASE_URL from "../apiConfig";
 
+function capitalizarTexto(texto) {
+  if (!texto || typeof texto !== "string") return "";
+  if (texto.length <= 4 && texto === texto.toUpperCase()) return texto;
+  if (texto === texto.toUpperCase()) {
+    return texto
+      .toLowerCase()
+      .split(" ")
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(" ");
+  }
+  return texto;
+}
+
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -270,7 +283,8 @@ function ProcessedCVs() {
         <Stack spacing={2}>
           {paginatedCvs.map((cv) => {
             const parsedJson = cv.json || {};
-            const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
+            const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
+            const nombre = capitalizarTexto(nombreOriginal);
             return (
               <Paper key={cv.id} sx={{ p: 2 }}>
                 <Typography fontWeight="bold">🧑 {nombre}</Typography>
@@ -320,7 +334,8 @@ function ProcessedCVs() {
             <TableBody>
               {paginatedCvs.map((cv) => {
                 const parsedJson = cv.json || {};
-                const nombre = parsedJson?.informacion_personal?.nombre || "Desconocido";
+                const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
+                const nombre = capitalizarTexto(nombreOriginal);
                 return (
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
