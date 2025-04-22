@@ -71,7 +71,8 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
     res.json({ message: "Archivo procesado con éxito.", pdfPath: pdfUrl });
   } catch (error) {
     console.error("❌ Error al procesar el archivo:", error.message);
-    res.status(500).json({ message: "Error al procesar el archivo." });
+    const status = error.statusCode || 500;
+    res.status(status).json({ message: error.message || "Error al procesar el archivo." });
   }
 });
 

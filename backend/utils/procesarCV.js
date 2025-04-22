@@ -19,11 +19,16 @@ async function procesarCV(rutaArchivo, opciones) {
       const result = await mammoth.extractRawText({ buffer: data });
       textoExtraido = result.value;
     } else {
-      throw new Error(`Formato no soportado (${rutaArchivo})`);
+      const error = new Error(`Formato no soportado (${rutaArchivo})`);
+      error.statusCode = 400;
+      throw error;
     }
 
-    if (!textoExtraido.trim()) {
-      throw new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
+    
+    if (!textoExtraido || textoExtraido.trim().length < 10) {
+      const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
+      error.statusCode = 404;
+      throw error;
     }
 
     console.log("🔍 Texto extraído (primeros 300 caracteres):", textoExtraido.substring(0, 300));
@@ -33,7 +38,9 @@ async function procesarCV(rutaArchivo, opciones) {
     console.log("🧠 Respuesta OpenAI:", datosEstructurados);
 
     if (!datosEstructurados) {
-      throw new Error("No se pudo generar el JSON con OpenAI.");
+      const error = new Error("No se pudo generar el JSON con OpenAI.");
+      error.statusCode = 500;
+      throw error;
     }
 
     if (!datosEstructurados.informacion_personal) {
