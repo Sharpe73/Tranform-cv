@@ -23,7 +23,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import CloseIcon from "@mui/icons-material/Close";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ function Sidebar() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decoded = jwt_decode(token);
+        const decoded = jwtDecode(token);
         setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
         if (decoded.rol === "admin") {
           setIsAdmin(true);
