@@ -39,8 +39,8 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // ✅ Recarga para reactivar los efectos del token en App.js
-      window.location.href = "/";
+      // ✅ Esta es la clave para que App.js se recargue completamente
+      window.location.replace("/");
     } catch (err) {
       setError(
         err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
