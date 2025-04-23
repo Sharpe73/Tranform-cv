@@ -3,11 +3,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  InputAdornment,
   Pagination,
   Paper,
   Stack,
@@ -19,13 +14,15 @@ import {
   TableRow,
   TextField,
   Typography,
-  useMediaQuery,
+  InputAdornment,
   Chip,
+  useMediaQuery,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
+import jwt_decode from "jwt-decode";
 import API_BASE_URL from "../apiConfig";
 
 function capitalizarTexto(texto) {
@@ -35,7 +32,7 @@ function capitalizarTexto(texto) {
     return texto
       .toLowerCase()
       .split(" ")
-      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
       .join(" ");
   }
   return texto;
@@ -49,17 +46,25 @@ function ProcessedCVs() {
   const [tagInput, setTagInput] = useState("");
   const [tabValue, setTabValue] = useState("nombre");
   const [currentPage, setCurrentPage] = useState(1);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [pin, setPin] = useState("");
-  const [pinError, setPinError] = useState("");
   const isMobile = useMediaQuery("(max-width:600px)");
   const itemsPerPage = 10;
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwt_decode(token);
+        setIsAdmin(decoded.rol === "admin");
+      } catch (err) {
+        console.error("Token inválido");
+      }
+    }
+  }, []);
 
   const cargarCVs = () => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/cv/list`, {
-      credentials: "include",
-    })
+    fetch(`${API_BASE_URL}/cv/list`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
         setCvs(data);
@@ -76,9 +81,7 @@ function ProcessedCVs() {
   }, []);
 
   const descargarJSON = (json, nombre) => {
-    const blob = new Blob([JSON.stringify(json, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -88,9 +91,7 @@ function ProcessedCVs() {
   };
 
   const descargarPDF = (id) => {
-    fetch(`${API_BASE_URL}/cv/pdf/${id}`, {
-      credentials: "include",
-    })
+    fetch(`${API_BASE_URL}/cv/pdf/${id}`, { credentials: "include" })
       .then((res) => res.blob())
       .then((blob) => {
         const url = URL.createObjectURL(blob);
@@ -100,53 +101,32 @@ function ProcessedCVs() {
         a.click();
         URL.revokeObjectURL(url);
       })
-      .catch((err) => {
-        console.error("❌ Error al descargar PDF:", err);
-      });
+      .catch((err) => console.error("❌ Error al descargar PDF:", err));
   };
 
-  const handleOpenDialog = () => {
-    setPin("");
-    setPinError("");
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  const confirmarEliminacion = async () => {
-    if (!pin) return;
-
+  const eliminarCVs = async () => {
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/admin/limpiar-cvs`, {
         method: "POST",
         headers: {
-          "x-admin-secret": pin,
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
       });
-
       const data = await res.json();
       if (res.status === 200) {
-        setOpenDialog(false);
-        setPin("");
-        setPinError("");
         alert(data.mensaje || "CVs eliminados correctamente");
         cargarCVs();
-      } else {
-        setPinError("❌ PIN incorrecto");
       }
     } catch (err) {
-      setPinError("❌ Error al eliminar los CVs");
-      console.error(err);
+      console.error("❌ Error al eliminar los CVs:", err);
     }
   };
 
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
-
     return tabValue === "nombre"
       ? nombre.toLowerCase().includes(searchName.toLowerCase())
       : searchTags.every((tag) => conocimientos.toLowerCase().includes(tag.toLowerCase()));
@@ -164,15 +144,8 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
-      <Box
-        display="flex"
-        flexDirection={isMobile ? "column" : "row"}
-        justifyContent="space-between"
-        alignItems={isMobile ? "stretch" : "center"}
-        gap={2}
-        mb={2}
-      >
-        <Stack direction="row" spacing={1} justifyContent={isMobile ? "center" : "flex-start"}>
+      <Box display="flex" flexDirection={isMobile ? "column" : "row"} justifyContent="space-between" alignItems={isMobile ? "stretch" : "center"} gap={2} mb={2}>
+        <Stack direction="row" spacing={1}>
           <Button
             onClick={() => setTabValue("nombre")}
             variant={tabValue === "nombre" ? "contained" : "text"}
@@ -190,16 +163,17 @@ function ProcessedCVs() {
         <Button
           variant="contained"
           startIcon={<DeleteIcon />}
-          onClick={handleOpenDialog}
+          onClick={eliminarCVs}
+          disabled={!isAdmin}
           sx={{
-            backgroundColor: "#d32f2f",
+            backgroundColor: isAdmin ? "#d32f2f" : "#ccc",
             fontWeight: "bold",
             px: 3,
             py: 1.2,
             boxShadow: 2,
-            width: isMobile ? "100%" : "auto",
-            alignSelf: isMobile ? "center" : "auto",
-            "&:hover": { backgroundColor: "#b71c1c" },
+            color: isAdmin ? "#fff" : "#666",
+            cursor: isAdmin ? "pointer" : "not-allowed",
+            "&:hover": isAdmin ? { backgroundColor: "#b71c1c" } : {},
           }}
         >
           ELIMINAR TODOS LOS CVS
@@ -251,76 +225,11 @@ function ProcessedCVs() {
         </Box>
       )}
 
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Ingresa el PIN de seguridad</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            type="password"
-            value={pin}
-            onChange={(e) => setPin(e.target.value)}
-            placeholder="PIN"
-            error={Boolean(pinError)}
-            helperText={pinError}
-            autoFocus
-            sx={{ mt: 1 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancelar</Button>
-          <Button onClick={confirmarEliminacion} variant="contained" color="error">
-            Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {loading ? (
         <Box mt={4} textAlign="center">
           <CircularProgress />
           <Typography>Cargando CVs procesados...</Typography>
         </Box>
-      ) : isMobile ? (
-        <Stack spacing={2}>
-          {paginatedCvs.map((cv) => {
-            const parsedJson = cv.json || {};
-            const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
-            const nombre = capitalizarTexto(nombreOriginal);
-            return (
-              <Paper key={cv.id} sx={{ p: 2 }}>
-                <Typography fontWeight="bold">🧑 {nombre}</Typography>
-                <Typography sx={{ mb: 1 }}>
-                  🗓️ {new Date(cv.created_at).toLocaleString("es-CL")}
-                </Typography>
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<PictureAsPdfIcon />}
-                    onClick={() => descargarPDF(cv.id)}
-                  >
-                    PDF
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<CodeIcon />}
-                    onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                    sx={{
-                      color: "#f29111",
-                      borderColor: "#f29111",
-                      fontWeight: "bold",
-                      "&:hover": {
-                        backgroundColor: "#f29111",
-                        color: "#fff",
-                      },
-                    }}
-                  >
-                    JSON
-                  </Button>
-                </Stack>
-              </Paper>
-            );
-          })}
-        </Stack>
       ) : (
         <TableContainer component={Paper}>
           <Table>
@@ -328,6 +237,7 @@ function ProcessedCVs() {
               <TableRow>
                 <TableCell><strong>🧑 Nombre</strong></TableCell>
                 <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                <TableCell><strong>👤 Transformado por</strong></TableCell>
                 <TableCell><strong>📄 PDF / JSON</strong></TableCell>
               </TableRow>
             </TableHead>
@@ -340,6 +250,7 @@ function ProcessedCVs() {
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
                     <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                    <TableCell>{cv.usuario || "Admin"}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <Button

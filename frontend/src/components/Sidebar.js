@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Drawer,
@@ -9,6 +9,11 @@ import {
   IconButton,
   Typography,
   Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -16,19 +21,46 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import CloseIcon from "@mui/icons-material/Close";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import LogoutIcon from "@mui/icons-material/Logout";
+import jwt_decode from "jwt-decode";
 
 function Sidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+  const [usuarioNombre, setUsuarioNombre] = useState("");
 
-  const toggleDrawer = (open) => () => {
-    setIsOpen(open);
-  };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwt_decode(token);
+        setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
+        if (decoded.rol === "admin") {
+          setIsAdmin(true);
+        }
+      } catch (error) {
+        console.error("❌ Error al decodificar token:", error.message);
+      }
+    }
+  }, []);
+
+  const toggleDrawer = (open) => () => setIsOpen(open);
 
   const handleNavigate = (path) => {
     navigate(path);
     setIsOpen(false);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
+    navigate("/login");
+  };
+
+  const hayUsuario = !!localStorage.getItem("token");
 
   return (
     <>
@@ -50,30 +82,30 @@ function Sidebar() {
             sx={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "space-between",
               padding: "10px 20px",
               borderBottom: "1px solid #ddd",
               position: "relative",
             }}
           >
-            <Typography
-              variant="h6"
-              fontWeight="bold"
-              sx={{ marginLeft: "10px", marginTop: "-5px" }}
-            >
+            <Typography variant="h6" fontWeight="bold">
               Opciones
             </Typography>
-            <IconButton
-              onClick={toggleDrawer(false)}
-              sx={{
-                position: "absolute",
-                right: 10,
-                top: "50%",
-                transform: "translateY(-50%)",
-              }}
-            >
+            <IconButton onClick={toggleDrawer(false)}>
               <CloseIcon />
             </IconButton>
           </Box>
+
+          {usuarioNombre && (
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="body2" color="textSecondary">
+                Bienvenido,
+              </Typography>
+              <Typography variant="subtitle1" fontWeight="bold">
+                {usuarioNombre}
+              </Typography>
+            </Box>
+          )}
 
           <List>
             <ListItem button onClick={() => handleNavigate("/dashboard")}>
@@ -103,9 +135,40 @@ function Sidebar() {
               </ListItemIcon>
               <ListItemText primary="Configuración" />
             </ListItem>
+
+            {isAdmin && (
+              <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
+                <ListItemIcon>
+                  <PersonAddIcon />
+                </ListItemIcon>
+                <ListItemText primary="Crear Usuario" />
+              </ListItem>
+            )}
+
+            {hayUsuario && (
+              <ListItem button onClick={() => setOpenLogoutDialog(true)}>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText primary="Cerrar Sesión" />
+              </ListItem>
+            )}
           </List>
         </Box>
       </Drawer>
+
+      <Dialog open={openLogoutDialog} onClose={() => setOpenLogoutDialog(false)}>
+        <DialogTitle>¿Cerrar sesión?</DialogTitle>
+        <DialogContent>
+          <Typography>¿Estás seguro de que deseas cerrar tu sesión?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenLogoutDialog(false)}>Cancelar</Button>
+          <Button onClick={handleLogout} variant="contained" color="error">
+            Cerrar Sesión
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
