@@ -5,14 +5,14 @@ const verifyToken = require("../middleware/verifyToken");
 
 
 router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
-  const { nombre, apellido, email, contraseña, rol } = req.body;
+  const { nombre, apellido, email, password, rol } = req.body;
 
   
   if (req.user?.rol !== "admin") {
     return res.status(403).json({ message: "Acceso denegado: solo el administrador puede crear usuarios." });
   }
 
-  if (!nombre || !apellido || !email || !contraseña || !rol) {
+  if (!nombre || !apellido || !email || !password || !rol) {
     return res.status(400).json({ message: "Faltan campos obligatorios" });
   }
 
