@@ -11,6 +11,7 @@ const verifyToken = require("./middleware/verifyToken");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Importar rutas
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 
@@ -71,7 +72,7 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
 
     await db.query(
       `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id) VALUES ($1, $2, $3, $4, $5)`,
-      [jsonData, pdfUrl, pdfBuffer, timestamp, req.usuario.id]
+      [jsonData, pdfUrl, pdfBuffer, timestamp, req.user.id]
     );
 
     console.log("✅ Datos guardados en la base de datos.");
@@ -163,8 +164,11 @@ app.get("/cv/consumo", async (req, res) => {
   }
 });
 
+// 🔐 Ruta protegida para limpiar CVs (solo admin)
 app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
-  const rol = req.usuario?.rol;
+  console.log("🔐 Usuario autenticado:", req.user);
+
+  const rol = req.user?.rol;
 
   if (rol !== "admin") {
     console.warn("⛔ Usuario sin permisos intentó borrar CVs.");
