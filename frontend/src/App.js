@@ -8,7 +8,7 @@ import Dashboard from "./components/Dashboard";
 import CreateUser from "./components/CreateUser";
 import Login from "./components/Login";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; 
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -44,7 +44,7 @@ function App() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decoded = jwtDecode(token); 
+        const decoded = jwtDecode(token); // ✅ corregido
         const now = Date.now() / 1000;
         if (decoded.exp && decoded.exp > now) {
           setIsAdmin(decoded.rol === "admin");
@@ -64,7 +64,6 @@ function App() {
     }
   }, []);
 
-  // Este componente interno sirve para ocultar Sidebar solo en /login
   const Layout = ({ children }) => {
     const location = useLocation();
     const isLogin = location.pathname === "/login";
@@ -87,13 +86,7 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={
-                isAuthenticated ? (
-                  <Config config={config} setConfig={setConfig} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
+              element={isAuthenticated ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
             <Route
               path="/transform"
@@ -107,12 +100,7 @@ function App() {
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
             />
-            {isAdmin && (
-              <Route
-                path="/crear-usuario"
-                element={<CreateUser />}
-              />
-            )}
+            {isAdmin && <Route path="/crear-usuario" element={<CreateUser />} />}
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
           </Routes>
