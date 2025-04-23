@@ -53,9 +53,14 @@ function Transform() {
     }
 
     try {
+      const token = localStorage.getItem("token");
+
       const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       setMessage("✅ Archivo procesado con éxito.");
       if (response.data?.pdfPath) {
         setPdfLink(`${API_BASE_URL}/${response.data.pdfPath}`);
@@ -65,6 +70,8 @@ function Transform() {
 
       if (error.response?.status === 404) {
         setMessage("⚠️ Este archivo no contiene texto reconocible. Asegúrate de subir un CV en formato texto, no escaneado como imagen.");
+      } else if (error.response?.status === 401) {
+        setMessage("❌ No tienes permisos para realizar esta acción. Inicia sesión nuevamente.");
       } else {
         setMessage("❌ Hubo un error al procesar el archivo. Inténtalo nuevamente.");
       }
