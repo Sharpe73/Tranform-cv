@@ -6,9 +6,14 @@ const fs = require("fs");
 const path = require("path");
 const { procesarCV } = require("./utils/procesarCV");
 const db = require("./database");
+const verifyToken = require("./middleware/verifyToken");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Importar rutas
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
@@ -18,6 +23,9 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/auth", authRoutes);
+app.use("/users", userRoutes); // <<--- NUEVO: rutas para crear usuarios
 
 const uploadsPath = path.join(__dirname, "uploads");
 console.log("📂 Serviendo archivos estáticos desde:", uploadsPath);
@@ -33,7 +41,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (req, res) => {
+// 🔐 Endpoint protegido con token
+app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo" }]), async (req, res) => {
   if (!req.files || !req.files["file"]) {
     return res.status(400).json({ message: "No se recibió ningún archivo." });
   }
@@ -63,8 +72,8 @@ app.post("/upload", upload.fields([{ name: "file" }, { name: "logo" }]), async (
     const timestamp = new Date().toISOString();
 
     await db.query(
-      `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at) VALUES ($1, $2, $3, $4)`,
-      [jsonData, pdfUrl, pdfBuffer, timestamp]
+      `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id) VALUES ($1, $2, $3, $4, $5)`,
+      [jsonData, pdfUrl, pdfBuffer, timestamp, req.user.id]
     );
 
     console.log("✅ Datos guardados en la base de datos.");
@@ -114,7 +123,10 @@ app.get("/cv/pdf/:id", async (req, res) => {
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
-      "SELECT id, json_data, pdf_url, created_at FROM cv_files ORDER BY created_at DESC"
+      `SELECT cv.id, cv.json_data, cv.pdf_url, cv.created_at, u.nombre, u.apellido
+       FROM cv_files cv
+       LEFT JOIN usuarios u ON cv.usuario_id = u.id
+       ORDER BY cv.created_at DESC`
     );
 
     const parsed = result.rows.map((row) => ({
@@ -122,6 +134,7 @@ app.get("/cv/list", async (req, res) => {
       json: JSON.parse(row.json_data),
       pdf_url: row.pdf_url,
       created_at: row.created_at,
+      usuario: row.nombre && row.apellido ? `${row.nombre} ${row.apellido}` : "Admin",
     }));
 
     res.json(parsed);
@@ -131,7 +144,6 @@ app.get("/cv/list", async (req, res) => {
   }
 });
 
-// 📊 Ruta actualizada para consumo mensual
 app.get("/cv/consumo", async (req, res) => {
   try {
     const inicioMes = new Date();
@@ -153,12 +165,13 @@ app.get("/cv/consumo", async (req, res) => {
   }
 });
 
-app.post("/admin/limpiar-cvs", async (req, res) => {
-  const pin = req.headers["x-admin-secret"];
+// 🔐 Ruta protegida para limpiar CVs (solo admin)
+app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
+  const rol = req.usuario?.rol;
 
-  if (pin !== process.env.ADMIN_SECRET) {
-    console.warn("⛔ PIN incorrecto al intentar eliminar CVs.");
-    return res.status(403).json({ mensaje: "PIN incorrecto" });
+  if (rol !== "admin") {
+    console.warn("⛔ Usuario sin permisos intentó borrar CVs.");
+    return res.status(403).json({ mensaje: "No autorizado: solo el administrador puede borrar CVs." });
   }
 
   try {

@@ -12,3 +12,6 @@ dist/
 # Archivos de sistema
 .DS_Store
 .vscode/
+
+# Scripts locales
+scripts/
