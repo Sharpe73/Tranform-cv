@@ -39,8 +39,10 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // ✅ Esta es la clave para que App.js se recargue completamente
-      window.location.replace("/");
+      // ✅ Redirección forzada tras breve espera para garantizar el almacenamiento
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 100);
     } catch (err) {
       setError(
         err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."

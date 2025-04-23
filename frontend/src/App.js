@@ -25,44 +25,48 @@ function App() {
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/styles`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.data) {
-          setConfig((prevConfig) => ({
-            ...prevConfig,
-            templateStyle: response.data.templateStyle || "default",
-          }));
-        }
-      })
-      .catch((error) => console.error("Error cargando estilos:", error));
-  }, []);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        const now = Date.now() / 1000;
-        if (decoded.exp && decoded.exp > now) {
-          setIsAdmin(decoded.rol === "admin");
-          setIsAuthenticated(true);
-        } else {
-          localStorage.removeItem("token");
-          localStorage.removeItem("usuario");
+
+    const validarToken = () => {
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          const now = Date.now() / 1000;
+          if (decoded.exp && decoded.exp > now) {
+            setIsAdmin(decoded.rol === "admin");
+            setIsAuthenticated(true);
+          } else {
+            localStorage.removeItem("token");
+            localStorage.removeItem("usuario");
+            setIsAuthenticated(false);
+          }
+        } catch (err) {
+          console.error("❌ Token inválido:", err.message);
           setIsAuthenticated(false);
         }
-      } catch (err) {
-        console.error("❌ Token inválido:", err.message);
+      } else {
         setIsAuthenticated(false);
       }
-    } else {
-      setIsAuthenticated(false);
-    }
+    };
+
+    const cargarEstilos = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/styles`, { withCredentials: true });
+        if (res.data) {
+          setConfig((prev) => ({
+            ...prev,
+            templateStyle: res.data.templateStyle || "default",
+          }));
+        }
+      } catch (err) {
+        console.error("Error cargando estilos:", err);
+      }
+    };
+
+    Promise.all([validarToken(), cargarEstilos()]).finally(() => setLoading(false));
   }, []);
 
   const Layout = ({ children }) => {
@@ -78,6 +82,10 @@ function App() {
       </Box>
     );
   };
+
+  if (loading) {
+    return <div style={{ padding: "2rem", textAlign: "center" }}>Cargando aplicación...</div>;
+  }
 
   return (
     <ThemeProvider theme={theme}>
