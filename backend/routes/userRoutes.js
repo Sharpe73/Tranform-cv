@@ -3,11 +3,9 @@ const router = express.Router();
 const db = require("../database");
 const verifyToken = require("../middleware/verifyToken");
 
-
 router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
   const { nombre, apellido, email, password, rol } = req.body;
 
-  
   if (req.user?.rol !== "admin") {
     return res.status(403).json({ message: "Acceso denegado: solo el administrador puede crear usuarios." });
   }
@@ -17,7 +15,6 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 
   try {
-    
     const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
 
     if (rolResult.rows.length === 0) {
@@ -29,7 +26,7 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
     await db.query(
       `INSERT INTO usuarios (nombre, apellido, email, password, rol_id)
        VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5)`,
-      [nombre, apellido, email, contraseña, rol_id]
+      [nombre, apellido, email, password, rol_id]
     );
 
     res.status(201).json({ message: "✅ Usuario creado correctamente" });
