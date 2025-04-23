@@ -39,7 +39,7 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // 🔁 Redirecciona forzando recarga para aplicar token
+      // ✅ Recarga para reactivar los efectos del token en App.js
       window.location.href = "/";
     } catch (err) {
       setError(
