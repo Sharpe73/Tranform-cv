@@ -6,6 +6,7 @@ import {
   Typography,
   Paper,
   Alert,
+  MenuItem,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -27,7 +28,7 @@ const CreateUser = () => {
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || usuario.rol !== "admin") {
-      navigate("/dashboard"); // redirige si no es admin
+      navigate("/dashboard");
     }
   }, [navigate]);
 
@@ -47,7 +48,7 @@ const CreateUser = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        `${API_BASE_URL}/usuarios`,
+        `${API_BASE_URL}/users/admin/crear-usuario`,
         form,
         {
           headers: {
@@ -118,6 +119,20 @@ const CreateUser = () => {
             required
             type="password"
           />
+
+          <TextField
+            fullWidth
+            select
+            label="Rol"
+            name="rol"
+            value={form.rol}
+            onChange={handleChange}
+            margin="normal"
+            required
+          >
+            <MenuItem value="user">Usuario</MenuItem>
+            <MenuItem value="admin">Administrador</MenuItem>
+          </TextField>
 
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
             Crear Usuario
