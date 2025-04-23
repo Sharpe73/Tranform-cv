@@ -48,7 +48,7 @@ const CreateUser = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        `${API_BASE_URL}/users/admin/crear-usuario`,
+        `${API_BASE_URL}/admin/crear-usuario`,
         form,
         {
           headers: {
@@ -119,7 +119,6 @@ const CreateUser = () => {
             required
             type="password"
           />
-
           <TextField
             fullWidth
             select

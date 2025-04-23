@@ -28,9 +28,8 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    const validarToken = () => {
+    const validarToken = async () => {
+      const token = localStorage.getItem("token");
       if (token) {
         try {
           const decoded = jwtDecode(token);
@@ -66,6 +65,7 @@ function App() {
       }
     };
 
+    // Ejecutar ambas funciones de forma asíncrona
     Promise.all([validarToken(), cargarEstilos()]).finally(() => setLoading(false));
   }, []);
 

@@ -33,16 +33,19 @@ const Login = () => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
-
       const { token, usuario } = response.data;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("usuario", JSON.stringify(usuario));
+      if (token && usuario) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // ✅ Redirección forzada tras breve espera para garantizar el almacenamiento
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
+        // ✅ Redirección forzada tras guardar token y usuario
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 100);
+      } else {
+        setError("Respuesta incompleta del servidor. Intenta nuevamente.");
+      }
     } catch (err) {
       setError(
         err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
