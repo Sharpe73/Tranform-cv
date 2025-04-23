@@ -105,6 +105,9 @@ function ProcessedCVs() {
   };
 
   const eliminarCVs = async () => {
+    const confirmar = window.confirm("¿Estás seguro que deseas eliminar TODOS los CVs? Esta acción no se puede deshacer.");
+    if (!confirmar) return;
+
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/admin/limpiar-cvs`, {
@@ -118,9 +121,12 @@ function ProcessedCVs() {
       if (res.status === 200) {
         alert(data.mensaje || "CVs eliminados correctamente");
         cargarCVs();
+      } else {
+        alert(data.mensaje || "Error al eliminar los CVs");
       }
     } catch (err) {
       console.error("❌ Error al eliminar los CVs:", err);
+      alert("Ocurrió un error al intentar eliminar los CVs.");
     }
   };
 
