@@ -22,7 +22,7 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
-import { jwtDecode } from "jwt-decode"; // ✅ CORREGIDO
+import { jwtDecode } from "jwt-decode";
 import API_BASE_URL from "../apiConfig";
 
 function capitalizarTexto(texto) {
@@ -54,7 +54,7 @@ function ProcessedCVs() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decoded = jwtDecode(token); // ✅ CORREGIDO
+        const decoded = jwtDecode(token);
         setIsAdmin(decoded.rol === "admin");
       } catch (err) {
         console.error("Token inválido");
@@ -163,7 +163,7 @@ function ProcessedCVs() {
         <Button
           variant="contained"
           startIcon={<DeleteIcon />}
-          onClick={eliminarCVs}
+          onClick={isAdmin ? eliminarCVs : undefined}
           disabled={!isAdmin}
           sx={{
             backgroundColor: isAdmin ? "#d32f2f" : "#ccc",

@@ -11,7 +11,6 @@ const verifyToken = require("./middleware/verifyToken");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Importar rutas
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 
@@ -25,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
-app.use("/users", userRoutes); // <<--- NUEVO: rutas para crear usuarios
+app.use("/users", userRoutes);
 
 const uploadsPath = path.join(__dirname, "uploads");
 console.log("📂 Serviendo archivos estáticos desde:", uploadsPath);
@@ -41,7 +40,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// 🔐 Endpoint protegido con token
 app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo" }]), async (req, res) => {
   if (!req.files || !req.files["file"]) {
     return res.status(400).json({ message: "No se recibió ningún archivo." });
@@ -73,7 +71,7 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
 
     await db.query(
       `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id) VALUES ($1, $2, $3, $4, $5)`,
-      [jsonData, pdfUrl, pdfBuffer, timestamp, req.user.id]
+      [jsonData, pdfUrl, pdfBuffer, timestamp, req.usuario.id]
     );
 
     console.log("✅ Datos guardados en la base de datos.");
@@ -165,7 +163,6 @@ app.get("/cv/consumo", async (req, res) => {
   }
 });
 
-// 🔐 Ruta protegida para limpiar CVs (solo admin)
 app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   const rol = req.usuario?.rol;
 
