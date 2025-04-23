@@ -22,7 +22,7 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // ✅ CORREGIDO
 import API_BASE_URL from "../apiConfig";
 
 function capitalizarTexto(texto) {
@@ -54,7 +54,7 @@ function ProcessedCVs() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const decoded = jwt_decode(token);
+        const decoded = jwtDecode(token); // ✅ CORREGIDO
         setIsAdmin(decoded.rol === "admin");
       } catch (err) {
         console.error("Token inválido");
