@@ -122,9 +122,10 @@ app.get("/cv/pdf/:id", async (req, res) => {
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT cv.id, cv.json_data, cv.pdf_url, cv.created_at, u.nombre, u.apellido
+      `SELECT cv.id, cv.json_data, cv.pdf_url, cv.created_at, u.nombre, u.apellido, r.nombre AS rol
        FROM cv_files cv
        LEFT JOIN usuarios u ON cv.usuario_id = u.id
+       LEFT JOIN roles r ON u.rol_id = r.id
        ORDER BY cv.created_at DESC`
     );
 
@@ -133,7 +134,10 @@ app.get("/cv/list", async (req, res) => {
       json: JSON.parse(row.json_data),
       pdf_url: row.pdf_url,
       created_at: row.created_at,
-      usuario: row.nombre && row.apellido ? `${row.nombre} ${row.apellido}` : "Admin",
+      usuario:
+        row.nombre && row.apellido && row.rol
+          ? `${row.nombre} ${row.apellido} (${row.rol === "admin" ? "Admin" : "Usuario"})`
+          : "Administrador Principal",
     }));
 
     res.json(parsed);
