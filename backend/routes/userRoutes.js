@@ -3,11 +3,12 @@ const router = express.Router();
 const db = require("../database");
 const verifyToken = require("../middleware/verifyToken");
 
-// Crear usuario solo si es admin
+
 router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
   const { nombre, apellido, email, contraseña, rol } = req.body;
 
-  if (req.usuario?.rol !== "admin") {
+  
+  if (req.user?.rol !== "admin") {
     return res.status(403).json({ message: "Acceso denegado: solo el administrador puede crear usuarios." });
   }
 
@@ -16,7 +17,7 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 
   try {
-    // Obtener el ID del rol
+    
     const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
 
     if (rolResult.rows.length === 0) {
