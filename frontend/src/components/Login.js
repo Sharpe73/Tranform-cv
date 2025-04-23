@@ -7,13 +7,10 @@ import {
   Paper,
   Alert,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_BASE_URL from "../apiConfig";
 
 const Login = () => {
-  const navigate = useNavigate();
-
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -42,7 +39,8 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      navigate("/dashboard");
+      // 🔁 Redirecciona forzando recarga para aplicar token
+      window.location.href = "/";
     } catch (err) {
       setError(
         err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
