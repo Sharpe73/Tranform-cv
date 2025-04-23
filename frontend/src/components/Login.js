@@ -41,7 +41,7 @@ const Login = () => {
 
         // ✅ Redirección forzada tras guardar token y usuario
         setTimeout(() => {
-          window.location.href = "/";
+          window.location.href = "/transform";
         }, 100);
       } else {
         setError("Respuesta incompleta del servidor. Intenta nuevamente.");

@@ -129,12 +129,14 @@ function Sidebar() {
               <ListItemText primary="CVs Procesados" />
             </ListItem>
 
-            <ListItem button onClick={() => handleNavigate("/")}>
-              <ListItemIcon>
-                <SettingsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Configuración" />
-            </ListItem>
+            {isAdmin && (
+              <ListItem button onClick={() => handleNavigate("/")}>
+                <ListItemIcon>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText primary="Configuración" />
+              </ListItem>
+            )}
 
             {isAdmin && (
               <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
