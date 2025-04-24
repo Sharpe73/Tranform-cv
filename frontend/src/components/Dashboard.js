@@ -58,6 +58,8 @@ function Dashboard() {
     { name: "CVs restantes", value: restante },
   ];
 
+  const scrollNecesario = dataPorUsuario.length > 4;
+
   return (
     <Box
       sx={{
@@ -75,6 +77,7 @@ function Dashboard() {
       </Typography>
 
       <Grid container spacing={4} justifyContent="center">
+        {/* Gráfico de torta */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -111,11 +114,7 @@ function Dashboard() {
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend
-                  verticalAlign="bottom"
-                  iconType="circle"
-                  wrapperStyle={{ marginTop: 20 }}
-                />
+                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
               </PieChart>
             </ResponsiveContainer>
 
@@ -125,7 +124,7 @@ function Dashboard() {
                 gutterBottom
                 sx={{ textAlign: "center" }}
               >
-                Progreso mensual: {consumo} de {CONSUMO_MAXIMO} CVs ({porcentaje}% )
+                Progreso mensual: {consumo} de {CONSUMO_MAXIMO} CVs ({porcentaje}%)
               </Typography>
               <MuiTooltip title={`${porcentaje}% utilizado`} arrow>
                 <LinearProgress
@@ -145,6 +144,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
+        {/* Gráfico de barras por usuario */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -162,35 +162,33 @@ function Dashboard() {
             >
               UTILIZACIÓN POR USUARIO
             </Typography>
-            <ResponsiveContainer width="100%" height="85%">
-              <BarChart
-                data={dataPorUsuario}
-                margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="usuario"
-                  interval={0}
-                  angle={-30}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar
-                  dataKey="cantidad"
-                  name="CVs Transformados"
-                  isAnimationActive={false}
+            <Box sx={{ overflowX: scrollNecesario ? "auto" : "hidden", width: "100%", height: "85%" }}>
+              <ResponsiveContainer width={scrollNecesario ? dataPorUsuario.length * 120 : "100%"} height="100%">
+                <BarChart
+                  data={dataPorUsuario}
+                  margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
                 >
-                  {dataPorUsuario.map((entry, index) => (
-                    <Cell
-                      key={`bar-${index}`}
-                      fill={BAR_COLORS[index % BAR_COLORS.length]}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="usuario"
+                    interval={0}
+                    angle={-30}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Bar dataKey="cantidad" isAnimationActive={false}>
+                    {dataPorUsuario.map((entry, index) => (
+                      <Cell
+                        key={`bar-${index}`}
+                        fill={BAR_COLORS[index % BAR_COLORS.length]}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Box>
           </Paper>
         </Grid>
       </Grid>
