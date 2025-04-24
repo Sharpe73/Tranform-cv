@@ -11,7 +11,6 @@ const verifyToken = require("./middleware/verifyToken");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Importar rutas
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 
@@ -168,14 +167,18 @@ app.get("/cv/consumo", async (req, res) => {
   }
 });
 
-// 📊 Ruta para obtener consumo por usuario
+// 📊 Ruta para obtener consumo por usuario (INCLUYE ROL)
 app.get("/cv/por-usuario", async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT u.nombre || ' ' || u.apellido AS usuario, COUNT(cv.id) AS cantidad
+      `SELECT 
+         u.nombre || ' ' || u.apellido AS usuario, 
+         COUNT(cv.id) AS cantidad,
+         r.nombre AS rol
        FROM cv_files cv
        LEFT JOIN usuarios u ON cv.usuario_id = u.id
-       GROUP BY usuario
+       LEFT JOIN roles r ON u.rol_id = r.id
+       GROUP BY u.nombre, u.apellido, r.nombre
        ORDER BY cantidad DESC`
     );
 
@@ -186,7 +189,6 @@ app.get("/cv/por-usuario", async (req, res) => {
   }
 });
 
-// 🔐 Ruta protegida para limpiar CVs (solo admin)
 app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   console.log("🔐 Usuario autenticado:", req.user);
 
@@ -208,7 +210,6 @@ app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ Validación para evitar emails duplicados al registrar usuarios
 app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
   const { nombre, apellido, email, password, rol } = req.body;
 
