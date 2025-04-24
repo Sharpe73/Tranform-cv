@@ -32,6 +32,14 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
     res.status(201).json({ message: "✅ Usuario creado correctamente" });
   } catch (error) {
     console.error("❌ Error al crear usuario:", error.message);
+
+  
+    if (error.code === "23505" && error.constraint === "usuarios_email_key") {
+      return res.status(400).json({
+        message: "❗ El correo ya está registrado en la base de datos. Por favor, ingrese otro correo.",
+      });
+    }
+
     res.status(500).json({ message: "Error interno al crear el usuario" });
   }
 });
