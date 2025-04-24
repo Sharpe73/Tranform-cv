@@ -8,6 +8,7 @@ import {
   Grid,
   useMediaQuery,
   useTheme,
+  Stack,
 } from "@mui/material";
 import {
   PieChart,
@@ -51,6 +52,7 @@ function Dashboard() {
 
   const restante = Math.max(CONSUMO_MAXIMO - consumo, 0);
   const porcentaje = Math.min((consumo / CONSUMO_MAXIMO) * 100, 100).toFixed(2);
+
   const data = [
     { name: "CVs usados", value: consumo },
     { name: "CVs restantes", value: restante },
@@ -131,7 +133,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        {/* Gráfico de barras */}
+        {/* Gráfico de barras por usuario */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -141,22 +143,35 @@ function Dashboard() {
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
               height: 430,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <Typography
               variant="h6"
-              sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
+              sx={{ textAlign: "center", fontWeight: "bold", mb: 1 }}
             >
               UTILIZACIÓN POR USUARIO
             </Typography>
 
-            <Box
-              sx={{
-                overflowX: esMovil ? "auto" : "hidden",
-                width: "100%",
-                height: "85%",
-              }}
+            <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              spacing={2}
+              sx={{ mb: 1 }}
             >
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.admin, mr: 1 }} />
+                <Typography variant="caption">Admin</Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.user, mr: 1 }} />
+                <Typography variant="caption">Usuario</Typography>
+              </Box>
+            </Stack>
+
+            <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%", flexGrow: 1 }}>
               <ResponsiveContainer
                 width={esMovil ? dataPorUsuario.length * 130 : "100%"}
                 height="100%"
@@ -176,14 +191,11 @@ function Dashboard() {
                   />
                   <YAxis allowDecimals={false} />
                   <Tooltip />
-                  <Bar
-                    dataKey="cantidad"
-                    isAnimationActive={false}
-                  >
+                  <Bar dataKey="cantidad" isAnimationActive={false}>
                     {dataPorUsuario.map((entry, index) => (
                       <Cell
                         key={`bar-${index}`}
-                        fill={ROLE_COLORS[entry.rol] || "#9e9e9e"} // gris por defecto
+                        fill={ROLE_COLORS[entry.rol] || "#9e9e9e"}
                       />
                     ))}
                   </Bar>
