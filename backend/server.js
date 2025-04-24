@@ -168,6 +168,24 @@ app.get("/cv/consumo", async (req, res) => {
   }
 });
 
+// 📊 Ruta para obtener consumo por usuario
+app.get("/cv/por-usuario", async (req, res) => {
+  try {
+    const result = await db.query(
+      `SELECT u.nombre || ' ' || u.apellido AS usuario, COUNT(cv.id) AS cantidad
+       FROM cv_files cv
+       LEFT JOIN usuarios u ON cv.usuario_id = u.id
+       GROUP BY usuario
+       ORDER BY cantidad DESC`
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("❌ Error al obtener CVs por usuario:", error.message);
+    res.status(500).json({ message: "Error al obtener CVs por usuario." });
+  }
+});
+
 // 🔐 Ruta protegida para limpiar CVs (solo admin)
 app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   console.log("🔐 Usuario autenticado:", req.user);
