@@ -84,7 +84,7 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Email"
+            label="USUARIO"
             name="email"
             type="email"
             value={form.email}
@@ -126,7 +126,7 @@ const Login = () => {
             sx={{ mt: 2, py: 1.2, fontWeight: "bold" }}
             disabled={loading}
           >
-            {loading ? "Cargando..." : "INICIAR SESIÓN"}
+            {loading ? "Cargando..." : "INGRESAR"}
           </Button>
         </form>
       </Paper>
