@@ -6,24 +6,22 @@ import {
   Typography,
   Paper,
   Alert,
+  InputAdornment,
+  Avatar,
 } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
+import EmailIcon from "@mui/icons-material/Email";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import axios from "axios";
 import API_BASE_URL from "../apiConfig";
 
 const Login = () => {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -35,17 +33,12 @@ const Login = () => {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
       const { token, usuario } = response.data;
 
-      if (token && usuario) {
-        localStorage.setItem("token", token);
-        localStorage.setItem("usuario", JSON.stringify(usuario));
+      localStorage.setItem("token", token);
+      localStorage.setItem("usuario", JSON.stringify(usuario));
 
-        // ✅ Redirección forzada tras guardar token y usuario
-        setTimeout(() => {
-          window.location.href = "/transform";
-        }, 100);
-      } else {
-        setError("Respuesta incompleta del servidor. Intenta nuevamente.");
-      }
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 100);
     } catch (err) {
       setError(
         err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
@@ -62,11 +55,23 @@ const Login = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        bgcolor: "#f5f5f5",
+        background: "linear-gradient(135deg, #e3f2fd, #fce4ec)",
       }}
     >
-      <Paper elevation={6} sx={{ p: 4, width: "100%", maxWidth: 400 }}>
-        <Typography variant="h5" gutterBottom fontWeight="bold">
+      <Paper
+        elevation={6}
+        sx={{
+          p: 4,
+          maxWidth: 400,
+          width: "100%",
+          borderRadius: 4,
+          textAlign: "center",
+        }}
+      >
+        <Avatar sx={{ bgcolor: "#1976d2", mx: "auto", mb: 2 }}>
+          <LockIcon />
+        </Avatar>
+        <Typography variant="h5" fontWeight="bold" color="primary" gutterBottom>
           Iniciar Sesión
         </Typography>
 
@@ -86,7 +91,15 @@ const Login = () => {
             onChange={handleChange}
             margin="normal"
             required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon />
+                </InputAdornment>
+              ),
+            }}
           />
+
           <TextField
             fullWidth
             label="Contraseña"
@@ -96,15 +109,24 @@ const Login = () => {
             onChange={handleChange}
             margin="normal"
             required
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <VpnKeyIcon />
+                </InputAdornment>
+              ),
+            }}
           />
+
           <Button
             type="submit"
             variant="contained"
+            color="primary"
             fullWidth
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, py: 1.2, fontWeight: "bold" }}
             disabled={loading}
           >
-            {loading ? "Cargando..." : "Iniciar Sesión"}
+            {loading ? "Cargando..." : "INICIAR SESIÓN"}
           </Button>
         </form>
       </Paper>

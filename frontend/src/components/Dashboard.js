@@ -24,7 +24,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/cv/consumo`, {
-      credentials: "include", // ✅ importante para evitar error CORS
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
