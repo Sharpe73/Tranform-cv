@@ -133,7 +133,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        {/* Gráfico de barras por usuario */}
+        {/* Gráfico de barras */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
