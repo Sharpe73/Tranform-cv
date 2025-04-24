@@ -167,13 +167,12 @@ app.get("/cv/consumo", async (req, res) => {
   }
 });
 
-
 app.get("/cv/por-usuario", async (req, res) => {
   try {
     const result = await db.query(
       `SELECT 
          u.nombre || ' ' || u.apellido AS usuario, 
-         COUNT(cv.id) AS cantidad,
+         CAST(COUNT(cv.id) AS INTEGER) AS cantidad,  -- 🔧 CAMBIO
          r.nombre AS rol
        FROM cv_files cv
        LEFT JOIN usuarios u ON cv.usuario_id = u.id
