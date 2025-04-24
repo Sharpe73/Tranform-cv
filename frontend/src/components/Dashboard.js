@@ -32,21 +32,13 @@ function Dashboard() {
   useEffect(() => {
     fetch(`${API_BASE_URL}/cv/consumo`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => {
-        setConsumo(data?.total || 0);
-      })
-      .catch((error) => {
-        console.error("❌ Error al obtener consumo:", error);
-      });
+      .then((data) => setConsumo(data?.total || 0))
+      .catch((error) => console.error("❌ Error al obtener consumo:", error));
 
     fetch(`${API_BASE_URL}/cv/por-usuario`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => {
-        setDataPorUsuario(data);
-      })
-      .catch((error) => {
-        console.error("❌ Error al obtener datos por usuario:", error);
-      });
+      .then((data) => setDataPorUsuario(data))
+      .catch((error) => console.error("❌ Error al obtener datos por usuario:", error));
   }, []);
 
   const restante = Math.max(CONSUMO_MAXIMO - consumo, 0);
@@ -58,13 +50,7 @@ function Dashboard() {
   ];
 
   return (
-    <Box
-      sx={{
-        p: 4,
-        minHeight: "100vh",
-        backgroundColor: "#f9fafc",
-      }}
-    >
+    <Box sx={{ p: 4, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
       <Typography
         variant="h4"
         gutterBottom
@@ -74,18 +60,26 @@ function Dashboard() {
       </Typography>
 
       <Grid container spacing={4} justifyContent="center">
+        {/* Pie Chart Panel */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
             sx={{
               p: 3,
-              height: 430,
               borderRadius: 4,
               backgroundColor: "#ffffff",
+              height: 400,
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <ResponsiveContainer width="100%" height={300}>
+            <Typography
+              variant="h6"
+              sx={{ textAlign: "center", mb: 2, fontWeight: "bold", color: "#333" }}
+            >
+              CONSUMO DE CV VS TOTAL X MES
+            </Typography>
+
+            <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
                   data={data}
@@ -97,22 +91,15 @@ function Dashboard() {
                   label={({ name, value }) => `${name}: ${value}`}
                 >
                   {data.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend
-                  verticalAlign="bottom"
-                  iconType="circle"
-                  wrapperStyle={{ marginTop: 20 }}
-                />
+                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
               </PieChart>
             </ResponsiveContainer>
 
-            <Box mt={3}>
+            <Box mt={2}>
               <Typography
                 variant="subtitle1"
                 gutterBottom
@@ -138,32 +125,33 @@ function Dashboard() {
           </Paper>
         </Grid>
 
+        {/* Bar Chart Panel */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
             sx={{
               p: 3,
-              height: 430,
               borderRadius: 4,
               backgroundColor: "#ffffff",
+              height: 400,
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={dataPorUsuario}
-                margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-              >
+            <Typography
+              variant="h6"
+              sx={{ textAlign: "center", mb: 2, fontWeight: "bold", color: "#333" }}
+            >
+              UTILIZACIÓN POR USUARIO
+            </Typography>
+
+            <ResponsiveContainer width="100%" height="80%">
+              <BarChart data={dataPorUsuario} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="usuario" />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
                 <Legend />
-                <Bar
-                  dataKey="cantidad"
-                  fill="#1976d2"
-                  name="CVs Transformados"
-                />
+                <Bar dataKey="cantidad" fill="#1976d2" name="CVs Transformados" />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
