@@ -26,7 +26,10 @@ import API_BASE_URL from "../apiConfig";
 
 const CONSUMO_MAXIMO = 500;
 const COLORS = ["#1976d2", "#ffb74d"];
-const BAR_COLORS = ["#1976d2", "#e91e63", "#4caf50", "#ff9800", "#9c27b0"];
+const ROLE_COLORS = {
+  admin: "#1976d2", // azul
+  user: "#4caf50",  // verde
+};
 
 function Dashboard() {
   const [consumo, setConsumo] = useState(0);
@@ -64,6 +67,7 @@ function Dashboard() {
       </Typography>
 
       <Grid container spacing={4} justifyContent="center">
+        {/* Gráfico de torta */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -93,18 +97,11 @@ function Dashboard() {
                   label={({ name, value }) => `${name}: ${value}`}
                 >
                   {data.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend
-                  verticalAlign="bottom"
-                  iconType="circle"
-                  wrapperStyle={{ marginTop: 20 }}
-                />
+                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
               </PieChart>
             </ResponsiveContainer>
 
@@ -134,6 +131,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
+        {/* Gráfico de barras */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -185,7 +183,7 @@ function Dashboard() {
                     {dataPorUsuario.map((entry, index) => (
                       <Cell
                         key={`bar-${index}`}
-                        fill={BAR_COLORS[index % BAR_COLORS.length]}
+                        fill={ROLE_COLORS[entry.rol] || "#9e9e9e"} // gris por defecto
                       />
                     ))}
                   </Bar>
