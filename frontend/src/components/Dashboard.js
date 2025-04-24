@@ -79,6 +79,7 @@ function Dashboard() {
             elevation={4}
             sx={{
               p: 3,
+              height: 430,
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
@@ -142,12 +143,13 @@ function Dashboard() {
             elevation={4}
             sx={{
               p: 3,
+              height: 430,
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             }}
           >
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={dataPorUsuario}
                 margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
@@ -157,7 +159,11 @@ function Dashboard() {
                 <YAxis allowDecimals={false} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="cantidad" fill="#1976d2" name="CVs Transformados" />
+                <Bar
+                  dataKey="cantidad"
+                  fill="#1976d2"
+                  name="CVs Transformados"
+                />
               </BarChart>
             </ResponsiveContainer>
           </Paper>
