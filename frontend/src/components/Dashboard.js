@@ -6,6 +6,8 @@ import {
   LinearProgress,
   Tooltip as MuiTooltip,
   Grid,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   PieChart,
@@ -29,45 +31,30 @@ const BAR_COLORS = ["#1976d2", "#e91e63", "#4caf50", "#ff9800", "#9c27b0"];
 function Dashboard() {
   const [consumo, setConsumo] = useState(0);
   const [dataPorUsuario, setDataPorUsuario] = useState([]);
+  const theme = useTheme();
+  const esMovil = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/cv/consumo`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => {
-        setConsumo(data?.total || 0);
-      })
-      .catch((error) => {
-        console.error("❌ Error al obtener consumo:", error);
-      });
+      .then((data) => setConsumo(data?.total || 0))
+      .catch((error) => console.error("❌ Error al obtener consumo:", error));
 
     fetch(`${API_BASE_URL}/cv/por-usuario`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => {
-        setDataPorUsuario(data);
-      })
-      .catch((error) => {
-        console.error("❌ Error al obtener datos por usuario:", error);
-      });
+      .then((data) => setDataPorUsuario(data))
+      .catch((error) => console.error("❌ Error al obtener datos por usuario:", error));
   }, []);
 
   const restante = Math.max(CONSUMO_MAXIMO - consumo, 0);
   const porcentaje = Math.min((consumo / CONSUMO_MAXIMO) * 100, 100).toFixed(2);
-
   const data = [
     { name: "CVs usados", value: consumo },
     { name: "CVs restantes", value: restante },
   ];
 
-  const scrollNecesario = dataPorUsuario.length > 4;
-
   return (
-    <Box
-      sx={{
-        p: 4,
-        minHeight: "100vh",
-        backgroundColor: "#f9fafc",
-      }}
-    >
+    <Box sx={{ p: 4, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
       <Typography
         variant="h4"
         gutterBottom
@@ -77,7 +64,6 @@ function Dashboard() {
       </Typography>
 
       <Grid container spacing={4} justifyContent="center">
-        {/* Gráfico de torta */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -114,7 +100,11 @@ function Dashboard() {
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
+                <Legend
+                  verticalAlign="bottom"
+                  iconType="circle"
+                  wrapperStyle={{ marginTop: 20 }}
+                />
               </PieChart>
             </ResponsiveContainer>
 
@@ -144,7 +134,6 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        {/* Gráfico de barras por usuario */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -162,8 +151,18 @@ function Dashboard() {
             >
               UTILIZACIÓN POR USUARIO
             </Typography>
-            <Box sx={{ overflowX: scrollNecesario ? "auto" : "hidden", width: "100%", height: "85%" }}>
-              <ResponsiveContainer width={scrollNecesario ? dataPorUsuario.length * 120 : "100%"} height="100%">
+
+            <Box
+              sx={{
+                overflowX: esMovil ? "auto" : "hidden",
+                width: "100%",
+                height: "85%",
+              }}
+            >
+              <ResponsiveContainer
+                width={esMovil ? dataPorUsuario.length * 130 : "100%"}
+                height="100%"
+              >
                 <BarChart
                   data={dataPorUsuario}
                   margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
@@ -175,10 +174,14 @@ function Dashboard() {
                     angle={-30}
                     textAnchor="end"
                     height={80}
+                    tick={{ fontSize: 11 }}
                   />
                   <YAxis allowDecimals={false} />
                   <Tooltip />
-                  <Bar dataKey="cantidad" isAnimationActive={false}>
+                  <Bar
+                    dataKey="cantidad"
+                    isAnimationActive={false}
+                  >
                     {dataPorUsuario.map((entry, index) => (
                       <Cell
                         key={`bar-${index}`}
