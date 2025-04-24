@@ -23,8 +23,7 @@ import {
 import API_BASE_URL from "../apiConfig";
 
 const CONSUMO_MAXIMO = 500;
-const COLORS = ["#1976d2", "#ffb74d"];
-const BARRA_COLORES = ["#1976d2", "#e91e63", "#4caf50", "#ff9800", "#9c27b0", "#00bcd4"];
+const COLORS = ["#1976d2", "#e91e63", "#4caf50", "#ff9800", "#9c27b0"];
 
 function Dashboard() {
   const [consumo, setConsumo] = useState(0);
@@ -83,15 +82,12 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: 440,
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
-            >
+            <Typography variant="h6" align="center" fontWeight="bold" gutterBottom>
               CONSUMO DE CV VS TOTAL X MES
             </Typography>
+
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -104,10 +100,7 @@ function Dashboard() {
                   label={({ name, value }) => `${name}: ${value}`}
                 >
                   {data.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -153,38 +146,33 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: 440,
-              overflowX: "auto",
+              height: 430,
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
-            >
+            <Typography variant="h6" align="center" fontWeight="bold" gutterBottom>
               UTILIZACIÓN POR USUARIO
             </Typography>
-            <ResponsiveContainer width="100%" height={330}>
-              <BarChart data={dataPorUsuario} margin={{ top: 10, right: 30, left: 0, bottom: 40 }}>
+
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={dataPorUsuario}
+                margin={{ top: 10, right: 30, left: 50, bottom: 70 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="usuario"
-                  angle={-35}
+                  angle={-30}
                   textAnchor="end"
                   interval={0}
-                  height={60}
                 />
                 <YAxis allowDecimals={false} />
                 <Tooltip />
-                <Legend verticalAlign="top" />
-                <Bar
-                  dataKey="cantidad"
-                  name="CVs Transformados"
-                  fill="#1976d2"
-                >
+                <Legend />
+                <Bar dataKey="cantidad" name="CVs Transformados">
                   {dataPorUsuario.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={BARRA_COLORES[index % BARRA_COLORES.length]}
+                      fill={COLORS[index % COLORS.length]}
                     />
                   ))}
                 </Bar>
