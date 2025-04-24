@@ -167,7 +167,7 @@ app.get("/cv/consumo", async (req, res) => {
   }
 });
 
-// 📊 Ruta para obtener consumo por usuario (INCLUYE ROL)
+
 app.get("/cv/por-usuario", async (req, res) => {
   try {
     const result = await db.query(
