@@ -28,8 +28,8 @@ import API_BASE_URL from "../apiConfig";
 const CONSUMO_MAXIMO = 500;
 const COLORS = ["#1976d2", "#ffb74d"];
 const ROLE_COLORS = {
-  admin: "#1976d2", // azul
-  user: "#4caf50",  // verde
+  admin: "#1976d2",
+  user: "#4caf50",
 };
 
 function Dashboard() {
@@ -46,7 +46,13 @@ function Dashboard() {
 
     fetch(`${API_BASE_URL}/cv/por-usuario`, { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => setDataPorUsuario(data))
+      .then((data) => {
+        const convertidos = data.map((item) => ({
+          ...item,
+          cantidad: Number(item.cantidad), // 🔧 Conversión explícita
+        }));
+        setDataPorUsuario(convertidos);
+      })
       .catch((error) => console.error("❌ Error al obtener datos por usuario:", error));
   }, []);
 
