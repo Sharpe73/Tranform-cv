@@ -28,7 +28,7 @@ const CreateUser = () => {
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || usuario.rol !== "admin") {
-      navigate("/dashboard");
+      navigate("/transform"); // redirigir a transform si no es admin
     }
   }, [navigate]);
 
@@ -66,7 +66,14 @@ const CreateUser = () => {
         rol: "user",
       });
     } catch (err) {
-      setError(err.response?.data?.message || "Error al crear usuario");
+      if (
+        err.response?.data?.message?.includes("duplicate key value") ||
+        err.response?.data?.message?.includes("ya está registrado")
+      ) {
+        setError("El correo ya existe en la base de datos. Por favor, ingrese otro.");
+      } else {
+        setError(err.response?.data?.message || "Error al crear usuario");
+      }
     }
   };
 
