@@ -37,7 +37,7 @@ const Login = () => {
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        window.location.href = "/transform";
       }, 100);
     } catch (err) {
       setError(
