@@ -28,7 +28,7 @@ const CreateUser = () => {
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || usuario.rol !== "admin") {
-      navigate("/transform"); // redirigir a transform si no es admin
+      navigate("/transform");
     }
   }, [navigate]);
 
