@@ -84,7 +84,7 @@ function Sidebar() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              padding: "4px 20px",
+              padding: "2px 20px",
               borderBottom: "1px solid #ddd",
               position: "relative",
             }}
