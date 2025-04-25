@@ -90,7 +90,7 @@ function Transform() {
       console.error("❌ Error al procesar el archivo:", error);
 
       if (error.response?.status === 403) {
-        setBloqueado(true); // 🔒 bloquear UI
+        setBloqueado(true);
         setMessage(error.response.data?.message || "❌ Límite mensual alcanzado.");
       } else if (error.response?.status === 404) {
         setMessage("⚠️ Este archivo no contiene texto reconocible.");
