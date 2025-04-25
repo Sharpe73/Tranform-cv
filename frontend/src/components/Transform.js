@@ -72,6 +72,9 @@ function Transform() {
         setMessage("⚠️ Este archivo no contiene texto reconocible. Asegúrate de subir un CV en formato texto, no escaneado como imagen.");
       } else if (error.response?.status === 401) {
         setMessage("❌ No tienes permisos para realizar esta acción. Inicia sesión nuevamente.");
+      } else if (error.response?.status === 403) {
+        
+        setMessage(error.response.data?.message || "❌ Límite mensual alcanzado. Intenta el próximo mes.");
       } else {
         setMessage("❌ Hubo un error al procesar el archivo. Inténtalo nuevamente.");
       }
