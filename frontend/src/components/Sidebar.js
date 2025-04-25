@@ -27,6 +27,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import GroupIcon from "@mui/icons-material/Group";
+import DomainIcon from "@mui/icons-material/Domain";
 import { jwtDecode } from "jwt-decode";
 
 function Sidebar() {
@@ -108,17 +109,17 @@ function Sidebar() {
           )}
 
           <List>
-            <ListItem button onClick={() => handleNavigate("/dashboard")}>  
+            <ListItem button onClick={() => handleNavigate("/dashboard")}>
               <ListItemIcon><BarChartIcon /></ListItemIcon>
               <ListItemText primary="Dashboard" />
             </ListItem>
 
-            <ListItem button onClick={() => handleNavigate("/transform")}>  
+            <ListItem button onClick={() => handleNavigate("/transform")}>
               <ListItemIcon><DescriptionIcon /></ListItemIcon>
               <ListItemText primary="Transformar Documento" />
             </ListItem>
 
-            <ListItem button onClick={() => handleNavigate("/procesados")}>  
+            <ListItem button onClick={() => handleNavigate("/procesados")}>
               <ListItemIcon><AssignmentIcon /></ListItemIcon>
               <ListItemText primary="CVs Procesados" />
             </ListItem>
@@ -137,6 +138,7 @@ function Sidebar() {
                       sx={{ pl: 4 }}
                       onClick={() => handleNavigate("/")}
                     >
+                      <ListItemIcon><DomainIcon /></ListItemIcon> {/* 🏢 Ícono agregado aquí */}
                       <ListItemText primary="Mi Organización" />
                     </ListItem>
                     <ListItem
@@ -153,7 +155,7 @@ function Sidebar() {
             )}
 
             {isAdmin && (
-              <ListItem button onClick={() => handleNavigate("/crear-usuario")}>  
+              <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
                 <ListItemIcon><PersonAddIcon /></ListItemIcon>
                 <ListItemText primary="Crear Usuario" />
               </ListItem>
