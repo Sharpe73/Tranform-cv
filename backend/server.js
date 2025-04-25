@@ -53,14 +53,12 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
   finMes.setUTCMonth(finMes.getUTCMonth() + 1);
 
   try {
-    const consumo = await db.query(
-      `SELECT COUNT(*) AS total
-       FROM cv_files
-       WHERE usuario_id = $1 AND created_at >= $2 AND created_at < $3`,
-      [req.user.id, inicioMes.toISOString(), finMes.toISOString()]
+    const consumoGlobal = await db.query(
+      `SELECT COUNT(*) AS total FROM cv_files WHERE created_at >= $1 AND created_at < $2`,
+      [inicioMes.toISOString(), finMes.toISOString()]
     );
 
-    const totalConsumido = parseInt(consumo.rows[0].total, 10);
+    const totalConsumido = parseInt(consumoGlobal.rows[0].total, 10);
 
     if (totalConsumido >= LIMITE_MENSUAL) {
       return res.status(403).json({
