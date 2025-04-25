@@ -27,7 +27,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import GroupIcon from "@mui/icons-material/Group";
-import DomainIcon from "@mui/icons-material/Domain";
+import BusinessIcon from "@mui/icons-material/Business";
 import { jwtDecode } from "jwt-decode";
 
 function Sidebar() {
@@ -138,16 +138,14 @@ function Sidebar() {
                       sx={{ pl: 4 }}
                       onClick={() => handleNavigate("/")}
                     >
-                      <ListItemIcon><DomainIcon /></ListItemIcon> {/* 🏢 Ícono agregado aquí */}
+                      <ListItemIcon><BusinessIcon /></ListItemIcon>
                       <ListItemText primary="Mi Organización" />
                     </ListItem>
                     <ListItem
-                      button
-                      sx={{ pl: 4 }}
-                      onClick={() => handleNavigate("/mi-equipo")}
+                      sx={{ pl: 4, color: "gray", cursor: "default" }}
                     >
-                      <ListItemIcon><GroupIcon /></ListItemIcon>
-                      <ListItemText primary="Mi Equipo" />
+                      <ListItemIcon><GroupIcon sx={{ color: "gray" }} /></ListItemIcon>
+                      <ListItemText primary="Mi Equipo (Próximamente)" />
                     </ListItem>
                   </List>
                 </Collapse>
