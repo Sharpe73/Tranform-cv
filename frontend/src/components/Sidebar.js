@@ -134,7 +134,7 @@ function Sidebar() {
                 <ListItemIcon>
                   <SettingsIcon />
                 </ListItemIcon>
-                <ListItemText primary="Configuración" />
+                <ListItemText primary="Ajustes" />
               </ListItem>
             )}
 
