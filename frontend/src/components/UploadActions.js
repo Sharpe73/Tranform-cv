@@ -8,7 +8,7 @@ const UploadActions = ({ isUploading, handleUpload, disabled }) => {
         variant="contained"
         color="success"
         onClick={handleUpload}
-        disabled={isUploading || disabled} 
+        disabled={isUploading || disabled}
         fullWidth
       >
         {isUploading ? "⏳ Procesando..." : "📤 Subir Archivo"}

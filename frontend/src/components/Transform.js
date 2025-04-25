@@ -32,7 +32,7 @@ function Transform() {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (res.data?.total >= 35) {
+        if (res.data?.total >= 5) {
           setBloqueado(true);
           setMessage("❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs.");
         }
