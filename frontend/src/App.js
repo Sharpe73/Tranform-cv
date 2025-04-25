@@ -15,6 +15,14 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import API_BASE_URL from "./apiConfig";
 
+
+const MiEquipo = () => (
+  <div style={{ padding: "2rem" }}>
+    <h2>🧑‍🤝‍🧑 Mi Equipo</h2>
+    <p>Esta sección estará disponible próximamente.</p>
+  </div>
+);
+
 function App() {
   const [config, setConfig] = useState({
     font: "Helvetica",
@@ -65,7 +73,6 @@ function App() {
       }
     };
 
-    // Ejecutar ambas funciones de forma asíncrona
     Promise.all([validarToken(), cargarEstilos()]).finally(() => setLoading(false));
   }, []);
 
@@ -109,7 +116,17 @@ function App() {
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
             />
+
+            {/* 🔧 Rutas nuevas */}
+            {isAdmin && (
+              <Route
+                path="/ajustes/organizacion"
+                element={<Config config={config} setConfig={setConfig} />}
+              />
+            )}
+            {isAdmin && <Route path="/ajustes/equipo" element={<MiEquipo />} />}
             {isAdmin && <Route path="/crear-usuario" element={<CreateUser />} />}
+
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
           </Routes>

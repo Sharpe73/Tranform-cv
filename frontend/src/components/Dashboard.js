@@ -49,7 +49,7 @@ function Dashboard() {
       .then((data) => {
         const convertidos = data.map((item) => ({
           ...item,
-          cantidad: Number(item.cantidad), // 🔧 Conversión explícita
+          cantidad: Number(item.cantidad),
         }));
         setDataPorUsuario(convertidos);
       })
@@ -75,7 +75,6 @@ function Dashboard() {
       </Typography>
 
       <Grid container spacing={4} justifyContent="center">
-        {/* Gráfico de torta */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -139,7 +138,6 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        {/* Gráfico de barras */}
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
