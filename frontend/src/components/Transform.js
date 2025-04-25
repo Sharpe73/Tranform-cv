@@ -15,12 +15,33 @@ function Transform() {
   const [pdfLink, setPdfLink] = useState("");
   const [config, setConfig] = useState({});
   const [showConfig, setShowConfig] = useState(false);
+  const [bloqueado, setBloqueado] = useState(false); 
 
   useEffect(() => {
     const savedConfig = JSON.parse(localStorage.getItem("cvConfig"));
     if (savedConfig) {
       setConfig(savedConfig);
     }
+
+    
+    const verificarBloqueo = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${API_BASE_URL}/cv/consumo`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (res.data?.total >= 35) {
+          setBloqueado(true);
+          setMessage("❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs.");
+        }
+      } catch (error) {
+        console.error("❌ Error al verificar consumo:", error);
+      }
+    };
+
+    verificarBloqueo();
   }, []);
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
@@ -68,13 +89,13 @@ function Transform() {
     } catch (error) {
       console.error("❌ Error al procesar el archivo:", error);
 
-      if (error.response?.status === 404) {
-        setMessage("⚠️ Este archivo no contiene texto reconocible. Asegúrate de subir un CV en formato texto, no escaneado como imagen.");
+      if (error.response?.status === 403) {
+        setBloqueado(true); // 🔒 bloquear UI
+        setMessage(error.response.data?.message || "❌ Límite mensual alcanzado.");
+      } else if (error.response?.status === 404) {
+        setMessage("⚠️ Este archivo no contiene texto reconocible.");
       } else if (error.response?.status === 401) {
-        setMessage("❌ No tienes permisos para realizar esta acción. Inicia sesión nuevamente.");
-      } else if (error.response?.status === 403) {
-        
-        setMessage(error.response.data?.message || "❌ Límite mensual alcanzado. Intenta el próximo mes.");
+        setMessage("❌ No tienes permisos. Inicia sesión nuevamente.");
       } else {
         setMessage("❌ Hubo un error al procesar el archivo. Inténtalo nuevamente.");
       }
@@ -90,11 +111,23 @@ function Transform() {
           🖹 Transformar Documento
         </Typography>
 
-        <UploadSection file={file} handleFileChange={handleFileChange} />
+        <UploadSection
+          file={file}
+          handleFileChange={handleFileChange}
+          disabled={bloqueado}
+        />
 
-        <ConfigCard config={config} showConfig={showConfig} setShowConfig={setShowConfig} />
+        <ConfigCard
+          config={config}
+          showConfig={showConfig}
+          setShowConfig={setShowConfig}
+        />
 
-        <UploadActions isUploading={isUploading} handleUpload={handleUpload} />
+        <UploadActions
+          isUploading={isUploading}
+          handleUpload={handleUpload}
+          disabled={bloqueado} 
+        />
 
         {message && <MessageDisplay message={message} />}
 

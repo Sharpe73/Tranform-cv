@@ -5,7 +5,7 @@ import {
   Typography
 } from "@mui/material";
 
-const UploadSection = ({ file, handleFileChange }) => {
+const UploadSection = ({ file, handleFileChange, disabled }) => {
   return (
     <Box sx={{ mt: 2, maxWidth: 400, mx: "auto" }}>
       <input
@@ -14,6 +14,7 @@ const UploadSection = ({ file, handleFileChange }) => {
         id="upload-file"
         type="file"
         onChange={handleFileChange}
+        disabled={disabled} 
       />
       <label htmlFor="upload-file">
         <Button
@@ -21,6 +22,7 @@ const UploadSection = ({ file, handleFileChange }) => {
           color="primary"
           component="span"
           fullWidth
+          disabled={disabled} 
         >
           📄 Seleccionar Archivo
         </Button>
