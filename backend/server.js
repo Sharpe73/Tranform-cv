@@ -45,20 +45,43 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     return res.status(400).json({ message: "No se recibió ningún archivo." });
   }
 
-  const filePath = path.join(uploadsPath, req.files["file"][0].filename);
-  const logoPath = req.files["logo"] ? path.join(uploadsPath, req.files["logo"][0].filename) : null;
+  // 🔒 Validar límite mensual de CVs procesados
+  const inicioMes = new Date();
+  inicioMes.setUTCDate(1);
+  inicioMes.setUTCHours(0, 0, 0, 0);
 
-  const opciones = {
-    fontHeader: req.body.fontHeader || "Helvetica",
-    fontParagraph: req.body.fontParagraph || "Helvetica",
-    fontSize: parseInt(req.body.fontSize, 10) || 12,
-    colorHeader: req.body.colorHeader || "#000000",
-    colorParagraph: req.body.colorParagraph || "#000000",
-    logoPath: logoPath,
-    templateStyle: "tradicional",
-  };
+  const finMes = new Date(inicioMes);
+  finMes.setUTCMonth(finMes.getUTCMonth() + 1);
 
   try {
+    const consumo = await db.query(
+      `SELECT COUNT(*) AS total
+       FROM cv_files
+       WHERE usuario_id = $1 AND created_at >= $2 AND created_at < $3`,
+      [req.user.id, inicioMes.toISOString(), finMes.toISOString()]
+    );
+
+    const totalConsumido = parseInt(consumo.rows[0].total, 10);
+
+    if (totalConsumido >= 35) {
+      return res.status(403).json({
+        message: "❌ Has alcanzado el límite mensual de 35 CVs procesados. Intenta nuevamente el próximo mes.",
+      });
+    }
+
+    const filePath = path.join(uploadsPath, req.files["file"][0].filename);
+    const logoPath = req.files["logo"] ? path.join(uploadsPath, req.files["logo"][0].filename) : null;
+
+    const opciones = {
+      fontHeader: req.body.fontHeader || "Helvetica",
+      fontParagraph: req.body.fontParagraph || "Helvetica",
+      fontSize: parseInt(req.body.fontSize, 10) || 12,
+      colorHeader: req.body.colorHeader || "#000000",
+      colorParagraph: req.body.colorParagraph || "#000000",
+      logoPath: logoPath,
+      templateStyle: "tradicional",
+    };
+
     const jsonPath = await procesarCV(filePath, opciones);
     const pdfFilename = path.basename(jsonPath.replace(".json", ".pdf"));
     const pdfPath = path.join(uploadsPath, pdfFilename);
@@ -172,7 +195,7 @@ app.get("/cv/por-usuario", async (req, res) => {
     const result = await db.query(
       `SELECT 
          u.nombre || ' ' || u.apellido AS usuario, 
-         CAST(COUNT(cv.id) AS INTEGER) AS cantidad,  -- 🔧 CAMBIO
+         CAST(COUNT(cv.id) AS INTEGER) AS cantidad,
          r.nombre AS rol
        FROM cv_files cv
        LEFT JOIN usuarios u ON cv.usuario_id = u.id
