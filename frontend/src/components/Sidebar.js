@@ -85,6 +85,7 @@ function Sidebar() {
               alignItems: "center",
               justifyContent: "space-between",
               padding: "10px 20px",
+              pt: 2.5,
               borderBottom: "1px solid #ddd",
               position: "relative",
             }}
