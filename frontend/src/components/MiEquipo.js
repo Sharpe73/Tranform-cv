@@ -109,8 +109,11 @@ function MiEquipo() {
         throw new Error("Error al actualizar usuario");
       }
 
-      fetchUsuarios();
+      await fetchUsuarios();
       handleCloseModal();
+
+      
+      alert("✅ Usuario actualizado correctamente.");
     } catch (error) {
       console.error("Error al actualizar usuario:", error);
     }
@@ -160,7 +163,7 @@ function MiEquipo() {
         <MenuItem onClick={handleEliminar}>Eliminar</MenuItem>
       </Menu>
 
-      {/* Modal para editar */}
+      
       <EditUserModal
         open={openModal}
         onClose={handleCloseModal}
