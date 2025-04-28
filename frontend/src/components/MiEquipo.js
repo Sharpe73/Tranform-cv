@@ -140,6 +140,7 @@ function MiEquipo() {
           <TableHead>
             <TableRow>
               <TableCell><strong>Nombre</strong></TableCell>
+              <TableCell><strong>Correo</strong></TableCell> 
               <TableCell><strong>Proyecto</strong></TableCell>
               <TableCell><strong>Nivel de acceso</strong></TableCell>
               <TableCell><strong>Acciones</strong></TableCell>
@@ -149,6 +150,7 @@ function MiEquipo() {
             {usuarios.map((usuario) => (
               <TableRow key={usuario.id}>
                 <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
+                <TableCell>{usuario.email || "-"}</TableCell>
                 <TableCell>Todos los proyectos</TableCell>
                 <TableCell>
                   {usuario.rol === "admin" ? "Administrador" : "Usuario"}
