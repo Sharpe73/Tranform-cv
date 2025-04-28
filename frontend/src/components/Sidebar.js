@@ -56,18 +56,12 @@ function Sidebar() {
 
   const toggleDrawer = (open) => () => setIsOpen(open);
 
-  const verificarSesion = async () => {
-    try {
-      await verificarSesionActiva();
-      // Si pasa, sigue normalmente
-    } catch (error) {
-      console.error("❌ Sesión no válida:", error);
-      // El interceptor de api.js ya se encarga de redirigir
-    }
-  };
-
   const handleNavigate = async (path) => {
-    await verificarSesion(); // ✅ verifica la sesión antes de navegar
+    const sesionValida = await verificarSesionActiva();
+    if (!sesionValida) {
+      // Si la sesión no es válida, el interceptor de api.js se encargará de redirigir
+      return;
+    }
     navigate(path);
     setIsOpen(false);
   };
