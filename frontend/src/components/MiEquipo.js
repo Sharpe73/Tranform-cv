@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
-import api from "./api";
+import API_BASE_URL from "../apiConfig";
 
 function MiEquipo() {
   const [usuarios, setUsuarios] = useState([]);
@@ -35,8 +35,14 @@ function MiEquipo() {
 
   const fetchUsuarios = async () => {
     try {
-      const response = await api.get("/users");
-      setUsuarios(response.data);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      setUsuarios(data);
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
     }
@@ -60,7 +66,18 @@ function MiEquipo() {
     if (usuarioSeleccionado) {
       if (window.confirm(`¿Seguro que quieres eliminar a ${usuarioSeleccionado.nombre}?`)) {
         try {
-          await api.delete(`/users/${usuarioSeleccionado.id}`);
+          const token = localStorage.getItem("token");
+          const response = await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error("Error al eliminar usuario");
+          }
+
           alert("✅ Usuario eliminado correctamente.");
           fetchUsuarios();
         } catch (error) {
@@ -86,11 +103,23 @@ function MiEquipo() {
 
   const handleGuardarCambios = async () => {
     try {
-      await api.put(`/users/${usuarioSeleccionado.id}`, {
-        nombre: usuarioSeleccionado.nombre,
-        apellido: usuarioSeleccionado.apellido,
-        rol: usuarioSeleccionado.rol,
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          nombre: usuarioSeleccionado.nombre,
+          apellido: usuarioSeleccionado.apellido,
+          rol: usuarioSeleccionado.rol,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar usuario");
+      }
 
       alert("✅ Usuario actualizado correctamente.");
       fetchUsuarios();
