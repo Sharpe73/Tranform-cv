@@ -136,16 +136,18 @@ function Sidebar() {
                     <ListItem
                       button
                       sx={{ pl: 4 }}
-                      onClick={() => handleNavigate("/")}
+                      onClick={() => handleNavigate("/ajustes/organizacion")}
                     >
                       <ListItemIcon><BusinessIcon /></ListItemIcon>
                       <ListItemText primary="Mi Organización" />
                     </ListItem>
                     <ListItem
-                      sx={{ pl: 4, color: "gray", cursor: "default" }}
+                      button
+                      sx={{ pl: 4 }}
+                      onClick={() => handleNavigate("/ajustes/equipo")}
                     >
-                      <ListItemIcon><GroupIcon sx={{ color: "gray" }} /></ListItemIcon>
-                      <ListItemText primary="Mi Equipo (Próximamente)" />
+                      <ListItemIcon><GroupIcon /></ListItemIcon>
+                      <ListItemText primary="Mi Equipo" />
                     </ListItem>
                   </List>
                 </Collapse>

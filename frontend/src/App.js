@@ -6,6 +6,7 @@ import Transform from "./components/Transform";
 import ProcessedCVs from "./components/ProcessedCVs";
 import Dashboard from "./components/Dashboard";
 import CreateUser from "./components/CreateUser";
+import MiEquipo from "./components/MiEquipo";
 import Login from "./components/Login";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -14,14 +15,6 @@ import theme from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import API_BASE_URL from "./apiConfig";
-
-
-const MiEquipo = () => (
-  <div style={{ padding: "2rem" }}>
-    <h2>🧑‍🤝‍🧑 Mi Equipo</h2>
-    <p>Esta sección estará disponible próximamente.</p>
-  </div>
-);
 
 function App() {
   const [config, setConfig] = useState({
@@ -116,17 +109,13 @@ function App() {
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
             />
-
-            {/* 🔧 Rutas nuevas */}
             {isAdmin && (
-              <Route
-                path="/ajustes/organizacion"
-                element={<Config config={config} setConfig={setConfig} />}
-              />
+              <>
+                <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
+                <Route path="/ajustes/equipo" element={<MiEquipo />} /> 
+                <Route path="/crear-usuario" element={<CreateUser />} />
+              </>
             )}
-            {isAdmin && <Route path="/ajustes/equipo" element={<MiEquipo />} />}
-            {isAdmin && <Route path="/crear-usuario" element={<CreateUser />} />}
-
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
           </Routes>
