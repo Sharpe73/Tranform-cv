@@ -29,7 +29,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import GroupIcon from "@mui/icons-material/Group";
 import BusinessIcon from "@mui/icons-material/Business";
 import { jwtDecode } from "jwt-decode";
-import api from "./api"; // 👈 Importamos API inteligente
+import { verificarSesionActiva } from "./api";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -58,16 +58,16 @@ function Sidebar() {
 
   const verificarSesion = async () => {
     try {
-      await api.get("/auth/validar");
-      // Si pasa, todo bien
+      await verificarSesionActiva();
+      // Si pasa, sigue normalmente
     } catch (error) {
       console.error("❌ Sesión no válida:", error);
-      // Ya será redireccionado por el interceptor
+      // El interceptor de api.js ya se encarga de redirigir
     }
   };
 
   const handleNavigate = async (path) => {
-    await verificarSesion(); // 🔥 Verifica antes de navegar
+    await verificarSesion(); // ✅ verifica la sesión antes de navegar
     navigate(path);
     setIsOpen(false);
   };
