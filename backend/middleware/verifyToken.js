@@ -12,17 +12,19 @@ async function verifyToken(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // contiene id, nombre, apellido, rol
 
+    
     const userResult = await db.query("SELECT id FROM usuarios WHERE id = $1", [decoded.id]);
 
     if (userResult.rows.length === 0) {
-      return res.status(401).json({ message: "Usuario eliminado, sesión terminada." });
+      console.error("❌ Usuario eliminado. Cerrando sesión.");
+      return res.status(401).json({ message: "usuario eliminado" });
     }
 
+    req.user = decoded; // contiene id, nombre, apellido, rol
     next();
   } catch (error) {
-    console.error("❌ Token inválido:", error.message);
+    console.error("❌ Token inválido o expirado:", error.message);
     res.status(401).json({ message: "Token inválido o expirado" });
   }
 }
