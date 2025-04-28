@@ -29,6 +29,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import GroupIcon from "@mui/icons-material/Group";
 import BusinessIcon from "@mui/icons-material/Business";
 import { jwtDecode } from "jwt-decode";
+import api from "./api"; // 👈 Importamos API inteligente
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -55,7 +56,18 @@ function Sidebar() {
 
   const toggleDrawer = (open) => () => setIsOpen(open);
 
-  const handleNavigate = (path) => {
+  const verificarSesion = async () => {
+    try {
+      await api.get("/auth/validar");
+      // Si pasa, todo bien
+    } catch (error) {
+      console.error("❌ Sesión no válida:", error);
+      // Ya será redireccionado por el interceptor
+    }
+  };
+
+  const handleNavigate = async (path) => {
+    await verificarSesion(); // 🔥 Verifica antes de navegar
     navigate(path);
     setIsOpen(false);
   };

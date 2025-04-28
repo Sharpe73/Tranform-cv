@@ -5,7 +5,6 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -14,10 +13,10 @@ api.interceptors.response.use(
 
       if (status === 401) {
         const mensaje = data.message || "";
-        
+
         if (
-          mensaje.includes("Token inválido") || 
-          mensaje.includes("Token expirado") || 
+          mensaje.includes("Token inválido") ||
+          mensaje.includes("Token expirado") ||
           mensaje.includes("usuario eliminado") ||
           mensaje.includes("No autorizado") ||
           mensaje.includes("Usuario no encontrado")
@@ -33,5 +32,25 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// 🚀 Nueva función para verificar la sesión contra el backend
+export async function verificarSesionActiva() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const res = await api.get("/auth/verificar", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return res.status === 200;
+  } catch (error) {
+    return false;
+  }
+}
 
 export default api;
