@@ -15,9 +15,10 @@ const LIMITE_MENSUAL = parseInt(process.env.LIMITE_MENSUAL) || 500;
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 
+
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
 
@@ -209,6 +210,7 @@ app.get("/cv/por-usuario", async (req, res) => {
   }
 });
 
+// 🚀 Limpieza de CVs
 app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   console.log("🔐 Usuario autenticado:", req.user);
 
@@ -230,6 +232,7 @@ app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   }
 });
 
+// 🚀 Crear Usuario
 app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
   const { nombre, apellido, email, password, rol } = req.body;
 
@@ -268,7 +271,7 @@ app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 });
 
-// 🚀 Nuevo: actualizar usuario
+// 🚀 Actualizar Usuario
 app.put("/users/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { nombre, apellido, rol } = req.body;
