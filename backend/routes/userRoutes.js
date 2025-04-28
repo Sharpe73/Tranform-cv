@@ -44,11 +44,11 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Obtener todos los usuarios
+
 router.get("/", verifyToken, async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT u.id, u.nombre, u.apellido, r.nombre AS rol
+      `SELECT u.id, u.nombre, u.apellido, u.email, r.nombre AS rol
        FROM usuarios u
        LEFT JOIN roles r ON u.rol_id = r.id
        ORDER BY u.id ASC`
@@ -58,6 +58,7 @@ router.get("/", verifyToken, async (req, res) => {
       id: user.id,
       nombre: user.nombre,
       apellido: user.apellido,
+      email: user.email,
       rol: user.rol === "admin" ? "admin" : "user",
     }));
 
@@ -68,7 +69,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Actualizar un usuario
+
 router.put("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { nombre, apellido, rol } = req.body;
