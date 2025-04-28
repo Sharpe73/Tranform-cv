@@ -104,12 +104,16 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Eliminar un usuario
+// 🔹 Eliminar un usuario (No puede eliminarse a sí mismo)
 router.delete("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
   if (req.user?.rol !== "admin") {
     return res.status(403).json({ message: "Acceso denegado: solo el administrador puede eliminar usuarios." });
+  }
+
+  if (parseInt(id, 10) === req.user.id) {
+    return res.status(400).json({ message: "No puedes eliminar tu propio usuario." });
   }
 
   try {
