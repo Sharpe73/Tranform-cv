@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
-import API_BASE_URL from "../apiConfig";
+import api from "../api";
 
 function MiEquipo() {
   const [usuarios, setUsuarios] = useState([]);
@@ -35,14 +35,8 @@ function MiEquipo() {
 
   const fetchUsuarios = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      setUsuarios(data);
+      const response = await api.get("/users");
+      setUsuarios(response.data);
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
     }
@@ -66,18 +60,7 @@ function MiEquipo() {
     if (usuarioSeleccionado) {
       if (window.confirm(`¿Seguro que quieres eliminar a ${usuarioSeleccionado.nombre}?`)) {
         try {
-          const token = localStorage.getItem("token");
-          const response = await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error("Error al eliminar usuario");
-          }
-
+          await api.delete(`/users/${usuarioSeleccionado.id}`);
           alert("✅ Usuario eliminado correctamente.");
           fetchUsuarios();
         } catch (error) {
@@ -103,23 +86,11 @@ function MiEquipo() {
 
   const handleGuardarCambios = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          nombre: usuarioSeleccionado.nombre,
-          apellido: usuarioSeleccionado.apellido,
-          rol: usuarioSeleccionado.rol,
-        }),
+      await api.put(`/users/${usuarioSeleccionado.id}`, {
+        nombre: usuarioSeleccionado.nombre,
+        apellido: usuarioSeleccionado.apellido,
+        rol: usuarioSeleccionado.rol,
       });
-
-      if (!response.ok) {
-        throw new Error("Error al actualizar usuario");
-      }
 
       alert("✅ Usuario actualizado correctamente.");
       fetchUsuarios();
