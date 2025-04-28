@@ -40,9 +40,14 @@ const Login = () => {
         window.location.href = "/transform";
       }, 100);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
-      );
+      // Verifica si el error es de usuario eliminado
+      if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
+        setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");
+      } else {
+        setError(
+          err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
+        );
+      }
     } finally {
       setLoading(false);
     }

@@ -22,9 +22,15 @@ function MiEquipo() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     fetchUsuarios();
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = JSON.parse(atob(token.split(".")[1]));
+      setCurrentUserId(decoded.id);
+    }
   }, []);
 
   const fetchUsuarios = async () => {
@@ -61,12 +67,18 @@ function MiEquipo() {
       if (window.confirm(`¿Seguro que quieres eliminar a ${usuarioSeleccionado.nombre}?`)) {
         try {
           const token = localStorage.getItem("token");
-          await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
+          const response = await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
             method: "DELETE",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           });
+
+          if (!response.ok) {
+            throw new Error("Error al eliminar usuario");
+          }
+
+          alert("✅ Usuario eliminado correctamente.");
           fetchUsuarios();
         } catch (error) {
           console.error("Error al eliminar usuario:", error);
@@ -109,11 +121,9 @@ function MiEquipo() {
         throw new Error("Error al actualizar usuario");
       }
 
-      await fetchUsuarios();
-      handleCloseModal();
-
-      
       alert("✅ Usuario actualizado correctamente.");
+      fetchUsuarios();
+      handleCloseModal();
     } catch (error) {
       console.error("Error al actualizar usuario:", error);
     }
@@ -144,9 +154,11 @@ function MiEquipo() {
                   {usuario.rol === "admin" ? "Administrador" : "Usuario"}
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
-                    <MoreVertIcon />
-                  </IconButton>
+                  {usuario.id !== currentUserId && (
+                    <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
+                      <MoreVertIcon />
+                    </IconButton>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -163,7 +175,6 @@ function MiEquipo() {
         <MenuItem onClick={handleEliminar}>Eliminar</MenuItem>
       </Menu>
 
-      
       <EditUserModal
         open={openModal}
         onClose={handleCloseModal}
