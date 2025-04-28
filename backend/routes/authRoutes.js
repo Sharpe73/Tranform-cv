@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../database");
 const jwt = require("jsonwebtoken");
 
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -43,6 +44,35 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("❌ Error en login:", error.message);
     res.status(500).json({ message: "Error interno en el servidor" });
+  }
+});
+
+// 🔹 Validar sesión activa
+router.get("/validar", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token no proporcionado" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const userResult = await db.query(
+      "SELECT id FROM usuarios WHERE id = $1",
+      [decoded.id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ message: "Usuario eliminado. Sesión terminada." });
+    }
+
+    res.json({ message: "Sesión activa" });
+  } catch (error) {
+    console.error("❌ Error al validar token:", error.message);
+    res.status(401).json({ message: "Token inválido o expirado" });
   }
 });
 
