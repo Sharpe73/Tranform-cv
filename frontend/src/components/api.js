@@ -23,8 +23,11 @@ api.interceptors.response.use(
         ) {
           localStorage.removeItem("token");
           localStorage.removeItem("usuario");
-          alert("❗ Tu cuenta ha sido eliminada o tu sesión ha expirado. Vuelve a iniciar sesión.");
-          window.location.href = "/login";
+
+          setTimeout(() => {
+            alert("❗ Tu cuenta ha sido eliminada o tu sesión ha expirado. Vuelve a iniciar sesión.");
+            window.location.href = "/login";
+          }, 300);
         }
       }
     }
@@ -33,7 +36,7 @@ api.interceptors.response.use(
   }
 );
 
-// 🚀 Nueva función para verificar la sesión contra el backend
+
 export async function verificarSesionActiva() {
   const token = localStorage.getItem("token");
   if (!token) {
