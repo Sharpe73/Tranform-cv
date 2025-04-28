@@ -81,12 +81,18 @@ function MiEquipo() {
     setUsuarioSeleccionado(null);
   };
 
-  const handleGuardarCambios = async () => {
-    if (!usuarioSeleccionado) return;
+  const handleChangeUsuario = (e) => {
+    const { name, value } = e.target;
+    setUsuarioSeleccionado((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
+  const handleGuardarCambios = async () => {
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
+      const response = await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -99,8 +105,12 @@ function MiEquipo() {
         }),
       });
 
-      fetchUsuarios(); // refrescar lista
-      handleCloseModal(); // cerrar modal
+      if (!response.ok) {
+        throw new Error("Error al actualizar usuario");
+      }
+
+      fetchUsuarios();
+      handleCloseModal();
     } catch (error) {
       console.error("Error al actualizar usuario:", error);
     }
@@ -155,12 +165,7 @@ function MiEquipo() {
         open={openModal}
         onClose={handleCloseModal}
         usuario={usuarioSeleccionado}
-        onChange={(e) =>
-          setUsuarioSeleccionado((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value,
-          }))
-        }
+        onChange={handleChangeUsuario}
         onSave={handleGuardarCambios}
       />
     </Box>

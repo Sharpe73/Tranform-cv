@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -9,50 +9,8 @@ import {
   MenuItem,
   Stack,
 } from "@mui/material";
-import API_BASE_URL from "../apiConfig";
 
-function EditUserModal({ open, onClose, usuario, onUpdate }) {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    rol: "",
-  });
-
-  useEffect(() => {
-    if (usuario) {
-      setFormData({
-        nombre: usuario.nombre || "",
-        apellido: usuario.apellido || "",
-        rol: usuario.rol || "user",
-      });
-    }
-  }, [usuario]);
-
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSave = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await fetch(`${API_BASE_URL}/users/${usuario.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      onUpdate(); // Refrescar la tabla
-      onClose();  // Cerrar el modal
-    } catch (error) {
-      console.error("Error al actualizar usuario:", error);
-    }
-  };
-
+function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
   if (!usuario) return null;
 
   return (
@@ -63,15 +21,15 @@ function EditUserModal({ open, onClose, usuario, onUpdate }) {
           <TextField
             label="Nombre"
             name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
+            value={usuario.nombre}
+            onChange={onChange}
             fullWidth
           />
           <TextField
             label="Apellido"
             name="apellido"
-            value={formData.apellido}
-            onChange={handleChange}
+            value={usuario.apellido}
+            onChange={onChange}
             fullWidth
           />
           <TextField
@@ -86,8 +44,8 @@ function EditUserModal({ open, onClose, usuario, onUpdate }) {
             select
             label="Nivel de Acceso"
             name="rol"
-            value={formData.rol}
-            onChange={handleChange}
+            value={usuario.rol}
+            onChange={onChange}
             fullWidth
           >
             <MenuItem value="admin">Administrador</MenuItem>
@@ -99,7 +57,7 @@ function EditUserModal({ open, onClose, usuario, onUpdate }) {
         <Button onClick={onClose} color="secondary">
           Cancelar
         </Button>
-        <Button onClick={handleSave} variant="contained" color="primary">
+        <Button onClick={onSave} variant="contained" color="primary">
           Guardar Cambios
         </Button>
       </DialogActions>
