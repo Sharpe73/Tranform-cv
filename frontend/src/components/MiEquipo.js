@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
-import api from "../api";
+import api from "./api";
 
 function MiEquipo() {
   const [usuarios, setUsuarios] = useState([]);
