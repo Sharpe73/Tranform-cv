@@ -92,30 +92,24 @@ function Dashboard() {
             >
               CONSUMO DE CV VS TOTAL X MES
             </Typography>
-
             <ResponsiveContainer width="100%" height={300}>
-              <Box sx={{ display: "flex", justifyContent: esMovil ? "center" : "normal" }}>
-                <PieChart width={esMovil ? 250 : 400} height={300}>
-                  <Pie
-                    data={data}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                  >
-                    {data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend
-                    verticalAlign="bottom"
-                    iconType="circle"
-                    wrapperStyle={{ marginTop: 20 }}
-                  />
-                </PieChart>
-              </Box>
+              <PieChart>
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
+              </PieChart>
             </ResponsiveContainer>
 
             <Box mt={3}>
