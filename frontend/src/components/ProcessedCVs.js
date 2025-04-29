@@ -17,11 +17,15 @@ import {
   InputAdornment,
   Chip,
   useMediaQuery,
+  Menu,
+  MenuItem,
+  IconButton,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { jwtDecode } from "jwt-decode";
 import API_BASE_URL from "../apiConfig";
 
@@ -49,6 +53,7 @@ function ProcessedCVs() {
   const isMobile = useMediaQuery("(max-width:600px)");
   const itemsPerPage = 10;
   const [isAdmin, setIsAdmin] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);  // For the delete menu
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -80,6 +85,32 @@ function ProcessedCVs() {
     cargarCVs();
   }, []);
 
+  const eliminarCV = async (cvId) => {
+    const confirmar = window.confirm("¿Estás seguro que deseas eliminar este CV?");
+    if (!confirmar) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/cv/eliminar/${cvId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (res.status === 200) {
+        alert(data.mensaje || "CV eliminado correctamente");
+        cargarCVs();
+      } else {
+        alert(data.mensaje || "Error al eliminar el CV");
+      }
+    } catch (err) {
+      console.error("❌ Error al eliminar el CV:", err);
+      alert("Ocurrió un error al intentar eliminar el CV.");
+    }
+  };
+
   const descargarJSON = (json, nombre) => {
     const blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -104,32 +135,6 @@ function ProcessedCVs() {
       .catch((err) => console.error("❌ Error al descargar PDF:", err));
   };
 
-  const eliminarCVs = async () => {
-    const confirmar = window.confirm("¿Estás seguro que deseas eliminar TODOS los CVs? Esta acción no se puede deshacer.");
-    if (!confirmar) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE_URL}/admin/limpiar-cvs`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (res.status === 200) {
-        alert(data.mensaje || "CVs eliminados correctamente");
-        cargarCVs();
-      } else {
-        alert(data.mensaje || "Error al eliminar los CVs");
-      }
-    } catch (err) {
-      console.error("❌ Error al eliminar los CVs:", err);
-      alert("Ocurrió un error al intentar eliminar los CVs.");
-    }
-  };
-
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
@@ -143,6 +148,14 @@ function ProcessedCVs() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget); // Open the menu
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null); // Close the menu
+  };
 
   return (
     <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto", minHeight: "100vh", pb: 8 }}>
@@ -165,25 +178,6 @@ function ProcessedCVs() {
             BUSCAR POR TAGS
           </Button>
         </Stack>
-
-        <Button
-          variant="contained"
-          startIcon={<DeleteIcon />}
-          onClick={isAdmin ? eliminarCVs : undefined}
-          disabled={!isAdmin}
-          sx={{
-            backgroundColor: isAdmin ? "#d32f2f" : "#ccc",
-            fontWeight: "bold",
-            px: 3,
-            py: 1.2,
-            boxShadow: 2,
-            color: isAdmin ? "#fff" : "#666",
-            cursor: isAdmin ? "pointer" : "not-allowed",
-            "&:hover": isAdmin ? { backgroundColor: "#b71c1c" } : {},
-          }}
-        >
-          ELIMINAR TODOS LOS CVS
-        </Button>
       </Box>
 
       {tabValue === "nombre" ? (
@@ -245,6 +239,7 @@ function ProcessedCVs() {
                 <TableCell><strong>🗓️ Fecha</strong></TableCell>
                 <TableCell><strong>👤 Transformado por</strong></TableCell>
                 <TableCell><strong>📄 PDF / JSON</strong></TableCell>
+                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}  {/* Action Column for Admin */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -285,6 +280,22 @@ function ProcessedCVs() {
                         </Button>
                       </Stack>
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <IconButton onClick={handleClick}>
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl)}
+                          onClose={handleClose}
+                        >
+                          <MenuItem onClick={() => eliminarCV(cv.id)} disabled={!isAdmin}>
+                            <DeleteIcon /> Eliminar
+                          </MenuItem>
+                        </Menu>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
