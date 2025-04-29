@@ -15,7 +15,6 @@ const LIMITE_MENSUAL = parseInt(process.env.LIMITE_MENSUAL) || 500;
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 
-
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -207,6 +206,31 @@ app.get("/cv/por-usuario", async (req, res) => {
   } catch (error) {
     console.error("❌ Error al obtener CVs por usuario:", error.message);
     res.status(500).json({ message: "Error al obtener CVs por usuario." });
+  }
+});
+
+
+app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user?.rol !== "admin") {
+    return res.status(403).json({ mensaje: "No autorizado: solo el administrador puede eliminar CVs." });
+  }
+
+  try {
+    const existe = await db.query("SELECT id FROM cv_files WHERE id = $1", [id]);
+
+    if (existe.rows.length === 0) {
+      return res.status(404).json({ mensaje: "El CV no existe o ya fue eliminado." });
+    }
+
+    await db.query("DELETE FROM cv_files WHERE id = $1", [id]);
+
+    console.log(`🗑️ CV con ID ${id} eliminado correctamente`);
+    res.status(200).json({ mensaje: "CV eliminado correctamente." });
+  } catch (error) {
+    console.error("❌ Error al eliminar CV:", error.message);
+    res.status(500).json({ mensaje: "Error al eliminar el CV." });
   }
 });
 
