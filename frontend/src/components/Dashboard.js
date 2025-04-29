@@ -67,24 +67,14 @@ function Dashboard() {
   return (
     <Box sx={{ p: 2, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
       <Typography
-        variant="h4"
+        variant={esMovil ? "h5" : "h4"}
         gutterBottom
-        sx={{
-          textAlign: "center",
-          fontWeight: "bold",
-          color: "#1976d2",
-          mb: 3,
-        }}
+        sx={{ textAlign: "center", fontWeight: "bold", color: "#1976d2" }}
       >
         📊 Consumo de CVs Transformados
       </Typography>
 
-      <Grid
-        container
-        spacing={4}
-        justifyContent="center"
-        direction={esMovil ? "column" : "row"}
-      >
+      <Grid container spacing={4} justifyContent="center">
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -93,7 +83,7 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: "100%",
+              height: esMovil ? "auto" : 430,
             }}
           >
             <Typography
@@ -102,7 +92,7 @@ function Dashboard() {
             >
               CONSUMO DE CV VS TOTAL X MES
             </Typography>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={esMovil ? 250 : 300}>
               <PieChart>
                 <Pie
                   data={data}
@@ -110,7 +100,7 @@ function Dashboard() {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={100}
+                  outerRadius={esMovil ? 70 : 100}
                   label={({ name, value }) => `${name}: ${value}`}
                 >
                   {data.map((entry, index) => (
@@ -160,7 +150,9 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: "100%",
+              height: esMovil ? "auto" : 430,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <Typography
@@ -203,9 +195,9 @@ function Dashboard() {
               </Box>
             </Stack>
 
-            <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%" }}>
+            <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%", flexGrow: 1 }}>
               <ResponsiveContainer
-                width={esMovil ? dataPorUsuario.length * 120 : "100%"}
+                width={esMovil ? dataPorUsuario.length * 130 : "100%"}
                 height={300}
               >
                 <BarChart
