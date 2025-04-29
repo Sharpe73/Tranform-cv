@@ -65,16 +65,26 @@ function Dashboard() {
   ];
 
   return (
-    <Box sx={{ p: 4, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
+    <Box sx={{ p: 2, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
       <Typography
         variant="h4"
         gutterBottom
-        sx={{ textAlign: "center", fontWeight: "bold", color: "#1976d2" }}
+        sx={{
+          textAlign: "center",
+          fontWeight: "bold",
+          color: "#1976d2",
+          mb: 3,
+        }}
       >
         📊 Consumo de CVs Transformados
       </Typography>
 
-      <Grid container spacing={4} justifyContent="center">
+      <Grid
+        container
+        spacing={4}
+        justifyContent="center"
+        direction={esMovil ? "column" : "row"}
+      >
         <Grid item xs={12} md={6}>
           <Paper
             elevation={4}
@@ -83,7 +93,7 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: 430,
+              height: "100%",
             }}
           >
             <Typography
@@ -108,7 +118,11 @@ function Dashboard() {
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
+                <Legend
+                  verticalAlign="bottom"
+                  iconType="circle"
+                  wrapperStyle={{ marginTop: 20 }}
+                />
               </PieChart>
             </ResponsiveContainer>
 
@@ -146,9 +160,7 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: 430,
-              display: "flex",
-              flexDirection: "column",
+              height: "100%",
             }}
           >
             <Typography
@@ -166,19 +178,35 @@ function Dashboard() {
               sx={{ mb: 1 }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.admin, mr: 1 }} />
+                <Box
+                  sx={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    backgroundColor: ROLE_COLORS.admin,
+                    mr: 1,
+                  }}
+                />
                 <Typography variant="caption">Admin</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.user, mr: 1 }} />
+                <Box
+                  sx={{
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    backgroundColor: ROLE_COLORS.user,
+                    mr: 1,
+                  }}
+                />
                 <Typography variant="caption">Usuario</Typography>
               </Box>
             </Stack>
 
-            <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%", flexGrow: 1 }}>
+            <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%" }}>
               <ResponsiveContainer
-                width={esMovil ? dataPorUsuario.length * 130 : "100%"}
-                height="100%"
+                width={esMovil ? dataPorUsuario.length * 120 : "100%"}
+                height={300}
               >
                 <BarChart
                   data={dataPorUsuario}
