@@ -1,7 +1,8 @@
-const { Document, Packer, Paragraph, TextRun } = require("docx");
-const fs = require("fs");
+// utils/wordUtils.js
 
-async function generateWordDocument(jsonString) {
+const { Document, Packer, Paragraph, TextRun } = require("docx");
+
+async function crearDocDesdeJSON(jsonString) {
   const json = typeof jsonString === "string" ? JSON.parse(jsonString) : jsonString;
   const doc = new Document();
   const seccion = [];
@@ -101,10 +102,8 @@ async function generateWordDocument(jsonString) {
   }
 
   doc.addSection({ children: seccion });
-
   const buffer = await Packer.toBuffer(doc);
-  return buffer; // Retorna el buffer para usarlo en la respuesta del backend
+  return buffer;
 }
 
-module.exports = { crearDocDesdeJSON: generateWordDocument };
-
+module.exports = { crearDocDesdeJSON };
