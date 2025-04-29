@@ -106,4 +106,5 @@ async function generateWordDocument(jsonString) {
   return buffer; // Retorna el buffer para usarlo en la respuesta del backend
 }
 
-module.exports = { generateWordDocument };
+module.exports = { crearDocDesdeJSON: generateWordDocument };
+
