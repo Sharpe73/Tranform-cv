@@ -5,7 +5,6 @@ const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const { procesarCV } = require("./utils/procesarCV");
-const { crearDocDesdeJSON } = require("./utils/wordUtils");
 const db = require("./database");
 const verifyToken = require("./middleware/verifyToken");
 
@@ -18,7 +17,7 @@ const userRoutes = require("./routes/userRoutes");
 
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],//crud
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
 
@@ -83,26 +82,21 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     const jsonPath = await procesarCV(filePath, opciones);
     const pdfFilename = path.basename(jsonPath.replace(".json", ".pdf"));
     const pdfPath = path.join(uploadsPath, pdfFilename);
+    const pdfUrl = `uploads/${pdfFilename}`;
 
     const rawData = fs.readFileSync(jsonPath, "utf-8");
     const jsonData = JSON.stringify(JSON.parse(rawData));
     const pdfBuffer = fs.readFileSync(pdfPath);
-
-    const wordFilename = `CV_${Date.now()}.docx`;
-    const wordPath = path.join(uploadsPath, wordFilename);
-    await crearDocDesdeJSON(JSON.parse(rawData), wordPath);
-    const wordBuffer = fs.readFileSync(wordPath);
-
     const timestamp = new Date().toISOString();
 
     await db.query(
-      `INSERT INTO cv_files (json_data, pdf_url, pdf_data, word_data, created_at, usuario_id)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [jsonData, `uploads/${pdfFilename}`, pdfBuffer, wordBuffer, timestamp, req.user.id]
+      `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [jsonData, pdfUrl, pdfBuffer, timestamp, req.user.id]
     );
 
     console.log("✅ Datos guardados en la base de datos.");
-    res.json({ message: "Archivo procesado con éxito." });
+    res.json({ message: "Archivo procesado con éxito.", pdfPath: pdfUrl });
   } catch (error) {
     console.error("❌ Error al procesar el archivo:", error.message);
     const status = error.statusCode || 500;
@@ -110,22 +104,19 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
   }
 });
 
-app.get("/cv/word/:id", async (req, res) => {
+app.get("/styles", (req, res) => {
+  const estilosPath = path.join(__dirname, "plantillas.json");
+
+  if (!fs.existsSync(estilosPath)) {
+    return res.status(500).json({ message: "⚠️ No se encontró el archivo de plantillas." });
+  }
+
   try {
-    const { id } = req.params;
-    const result = await db.query("SELECT word_data FROM cv_files WHERE id = $1", [id]);
-
-    if (result.rows.length === 0 || !result.rows[0].word_data) {
-      return res.status(404).send("Archivo no encontrado");
-    }
-
-    const buffer = result.rows[0].word_data;
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    res.setHeader("Content-Disposition", `attachment; filename=cv_${id}.docx`);
-    res.send(buffer);
+    const estilos = JSON.parse(fs.readFileSync(estilosPath, "utf-8")).plantillas;
+    res.json({ plantillas: Object.keys(estilos) });
   } catch (error) {
-    console.error("Error al descargar Word:", error.message);
-    res.status(500).send("Error al descargar Word");
+    console.error("❌ Error cargando estilos:", error.message);
+    res.status(500).json({ message: "Error al cargar estilos." });
   }
 });
 
@@ -148,26 +139,10 @@ app.get("/cv/pdf/:id", async (req, res) => {
   }
 });
 
-app.get("/styles", (req, res) => {
-  const estilosPath = path.join(__dirname, "plantillas.json");
-
-  if (!fs.existsSync(estilosPath)) {
-    return res.status(500).json({ message: "⚠️ No se encontró el archivo de plantillas." });
-  }
-
-  try {
-    const estilos = JSON.parse(fs.readFileSync(estilosPath, "utf-8")).plantillas;
-    res.json({ plantillas: Object.keys(estilos) });
-  } catch (error) {
-    console.error("❌ Error cargando estilos:", error.message);
-    res.status(500).json({ message: "Error al cargar estilos." });
-  }
-});
-
 app.get("/cv/list", async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT cv.id, cv.json_data, cv.created_at, u.nombre, u.apellido, r.nombre AS rol
+      `SELECT cv.id, cv.json_data, cv.pdf_url, cv.created_at, u.nombre, u.apellido, r.nombre AS rol
        FROM cv_files cv
        LEFT JOIN usuarios u ON cv.usuario_id = u.id
        LEFT JOIN roles r ON u.rol_id = r.id
@@ -177,6 +152,7 @@ app.get("/cv/list", async (req, res) => {
     const parsed = result.rows.map((row) => ({
       id: row.id,
       json: JSON.parse(row.json_data),
+      pdf_url: row.pdf_url,
       created_at: row.created_at,
       usuario:
         row.nombre && row.apellido && row.rol
@@ -233,6 +209,7 @@ app.get("/cv/por-usuario", async (req, res) => {
   }
 });
 
+
 app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
@@ -254,6 +231,103 @@ app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("❌ Error al eliminar CV:", error.message);
     res.status(500).json({ mensaje: "Error al eliminar el CV." });
+  }
+});
+
+// 🚀 Limpieza de CVs
+app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
+  console.log("🔐 Usuario autenticado:", req.user);
+
+  const rol = req.user?.rol;
+
+  if (rol !== "admin") {
+    console.warn("⛔ Usuario sin permisos intentó borrar CVs.");
+    return res.status(403).json({ mensaje: "No autorizado: solo el administrador puede borrar CVs." });
+  }
+
+  try {
+    await db.query("TRUNCATE TABLE cv_files RESTART IDENTITY");
+    await db.query("VACUUM FULL cv_files");
+    console.log("✅ CVs eliminados correctamente por solicitud autorizada.");
+    res.status(200).json({ mensaje: "Todos los CVs fueron eliminados correctamente y el espacio fue liberado." });
+  } catch (error) {
+    console.error("❌ Error al limpiar los CVs:", error.message);
+    res.status(500).json({ mensaje: "Error al limpiar los CVs." });
+  }
+});
+
+// 🚀 Crear Usuario
+app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
+  const { nombre, apellido, email, password, rol } = req.body;
+
+  if (req.user?.rol !== "admin") {
+    return res.status(403).json({ message: "Acceso denegado: solo el administrador puede crear usuarios." });
+  }
+
+  if (!nombre || !apellido || !email || !password || !rol) {
+    return res.status(400).json({ message: "Faltan campos obligatorios" });
+  }
+
+  try {
+    const existingUser = await db.query("SELECT id FROM usuarios WHERE email = $1", [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ message: "El correo ya existe en la base de datos. Por favor ingrese otro correo." });
+    }
+
+    const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
+
+    if (rolResult.rows.length === 0) {
+      return res.status(400).json({ message: `El rol '${rol}' no existe.` });
+    }
+
+    const rol_id = rolResult.rows[0].id;
+
+    await db.query(
+      `INSERT INTO usuarios (nombre, apellido, email, password, rol_id)
+       VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5)`,
+      [nombre, apellido, email, password, rol_id]
+    );
+
+    res.status(201).json({ message: "✅ Usuario creado correctamente" });
+  } catch (error) {
+    console.error("❌ Error al crear usuario:", error.message);
+    res.status(500).json({ message: "Error interno al crear el usuario" });
+  }
+});
+
+// 🚀 Actualizar Usuario
+app.put("/users/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const { nombre, apellido, rol } = req.body;
+
+  if (req.user?.rol !== "admin") {
+    return res.status(403).json({ message: "Acceso denegado: solo el administrador puede actualizar usuarios." });
+  }
+
+  if (!nombre || !apellido || !rol) {
+    return res.status(400).json({ message: "Faltan campos obligatorios para actualizar el usuario." });
+  }
+
+  try {
+    const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
+
+    if (rolResult.rows.length === 0) {
+      return res.status(400).json({ message: `El rol '${rol}' no existe.` });
+    }
+
+    const rol_id = rolResult.rows[0].id;
+
+    await db.query(
+      `UPDATE usuarios
+       SET nombre = $1, apellido = $2, rol_id = $3
+       WHERE id = $4`,
+      [nombre, apellido, rol_id, id]
+    );
+
+    res.status(200).json({ message: "✅ Usuario actualizado correctamente." });
+  } catch (error) {
+    console.error("❌ Error al actualizar usuario:", error.message);
+    res.status(500).json({ message: "Error interno al actualizar el usuario." });
   }
 });
 
