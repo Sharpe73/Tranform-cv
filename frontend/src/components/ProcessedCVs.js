@@ -53,7 +53,8 @@ function ProcessedCVs() {
   const isMobile = useMediaQuery("(max-width:600px)");
   const itemsPerPage = 10;
   const [isAdmin, setIsAdmin] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);  // For the delete menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [menuCvId, setMenuCvId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -101,7 +102,9 @@ function ProcessedCVs() {
       const data = await res.json();
       if (res.status === 200) {
         alert(data.mensaje || "CV eliminado correctamente");
-        cargarCVs();
+        setCvs((prev) => prev.filter((cv) => cv.id !== cvId));
+        setAnchorEl(null);
+        setMenuCvId(null);
       } else {
         alert(data.mensaje || "Error al eliminar el CV");
       }
@@ -149,12 +152,14 @@ function ProcessedCVs() {
     currentPage * itemsPerPage
   );
 
-  const handleClick = (event) => {
+  const handleMenuOpen = (event, cvId) => {
     setAnchorEl(event.currentTarget);
+    setMenuCvId(cvId);
   };
 
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
+    setMenuCvId(null);
   };
 
   return (
@@ -239,7 +244,7 @@ function ProcessedCVs() {
                 <TableCell><strong>🗓️ Fecha</strong></TableCell>
                 <TableCell><strong>👤 Transformado por</strong></TableCell>
                 <TableCell><strong>📄 PDF / JSON</strong></TableCell>
-                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}  {/* Action Column for Admin */}
+                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -282,15 +287,15 @@ function ProcessedCVs() {
                     </TableCell>
                     {isAdmin && (
                       <TableCell>
-                        <IconButton onClick={handleClick}>
+                        <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
                           <MoreVertIcon />
                         </IconButton>
                         <Menu
                           anchorEl={anchorEl}
-                          open={Boolean(anchorEl)}
-                          onClose={handleClose}
+                          open={Boolean(anchorEl) && menuCvId === cv.id}
+                          onClose={handleMenuClose}
                         >
-                          <MenuItem onClick={() => eliminarCV(cv.id)} disabled={!isAdmin}>
+                          <MenuItem onClick={() => eliminarCV(cv.id)}>
                             <DeleteIcon /> Eliminar
                           </MenuItem>
                         </Menu>
