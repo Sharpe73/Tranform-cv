@@ -22,6 +22,7 @@ import {
   IconButton,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DescriptionIcon from "@mui/icons-material/Description";
 import CodeIcon from "@mui/icons-material/Code";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
@@ -53,7 +54,8 @@ function ProcessedCVs() {
   const isMobile = useMediaQuery("(max-width:600px)");
   const itemsPerPage = 10;
   const [isAdmin, setIsAdmin] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);  // For the delete menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [jsonVisible, setJsonVisible] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -135,6 +137,20 @@ function ProcessedCVs() {
       .catch((err) => console.error("❌ Error al descargar PDF:", err));
   };
 
+  const descargarWord = (id) => {
+    fetch(`${API_BASE_URL}/cv/word/${id}`, { credentials: "include" })
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `cv_${id}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      })
+      .catch((err) => console.error("❌ Error al descargar Word:", err));
+  };
+
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
@@ -150,11 +166,11 @@ function ProcessedCVs() {
   );
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget); // Open the menu
+    setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
-    setAnchorEl(null); // Close the menu
+    setAnchorEl(null);
   };
 
   return (
@@ -238,8 +254,8 @@ function ProcessedCVs() {
                 <TableCell><strong>🧑 Nombre</strong></TableCell>
                 <TableCell><strong>🗓️ Fecha</strong></TableCell>
                 <TableCell><strong>👤 Transformado por</strong></TableCell>
-                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
-                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}  {/* Action Column for Admin */}
+                <TableCell><strong>📄 PDF / Word</strong></TableCell>
+                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -263,21 +279,40 @@ function ProcessedCVs() {
                           PDF
                         </Button>
                         <Button
-                          variant="outlined"
-                          startIcon={<CodeIcon />}
-                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                          sx={{
-                            color: "#f29111",
-                            borderColor: "#f29111",
-                            fontWeight: "bold",
-                            "&:hover": {
-                              backgroundColor: "#f29111",
-                              color: "#fff",
-                            },
-                          }}
+                          variant="contained"
+                          color="secondary"
+                          startIcon={<DescriptionIcon />}
+                          onClick={() => descargarWord(cv.id)}
                         >
-                          JSON
+                          Word
                         </Button>
+                        {jsonVisible && (
+                          <Button
+                            variant="outlined"
+                            startIcon={<CodeIcon />}
+                            onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                            sx={{
+                              color: "#f29111",
+                              borderColor: "#f29111",
+                              fontWeight: "bold",
+                              "&:hover": {
+                                backgroundColor: "#f29111",
+                                color: "#fff",
+                              },
+                            }}
+                          >
+                            JSON
+                          </Button>
+                        )}
+                        {!jsonVisible && (
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() => setJsonVisible(true)}
+                          >
+                            Mostrar JSON
+                          </Button>
+                        )}
                       </Stack>
                     </TableCell>
                     {isAdmin && (
