@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -12,11 +13,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  useMediaQuery,
-  Card,
-  CardContent,
-  Stack,
-  Button
+  Tooltip,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
@@ -28,7 +25,6 @@ function MiEquipo() {
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
-  const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
     fetchUsuarios();
@@ -43,9 +39,7 @@ function MiEquipo() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`${API_BASE_URL}/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
       setUsuarios(data);
@@ -75,15 +69,9 @@ function MiEquipo() {
           const token = localStorage.getItem("token");
           const response = await fetch(`${API_BASE_URL}/users/${usuarioSeleccionado.id}`, {
             method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
-
-          if (!response.ok) {
-            throw new Error("Error al eliminar usuario");
-          }
-
+          if (!response.ok) throw new Error("Error al eliminar usuario");
           alert("✅ Usuario eliminado correctamente.");
           fetchUsuarios();
         } catch (error) {
@@ -101,10 +89,7 @@ function MiEquipo() {
 
   const handleChangeUsuario = (e) => {
     const { name, value } = e.target;
-    setUsuarioSeleccionado((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUsuarioSeleccionado((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleGuardarCambios = async () => {
@@ -122,11 +107,7 @@ function MiEquipo() {
           rol: usuarioSeleccionado.rol,
         }),
       });
-
-      if (!response.ok) {
-        throw new Error("Error al actualizar usuario");
-      }
-
+      if (!response.ok) throw new Error("Error al actualizar usuario");
       alert("✅ Usuario actualizado correctamente.");
       fetchUsuarios();
       handleCloseModal();
@@ -136,76 +117,47 @@ function MiEquipo() {
   };
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "1200px", margin: "0 auto" }}>
-      <Typography variant="h4" gutterBottom textAlign="center">
+    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto" }}>
+      <Typography variant="h4" gutterBottom fontWeight="bold">
         👥 Mi Equipo
       </Typography>
 
-      {isMobile ? (
-        <Stack spacing={2}>
-          {usuarios.map((usuario) => (
-            <Card key={usuario.id} sx={{ borderRadius: 4, boxShadow: 3 }}>
-              <CardContent>
-                <Typography variant="h6">
-                  {usuario.nombre} {usuario.apellido}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Correo: {usuario.email || "-"}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Proyecto: Todos los proyectos
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Acceso: {usuario.rol === "admin" ? "Administrador" : "Usuario"}
-                </Typography>
-                {usuario.id !== currentUserId && (
-                  <Box mt={1}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={(e) => handleMenuOpen(e, usuario)}
-                      endIcon={<MoreVertIcon />}
-                    >
-                      Opciones
-                    </Button>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </Stack>
-      ) : (
-        <TableContainer component={Paper} sx={{ borderRadius: 4 }}>
-          <Table>
-            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableRow>
-                <TableCell><strong>Nombre</strong></TableCell>
-                <TableCell><strong>Correo</strong></TableCell>
-                <TableCell><strong>Proyecto</strong></TableCell>
-                <TableCell><strong>Acceso</strong></TableCell>
-                <TableCell><strong>Acciones</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {usuarios.map((usuario) => (
-                <TableRow key={usuario.id}>
-                  <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
-                  <TableCell>{usuario.email || "-"}</TableCell>
-                  <TableCell>Todos los proyectos</TableCell>
-                  <TableCell>{usuario.rol === "admin" ? "Administrador" : "Usuario"}</TableCell>
-                  <TableCell>
-                    {usuario.id !== currentUserId && (
+      <TableContainer component={Paper} elevation={3}>
+        <Table>
+          <TableHead sx={{ backgroundColor: "#f9f9f9" }}>
+            <TableRow>
+              <TableCell><strong>Nombre</strong></TableCell>
+              <TableCell><strong>Correo</strong></TableCell>
+              <TableCell><strong>Proyecto</strong></TableCell>
+              <TableCell><strong>Acceso</strong></TableCell>
+              <TableCell align="center"><strong>Acciones</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {usuarios.map((usuario) => (
+              <TableRow
+                key={usuario.id}
+                hover
+                sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}
+              >
+                <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
+                <TableCell>{usuario.email || "-"}</TableCell>
+                <TableCell>Todos los proyectos</TableCell>
+                <TableCell>{usuario.rol === "admin" ? "Administrador" : "Usuario"}</TableCell>
+                <TableCell align="center">
+                  {usuario.id !== currentUserId && (
+                    <Tooltip title="Opciones">
                       <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
                         <MoreVertIcon />
                       </IconButton>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+                    </Tooltip>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={handleEditar}>Editar</MenuItem>
