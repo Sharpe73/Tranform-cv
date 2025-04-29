@@ -18,7 +18,7 @@ const userRoutes = require("./routes/userRoutes");
 
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE"],//crud
   credentials: true,
 }));
 
