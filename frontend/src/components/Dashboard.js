@@ -65,9 +65,9 @@ function Dashboard() {
   ];
 
   return (
-    <Box sx={{ p: 2, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
+    <Box sx={{ p: 4, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
       <Typography
-        variant={esMovil ? "h5" : "h4"}
+        variant="h4"
         gutterBottom
         sx={{ textAlign: "center", fontWeight: "bold", color: "#1976d2" }}
       >
@@ -83,7 +83,7 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: esMovil ? "auto" : 430,
+              height: 430,
             }}
           >
             <Typography
@@ -92,7 +92,7 @@ function Dashboard() {
             >
               CONSUMO DE CV VS TOTAL X MES
             </Typography>
-            <ResponsiveContainer width="100%" height={esMovil ? 250 : 300}>
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={data}
@@ -100,8 +100,7 @@ function Dashboard() {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={esMovil ? 70 : 100}
-                  label={({ name, value }) => `${name}: ${value}`}
+                  outerRadius={100}
                 >
                   {data.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -150,7 +149,7 @@ function Dashboard() {
               borderRadius: 4,
               backgroundColor: "#ffffff",
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: esMovil ? "auto" : 430,
+              height: 430,
               display: "flex",
               flexDirection: "column",
             }}
@@ -170,27 +169,11 @@ function Dashboard() {
               sx={{ mb: 1 }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    backgroundColor: ROLE_COLORS.admin,
-                    mr: 1,
-                  }}
-                />
+                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.admin, mr: 1 }} />
                 <Typography variant="caption">Admin</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    backgroundColor: ROLE_COLORS.user,
-                    mr: 1,
-                  }}
-                />
+                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.user, mr: 1 }} />
                 <Typography variant="caption">Usuario</Typography>
               </Box>
             </Stack>
@@ -198,7 +181,7 @@ function Dashboard() {
             <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%", flexGrow: 1 }}>
               <ResponsiveContainer
                 width={esMovil ? dataPorUsuario.length * 130 : "100%"}
-                height={300}
+                height="100%"
               >
                 <BarChart
                   data={dataPorUsuario}
