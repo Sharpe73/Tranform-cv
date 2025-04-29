@@ -12,6 +12,11 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  useMediaQuery,
+  Card,
+  CardContent,
+  Stack,
+  Button
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
@@ -23,6 +28,7 @@ function MiEquipo() {
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
     fetchUsuarios();
@@ -130,49 +136,78 @@ function MiEquipo() {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box sx={{ padding: 3, maxWidth: "1200px", margin: "0 auto" }}>
+      <Typography variant="h4" gutterBottom textAlign="center">
         👥 Mi Equipo
       </Typography>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>Nombre</strong></TableCell>
-              <TableCell><strong>Correo</strong></TableCell> 
-              <TableCell><strong>Proyecto</strong></TableCell>
-              <TableCell><strong>Nivel de acceso</strong></TableCell>
-              <TableCell><strong>Acciones</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {usuarios.map((usuario) => (
-              <TableRow key={usuario.id}>
-                <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
-                <TableCell>{usuario.email || "-"}</TableCell>
-                <TableCell>Todos los proyectos</TableCell>
-                <TableCell>
-                  {usuario.rol === "admin" ? "Administrador" : "Usuario"}
-                </TableCell>
-                <TableCell>
-                  {usuario.id !== currentUserId && (
-                    <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
-                      <MoreVertIcon />
-                    </IconButton>
-                  )}
-                </TableCell>
+      {isMobile ? (
+        <Stack spacing={2}>
+          {usuarios.map((usuario) => (
+            <Card key={usuario.id} sx={{ borderRadius: 4, boxShadow: 3 }}>
+              <CardContent>
+                <Typography variant="h6">
+                  {usuario.nombre} {usuario.apellido}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Correo: {usuario.email || "-"}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Proyecto: Todos los proyectos
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Acceso: {usuario.rol === "admin" ? "Administrador" : "Usuario"}
+                </Typography>
+                {usuario.id !== currentUserId && (
+                  <Box mt={1}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={(e) => handleMenuOpen(e, usuario)}
+                      endIcon={<MoreVertIcon />}
+                    >
+                      Opciones
+                    </Button>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
+      ) : (
+        <TableContainer component={Paper} sx={{ borderRadius: 4 }}>
+          <Table>
+            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableRow>
+                <TableCell><strong>Nombre</strong></TableCell>
+                <TableCell><strong>Correo</strong></TableCell>
+                <TableCell><strong>Proyecto</strong></TableCell>
+                <TableCell><strong>Acceso</strong></TableCell>
+                <TableCell><strong>Acciones</strong></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {usuarios.map((usuario) => (
+                <TableRow key={usuario.id}>
+                  <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
+                  <TableCell>{usuario.email || "-"}</TableCell>
+                  <TableCell>Todos los proyectos</TableCell>
+                  <TableCell>{usuario.rol === "admin" ? "Administrador" : "Usuario"}</TableCell>
+                  <TableCell>
+                    {usuario.id !== currentUserId && (
+                      <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
+                        <MoreVertIcon />
+                      </IconButton>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={handleEditar}>Editar</MenuItem>
         <MenuItem onClick={handleEliminar}>Eliminar</MenuItem>
       </Menu>
