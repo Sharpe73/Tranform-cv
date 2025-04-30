@@ -63,9 +63,9 @@ function Dashboard() {
   ];
 
   return (
-    <Box sx={{ p: 2, backgroundColor: "#f9fafc", minHeight: "100vh" }}>
+    <Box sx={{ p: esMovil ? 1 : 4, backgroundColor: "#f9fafc", minHeight: "100vh" }}>
       <Typography
-        variant="h4"
+        variant={esMovil ? "h5" : "h4"}
         align="center"
         fontWeight="bold"
         color="primary"
@@ -84,19 +84,18 @@ function Dashboard() {
           flexWrap: "wrap",
         }}
       >
-        {/* Pie Chart */}
         <Paper
           elevation={4}
           sx={{
             flex: 1,
             minWidth: 300,
             maxWidth: 600,
-            p: 3,
+            p: 2,
             borderRadius: 4,
-            height: 430,
+            height: esMovil ? "auto" : 430,
           }}
         >
-          <Typography variant="h6" align="center" fontWeight="bold" mb={2}>
+          <Typography variant="h6" align="center" fontWeight="bold" mb={1}>
             CONSUMO DE CV VS TOTAL X MES
           </Typography>
 
@@ -141,16 +140,15 @@ function Dashboard() {
           </Box>
         </Paper>
 
-        {/* Bar Chart */}
         <Paper
           elevation={4}
           sx={{
             flex: 1,
             minWidth: 300,
             maxWidth: 600,
-            p: 3,
+            p: 2,
             borderRadius: 4,
-            height: 430,
+            height: esMovil ? "auto" : 430,
             display: "flex",
             flexDirection: "column",
           }}
@@ -170,34 +168,35 @@ function Dashboard() {
             </Box>
           </Stack>
 
-          <Box sx={{ width: "100%", flexGrow: 1, overflowX: esMovil ? "auto" : "visible" }}>
-            <ResponsiveContainer
-              width={esMovil ? dataPorUsuario.length * 130 : "100%"}
-              height="100%"
+          <ResponsiveContainer
+            width="100%"
+            height={esMovil ? 300 : "100%"}
+          >
+            <BarChart
+              data={dataPorUsuario}
+              margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
             >
-              <BarChart
-                data={dataPorUsuario}
-                margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="usuario"
-                  interval={0}
-                  angle={-30}
-                  textAnchor="end"
-                  height={80}
-                  tick={{ fontSize: 11 }}
-                />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="cantidad" isAnimationActive={false}>
-                  {dataPorUsuario.map((entry, index) => (
-                    <Cell key={index} fill={ROLE_COLORS[entry.rol] || "#9e9e9e"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="usuario"
+                interval={0}
+                angle={-30}
+                textAnchor="end"
+                height={80}
+                tick={{ fontSize: 11 }}
+              />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Bar dataKey="cantidad" isAnimationActive={false}>
+                {dataPorUsuario.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={ROLE_COLORS[entry.rol] || "#9e9e9e"}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </Paper>
       </Box>
     </Box>
