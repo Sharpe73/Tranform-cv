@@ -4,26 +4,6 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
-const Tesseract = require("tesseract.js");
-const pdf2png = require("pdf2png-mp");
-
-// Crear carpeta temporal si no existe
-const tempDir = path.join(__dirname, "../temp");
-if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
-
-// OCR sobre imagen .png
-async function extraerTextoConOCR(imagenPath) {
-  const result = await Tesseract.recognize(imagenPath, "spa");
-  return result.data.text;
-}
-
-// Convierte la primera página del PDF a imagen PNG (sin usar poppler/gm)
-async function convertirPDFaImagen(pdfPath) {
-  const result = await pdf2png.convert(pdfPath, 1);
-  const outputPath = path.join(tempDir, "pagina1.png");
-  fs.writeFileSync(outputPath, result.content);
-  return outputPath;
-}
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -34,20 +14,6 @@ async function procesarCV(rutaArchivo, opciones) {
       const dataBuffer = fs.readFileSync(rutaArchivo);
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
-
-      // Si no hay texto, aplicar OCR
-      if (!textoExtraido || textoExtraido.trim().length < 10) {
-        console.log("🔎 PDF sin texto real. Usando OCR...");
-        const imagenPath = await convertirPDFaImagen(rutaArchivo);
-        textoExtraido = await extraerTextoConOCR(imagenPath);
-
-        if (!textoExtraido || textoExtraido.trim().length < 10) {
-          const error = new Error(`OCR no pudo extraer texto del archivo ${rutaArchivo}`);
-          error.statusCode = 404;
-          throw error;
-        }
-      }
-
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
       const result = await mammoth.extractRawText({ buffer: data });
@@ -55,6 +21,13 @@ async function procesarCV(rutaArchivo, opciones) {
     } else {
       const error = new Error(`Formato no soportado (${rutaArchivo})`);
       error.statusCode = 400;
+      throw error;
+    }
+
+    
+    if (!textoExtraido || textoExtraido.trim().length < 10) {
+      const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
+      error.statusCode = 404;
       throw error;
     }
 
@@ -81,7 +54,6 @@ async function procesarCV(rutaArchivo, opciones) {
     opciones.templateStyle = "tradicional";
     await generarPDF(datosEstructurados, nombreBase, opciones);
     return outputPathJSON;
-
   } catch (error) {
     console.error(`❌ Error procesando CV:`, error);
     throw error;
