@@ -5,11 +5,10 @@ import {
   Typography,
   LinearProgress,
   Tooltip as MuiTooltip,
+  Stack,
   useMediaQuery,
   useTheme,
-  Stack,
 } from "@mui/material";
-import Grid2 from "@mui/material/Unstable_Grid2";
 import {
   PieChart,
   Pie,
@@ -65,7 +64,7 @@ function Dashboard() {
   ];
 
   return (
-    <Box sx={{ p: 4, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
+    <Box sx={{ p: 2, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
       <Typography
         variant="h4"
         gutterBottom
@@ -74,141 +73,167 @@ function Dashboard() {
         📊 Consumo de CVs Transformados
       </Typography>
 
-      <Grid2 container spacing={4} justifyContent="center">
-        <Grid2 xs={12} md={6}>
-          <Paper
-            elevation={4}
-            sx={{
-              p: 3,
-              borderRadius: 4,
-              backgroundColor: "#ffffff",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: 430,
-            }}
+      <Stack
+        direction={esMovil ? "column" : "row"}
+        spacing={4}
+        justifyContent="center"
+        alignItems="stretch"
+        sx={{ mt: 4 }}
+      >
+        {/* Pie Chart */}
+        <Paper
+          elevation={4}
+          sx={{
+            p: 3,
+            borderRadius: 4,
+            backgroundColor: "#ffffff",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            width: esMovil ? "100%" : "50%",
+            height: 430,
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
           >
-            <Typography
-              variant="h6"
-              sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
-            >
-              CONSUMO DE CV VS TOTAL X MES
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={data}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
-              </PieChart>
-            </ResponsiveContainer>
-
-            <Box mt={3}>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                sx={{ textAlign: "center" }}
+            CONSUMO DE CV VS TOTAL X MES
+          </Typography>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label={({ name, value }) => `${name}: ${value}`}
               >
-                Progreso mensual: {consumo} de {CONSUMO_MAXIMO} CVs ({porcentaje}%)
-              </Typography>
-              <MuiTooltip title={`${porcentaje}% utilizado`} arrow>
-                <LinearProgress
-                  variant="determinate"
-                  value={parseFloat(porcentaje)}
-                  sx={{
-                    height: 12,
-                    borderRadius: 5,
-                    backgroundColor: "#eee",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: "#1976d2",
-                    },
-                  }}
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend
+                verticalAlign="bottom"
+                iconType="circle"
+                wrapperStyle={{ marginTop: 20 }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+
+          <Box mt={3}>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ textAlign: "center" }}
+            >
+              Progreso mensual: {consumo} de {CONSUMO_MAXIMO} CVs ({porcentaje}%)
+            </Typography>
+            <MuiTooltip title={`${porcentaje}% utilizado`} arrow>
+              <LinearProgress
+                variant="determinate"
+                value={parseFloat(porcentaje)}
+                sx={{
+                  height: 12,
+                  borderRadius: 5,
+                  backgroundColor: "#eee",
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: "#1976d2",
+                  },
+                }}
+              />
+            </MuiTooltip>
+          </Box>
+        </Paper>
+
+        {/* Bar Chart */}
+        <Paper
+          elevation={4}
+          sx={{
+            p: 3,
+            borderRadius: 4,
+            backgroundColor: "#ffffff",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            width: esMovil ? "100%" : "50%",
+            height: 430,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", fontWeight: "bold", mb: 1 }}
+          >
+            UTILIZACIÓN POR USUARIO
+          </Typography>
+
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+            sx={{ mb: 1 }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box
+                sx={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  backgroundColor: ROLE_COLORS.admin,
+                  mr: 1,
+                }}
+              />
+              <Typography variant="caption">Admin</Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box
+                sx={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  backgroundColor: ROLE_COLORS.user,
+                  mr: 1,
+                }}
+              />
+              <Typography variant="caption">Usuario</Typography>
+            </Box>
+          </Stack>
+
+          <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%", flexGrow: 1 }}>
+            <ResponsiveContainer
+              width={esMovil ? dataPorUsuario.length * 130 : "100%"}
+              height="100%"
+            >
+              <BarChart
+                data={dataPorUsuario}
+                margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="usuario"
+                  interval={0}
+                  angle={-30}
+                  textAnchor="end"
+                  height={80}
+                  tick={{ fontSize: 11 }}
                 />
-              </MuiTooltip>
-            </Box>
-          </Paper>
-        </Grid2>
-
-        <Grid2 xs={12} md={6}>
-          <Paper
-            elevation={4}
-            sx={{
-              p: 3,
-              borderRadius: 4,
-              backgroundColor: "#ffffff",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              height: 430,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{ textAlign: "center", fontWeight: "bold", mb: 1 }}
-            >
-              UTILIZACIÓN POR USUARIO
-            </Typography>
-
-            <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              spacing={2}
-              sx={{ mb: 1 }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.admin, mr: 1 }} />
-                <Typography variant="caption">Admin</Typography>
-              </Box>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.user, mr: 1 }} />
-                <Typography variant="caption">Usuario</Typography>
-              </Box>
-            </Stack>
-
-            <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%", flexGrow: 1 }}>
-              <ResponsiveContainer
-                width={esMovil ? dataPorUsuario.length * 130 : "100%"}
-                height="100%"
-              >
-                <BarChart
-                  data={dataPorUsuario}
-                  margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="usuario"
-                    interval={0}
-                    angle={-30}
-                    textAnchor="end"
-                    height={80}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="cantidad" isAnimationActive={false}>
-                    {dataPorUsuario.map((entry, index) => (
-                      <Cell
-                        key={`bar-${index}`}
-                        fill={ROLE_COLORS[entry.rol] || "#9e9e9e"}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-          </Paper>
-        </Grid2>
-      </Grid2>
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="cantidad" isAnimationActive={false}>
+                  {dataPorUsuario.map((entry, index) => (
+                    <Cell
+                      key={`bar-${index}`}
+                      fill={ROLE_COLORS[entry.rol] || "#9e9e9e"}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
+        </Paper>
+      </Stack>
     </Box>
   );
 }
