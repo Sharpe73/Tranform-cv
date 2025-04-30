@@ -170,29 +170,34 @@ function Dashboard() {
             </Box>
           </Stack>
 
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={dataPorUsuario}
-              margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
+          <Box sx={{ width: "100%", flexGrow: 1, overflowX: esMovil ? "auto" : "visible" }}>
+            <ResponsiveContainer
+              width={esMovil ? dataPorUsuario.length * 130 : "100%"}
+              height="100%"
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="usuario"
-                interval={0}
-                angle={-30}
-                textAnchor="end"
-                height={80}
-                tick={{ fontSize: 11 }}
-              />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="cantidad" isAnimationActive={false}>
-                {dataPorUsuario.map((entry, index) => (
-                  <Cell key={index} fill={ROLE_COLORS[entry.rol] || "#9e9e9e"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+              <BarChart
+                data={dataPorUsuario}
+                margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="usuario"
+                  interval={0}
+                  angle={-30}
+                  textAnchor="end"
+                  height={80}
+                  tick={{ fontSize: 11 }}
+                />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="cantidad" isAnimationActive={false}>
+                  {dataPorUsuario.map((entry, index) => (
+                    <Cell key={index} fill={ROLE_COLORS[entry.rol] || "#9e9e9e"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
         </Paper>
       </Box>
     </Box>
