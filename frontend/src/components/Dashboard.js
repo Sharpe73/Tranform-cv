@@ -5,9 +5,9 @@ import {
   Typography,
   LinearProgress,
   Tooltip as MuiTooltip,
-  Stack,
   useMediaQuery,
   useTheme,
+  Stack,
 } from "@mui/material";
 import {
   PieChart,
@@ -57,19 +57,18 @@ function Dashboard() {
 
   const restante = Math.max(CONSUMO_MAXIMO - consumo, 0);
   const porcentaje = Math.min((consumo / CONSUMO_MAXIMO) * 100, 100).toFixed(2);
+
   const data = [
     { name: "CVs usados", value: consumo },
     { name: "CVs restantes", value: restante },
   ];
 
   return (
-    <Box sx={{ p: 2, backgroundColor: "#f9fafc", minHeight: "100vh" }}>
+    <Box sx={{ p: 4, minHeight: "100vh", backgroundColor: "#f9fafc" }}>
       <Typography
         variant="h4"
-        align="center"
-        fontWeight="bold"
-        color="primary"
         gutterBottom
+        sx={{ textAlign: "center", fontWeight: "bold", color: "#1976d2" }}
       >
         📊 Consumo de CVs Transformados
       </Typography>
@@ -78,28 +77,28 @@ function Dashboard() {
         sx={{
           display: "flex",
           flexDirection: esMovil ? "column" : "row",
-          gap: 2,
+          gap: 4,
           justifyContent: "center",
           alignItems: "stretch",
-          flexWrap: "wrap",
         }}
       >
-        {/* Pie Chart */}
         <Paper
           elevation={4}
           sx={{
-            flex: 1,
-            minWidth: 300,
-            maxWidth: 600,
             p: 3,
             borderRadius: 4,
+            backgroundColor: "#ffffff",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             height: 430,
+            flex: 1,
           }}
         >
-          <Typography variant="h6" align="center" fontWeight="bold" mb={2}>
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
+          >
             CONSUMO DE CV VS TOTAL X MES
           </Typography>
-
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -112,16 +111,20 @@ function Dashboard() {
                 label={({ name, value }) => `${name}: ${value}`}
               >
                 {data.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
-              <Legend verticalAlign="bottom" iconType="circle" />
+              <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ marginTop: 20 }} />
             </PieChart>
           </ResponsiveContainer>
 
-          <Box mt={2}>
-            <Typography variant="subtitle1" align="center">
+          <Box mt={3}>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ textAlign: "center" }}
+            >
               Progreso mensual: {consumo} de {CONSUMO_MAXIMO} CVs ({porcentaje}%)
             </Typography>
             <MuiTooltip title={`${porcentaje}% utilizado`} arrow>
@@ -141,25 +144,33 @@ function Dashboard() {
           </Box>
         </Paper>
 
-        {/* Bar Chart */}
         <Paper
           elevation={4}
           sx={{
-            flex: 1,
-            minWidth: 300,
-            maxWidth: 600,
             p: 3,
             borderRadius: 4,
+            backgroundColor: "#ffffff",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
             height: 430,
+            flex: 1,
             display: "flex",
             flexDirection: "column",
           }}
         >
-          <Typography variant="h6" align="center" fontWeight="bold" mb={1}>
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", fontWeight: "bold", mb: 1 }}
+          >
             UTILIZACIÓN POR USUARIO
           </Typography>
 
-          <Stack direction="row" justifyContent="center" spacing={2} mb={1}>
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+            sx={{ mb: 1 }}
+          >
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.admin, mr: 1 }} />
               <Typography variant="caption">Admin</Typography>
@@ -170,29 +181,41 @@ function Dashboard() {
             </Box>
           </Stack>
 
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={dataPorUsuario}
-              margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
+          <Box sx={{ overflowX: esMovil ? "auto" : "hidden", width: "100%", flexGrow: 1 }}>
+            <ResponsiveContainer
+              width={esMovil ? dataPorUsuario.length * 130 : "100%"}
+              height="100%"
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="usuario"
-                interval={0}
-                angle={-30}
-                textAnchor="end"
-                height={80}
-                tick={{ fontSize: 11 }}
-              />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="cantidad" isAnimationActive={false}>
-                {dataPorUsuario.map((entry, index) => (
-                  <Cell key={index} fill={ROLE_COLORS[entry.rol] || "#9e9e9e"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+              <BarChart
+                data={dataPorUsuario}
+                margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="usuario"
+                  interval={0}
+                  angle={-30}
+                  textAnchor="end"
+                  height={80}
+                  tick={{
+                    fontSize: 11,
+                    wordWrap: "break-word",
+                    whiteSpace: "normal",
+                  }}
+                />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Bar dataKey="cantidad" isAnimationActive={false}>
+                  {dataPorUsuario.map((entry, index) => (
+                    <Cell
+                      key={`bar-${index}`}
+                      fill={ROLE_COLORS[entry.rol] || "#9e9e9e"}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
         </Paper>
       </Box>
     </Box>
