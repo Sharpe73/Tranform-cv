@@ -5,11 +5,11 @@ import {
   Typography,
   LinearProgress,
   Tooltip as MuiTooltip,
-  Grid,
   useMediaQuery,
   useTheme,
   Stack,
 } from "@mui/material";
+import Grid2 from "@mui/material/Unstable_Grid2";
 import {
   PieChart,
   Pie,
@@ -74,8 +74,8 @@ function Dashboard() {
         📊 Consumo de CVs Transformados
       </Typography>
 
-      <Grid container spacing={4} justifyContent="center">
-        <Grid item xs={12} md={6}>
+      <Grid2 container spacing={4} justifyContent="center">
+        <Grid2 xs={12} md={6}>
           <Paper
             elevation={4}
             sx={{
@@ -136,9 +136,9 @@ function Dashboard() {
               </MuiTooltip>
             </Box>
           </Paper>
-        </Grid>
+        </Grid2>
 
-        <Grid item xs={12} md={6}>
+        <Grid2 xs={12} md={6}>
           <Paper
             elevation={4}
             sx={{
@@ -207,8 +207,8 @@ function Dashboard() {
               </ResponsiveContainer>
             </Box>
           </Paper>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
     </Box>
   );
 }
