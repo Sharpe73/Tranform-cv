@@ -20,6 +20,9 @@ import {
   Menu,
   MenuItem,
   IconButton,
+  Card,
+  CardContent,
+  Divider,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
@@ -170,22 +173,15 @@ function ProcessedCVs() {
 
       <Box display="flex" flexDirection={isMobile ? "column" : "row"} justifyContent="space-between" alignItems={isMobile ? "stretch" : "center"} gap={2} mb={2}>
         <Stack direction="row" spacing={1}>
-          <Button
-            onClick={() => setTabValue("nombre")}
-            variant={tabValue === "nombre" ? "contained" : "text"}
-          >
+          <Button onClick={() => setTabValue("nombre")} variant={tabValue === "nombre" ? "contained" : "text"}>
             BUSCAR POR NOMBRE
           </Button>
-          <Button
-            onClick={() => setTabValue("tags")}
-            variant={tabValue === "tags" ? "contained" : "text"}
-          >
+          <Button onClick={() => setTabValue("tags")} variant={tabValue === "tags" ? "contained" : "text"}>
             BUSCAR POR TAGS
           </Button>
         </Stack>
       </Box>
 
-      {/* Buscador */}
       {tabValue === "nombre" ? (
         <TextField
           variant="outlined"
@@ -231,89 +227,149 @@ function ProcessedCVs() {
         </Box>
       )}
 
-      {/* Tabla */}
       {loading ? (
         <Box mt={4} textAlign="center">
           <CircularProgress />
           <Typography>Cargando CVs procesados...</Typography>
         </Box>
+      ) : isMobile ? (
+        <Stack spacing={2}>
+          {paginatedCvs.map((cv) => {
+            const parsedJson = cv.json || {};
+            const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
+            const nombre = capitalizarTexto(nombreOriginal);
+            return (
+              <Card key={cv.id}>
+                <CardContent>
+                  <Typography variant="h6">{nombre}</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Fecha: {new Date(cv.created_at).toLocaleString("es-CL")}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Transformado por: {cv.usuario || "Admin"}
+                  </Typography>
+                  <Divider sx={{ my: 1 }} />
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<PictureAsPdfIcon />}
+                      onClick={() => descargarPDF(cv.id)}
+                    >
+                      PDF
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<CodeIcon />}
+                      onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                      sx={{
+                        color: "#f29111",
+                        borderColor: "#f29111",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          backgroundColor: "#f29111",
+                          color: "#fff",
+                        },
+                      }}
+                    >
+                      JSON
+                    </Button>
+                  </Stack>
+                  {isAdmin && (
+                    <Box mt={1}>
+                      <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
+                        <MoreVertIcon />
+                      </IconButton>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl) && menuCvId === cv.id}
+                        onClose={handleMenuClose}
+                      >
+                        <MenuItem onClick={() => eliminarCV(cv.id)}>
+                          <DeleteIcon /> Eliminar
+                        </MenuItem>
+                      </Menu>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </Stack>
       ) : (
-        <Box sx={{ overflowX: "auto" }}>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableRow>
-                  <TableCell><strong>🧑 Nombre</strong></TableCell>
-                  <TableCell><strong>🗓️ Fecha</strong></TableCell>
-                  <TableCell><strong>👤 Transformado por</strong></TableCell>
-                  <TableCell><strong>📄 PDF / JSON</strong></TableCell>
-                  {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedCvs.map((cv) => {
-                  const parsedJson = cv.json || {};
-                  const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
-                  const nombre = capitalizarTexto(nombreOriginal);
-                  return (
-                    <TableRow key={cv.id}>
-                      <TableCell>{nombre}</TableCell>
-                      <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
-                      <TableCell>{cv.usuario || "Admin"}</TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableRow>
+                <TableCell><strong>🧑 Nombre</strong></TableCell>
+                <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                <TableCell><strong>👤 Transformado por</strong></TableCell>
+                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
+                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paginatedCvs.map((cv) => {
+                const parsedJson = cv.json || {};
+                const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
+                const nombre = capitalizarTexto(nombreOriginal);
+                return (
+                  <TableRow key={cv.id}>
+                    <TableCell>{nombre}</TableCell>
+                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                    <TableCell>{cv.usuario || "Admin"}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<PictureAsPdfIcon />}
+                          onClick={() => descargarPDF(cv.id)}
+                        >
+                          PDF
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<CodeIcon />}
+                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                          sx={{
+                            color: "#f29111",
+                            borderColor: "#f29111",
+                            fontWeight: "bold",
+                            "&:hover": {
+                              backgroundColor: "#f29111",
+                              color: "#fff",
+                            },
+                          }}
+                        >
+                          JSON
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                    {isAdmin && (
                       <TableCell>
-                        <Stack direction="row" spacing={1}>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<PictureAsPdfIcon />}
-                            onClick={() => descargarPDF(cv.id)}
-                          >
-                            PDF
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            startIcon={<CodeIcon />}
-                            onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                            sx={{
-                              color: "#f29111",
-                              borderColor: "#f29111",
-                              fontWeight: "bold",
-                              "&:hover": {
-                                backgroundColor: "#f29111",
-                                color: "#fff",
-                              },
-                            }}
-                          >
-                            JSON
-                          </Button>
-                        </Stack>
+                        <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl) && menuCvId === cv.id}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={() => eliminarCV(cv.id)}>
+                            <DeleteIcon /> Eliminar
+                          </MenuItem>
+                        </Menu>
                       </TableCell>
-                      {isAdmin && (
-                        <TableCell>
-                          <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
-                            <MoreVertIcon />
-                          </IconButton>
-                          <Menu
-                            anchorEl={anchorEl}
-                            open={Boolean(anchorEl) && menuCvId === cv.id}
-                            onClose={handleMenuClose}
-                          >
-                            <MenuItem onClick={() => eliminarCV(cv.id)}>
-                              <DeleteIcon /> Eliminar
-                            </MenuItem>
-                          </Menu>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
+                    )}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
 
-      {/* Paginación */}
       <Box mt={2} display="flex" justifyContent="center">
         <Pagination
           count={totalPages}
