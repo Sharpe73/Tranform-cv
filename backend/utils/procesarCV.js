@@ -5,7 +5,7 @@ const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
 const Tesseract = require("tesseract.js");
-const { pdf2png } = require("pdf2png-mp");
+const pdf2png = require("pdf2png-mp");
 
 // Crear carpeta temporal si no existe
 const tempDir = path.join(__dirname, "../temp");
@@ -17,9 +17,9 @@ async function extraerTextoConOCR(imagenPath) {
   return result.data.text;
 }
 
-// Convierte la primera página del PDF a imagen PNG
+// Convierte la primera página del PDF a imagen PNG (sin usar poppler/gm)
 async function convertirPDFaImagen(pdfPath) {
-  const result = await pdf2png(pdfPath, 1); // página 1
+  const result = await pdf2png.convert(pdfPath, 1);
   const outputPath = path.join(tempDir, "pagina1.png");
   fs.writeFileSync(outputPath, result.content);
   return outputPath;
