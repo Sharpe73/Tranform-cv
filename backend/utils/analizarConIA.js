@@ -35,7 +35,7 @@ Reglas importantes:
     console.log("🧠 Enviando solicitud a OpenAI...");
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model:"gpt-3.5-turbo",
       messages: [
         { role: "user", content: instrucciones },
         { role: "user", content: texto },
