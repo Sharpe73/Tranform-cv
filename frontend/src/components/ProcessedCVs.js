@@ -185,6 +185,7 @@ function ProcessedCVs() {
         </Stack>
       </Box>
 
+      {/* Buscador */}
       {tabValue === "nombre" ? (
         <TextField
           variant="outlined"
@@ -230,85 +231,89 @@ function ProcessedCVs() {
         </Box>
       )}
 
+      {/* Tabla */}
       {loading ? (
         <Box mt={4} textAlign="center">
           <CircularProgress />
           <Typography>Cargando CVs procesados...</Typography>
         </Box>
       ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableRow>
-                <TableCell><strong>🧑 Nombre</strong></TableCell>
-                <TableCell><strong>🗓️ Fecha</strong></TableCell>
-                <TableCell><strong>👤 Transformado por</strong></TableCell>
-                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
-                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedCvs.map((cv) => {
-                const parsedJson = cv.json || {};
-                const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
-                const nombre = capitalizarTexto(nombreOriginal);
-                return (
-                  <TableRow key={cv.id}>
-                    <TableCell>{nombre}</TableCell>
-                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
-                    <TableCell>{cv.usuario || "Admin"}</TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          startIcon={<PictureAsPdfIcon />}
-                          onClick={() => descargarPDF(cv.id)}
-                        >
-                          PDF
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          startIcon={<CodeIcon />}
-                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                          sx={{
-                            color: "#f29111",
-                            borderColor: "#f29111",
-                            fontWeight: "bold",
-                            "&:hover": {
-                              backgroundColor: "#f29111",
-                              color: "#fff",
-                            },
-                          }}
-                        >
-                          JSON
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                    {isAdmin && (
+        <Box sx={{ overflowX: "auto" }}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+                <TableRow>
+                  <TableCell><strong>🧑 Nombre</strong></TableCell>
+                  <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                  <TableCell><strong>👤 Transformado por</strong></TableCell>
+                  <TableCell><strong>📄 PDF / JSON</strong></TableCell>
+                  {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedCvs.map((cv) => {
+                  const parsedJson = cv.json || {};
+                  const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
+                  const nombre = capitalizarTexto(nombreOriginal);
+                  return (
+                    <TableRow key={cv.id}>
+                      <TableCell>{nombre}</TableCell>
+                      <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                      <TableCell>{cv.usuario || "Admin"}</TableCell>
                       <TableCell>
-                        <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl) && menuCvId === cv.id}
-                          onClose={handleMenuClose}
-                        >
-                          <MenuItem onClick={() => eliminarCV(cv.id)}>
-                            <DeleteIcon /> Eliminar
-                          </MenuItem>
-                        </Menu>
+                        <Stack direction="row" spacing={1}>
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<PictureAsPdfIcon />}
+                            onClick={() => descargarPDF(cv.id)}
+                          >
+                            PDF
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            startIcon={<CodeIcon />}
+                            onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                            sx={{
+                              color: "#f29111",
+                              borderColor: "#f29111",
+                              fontWeight: "bold",
+                              "&:hover": {
+                                backgroundColor: "#f29111",
+                                color: "#fff",
+                              },
+                            }}
+                          >
+                            JSON
+                          </Button>
+                        </Stack>
                       </TableCell>
-                    )}
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                      {isAdmin && (
+                        <TableCell>
+                          <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
+                            <MoreVertIcon />
+                          </IconButton>
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl) && menuCvId === cv.id}
+                            onClose={handleMenuClose}
+                          >
+                            <MenuItem onClick={() => eliminarCV(cv.id)}>
+                              <DeleteIcon /> Eliminar
+                            </MenuItem>
+                          </Menu>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       )}
 
+      {/* Paginación */}
       <Box mt={2} display="flex" justifyContent="center">
         <Pagination
           count={totalPages}
