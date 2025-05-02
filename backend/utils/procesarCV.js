@@ -4,7 +4,6 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
-const { extraerTextoDesdePDF } = require("./googlePDFVisionOCR");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -15,19 +14,6 @@ async function procesarCV(rutaArchivo, opciones) {
       const dataBuffer = fs.readFileSync(rutaArchivo);
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
-
-      
-      if (!textoExtraido || textoExtraido.trim().length < 10) {
-        console.log("🔎 PDF sin texto real. Enviando a Google Vision OCR multipágina...");
-        textoExtraido = await extraerTextoDesdePDF(rutaArchivo);
-
-        if (!textoExtraido || textoExtraido.trim().length < 10) {
-          const error = new Error(`OCR no pudo extraer texto del archivo ${rutaArchivo}`);
-          error.statusCode = 404;
-          throw error;
-        }
-      }
-
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
       const result = await mammoth.extractRawText({ buffer: data });
@@ -35,6 +21,13 @@ async function procesarCV(rutaArchivo, opciones) {
     } else {
       const error = new Error(`Formato no soportado (${rutaArchivo})`);
       error.statusCode = 400;
+      throw error;
+    }
+
+    
+    if (!textoExtraido || textoExtraido.trim().length < 10) {
+      const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
+      error.statusCode = 404;
       throw error;
     }
 
