@@ -30,7 +30,10 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, form, {
+        withCredentials: true, 
+      });
+
       const { token, usuario } = response.data;
 
       localStorage.setItem("token", token);
@@ -40,7 +43,6 @@ const Login = () => {
         window.location.href = "/transform";
       }, 100);
     } catch (err) {
-      // Verifica si el error es de usuario eliminado
       if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
         setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");
       } else {

@@ -23,7 +23,6 @@ function Transform() {
       setConfig(savedConfig);
     }
 
-    
     const verificarBloqueo = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -80,6 +79,7 @@ function Transform() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        withCredentials: true
       });
 
       setMessage("✅ Archivo procesado con éxito.");
