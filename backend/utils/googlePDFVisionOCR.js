@@ -25,7 +25,7 @@ async function extraerTextoDesdePDF(pdfPath) {
     console.log("🧾 Respuesta completa de Google Vision OCR:", JSON.stringify(data, null, 2));
 
     if (!data.responses || !Array.isArray(data.responses)) {
-      throw new Error("OCR falló: respuesta inválida de Google Vision.");
+      throw new Error("OCR falló: respuesta inválida de Google Vision.");//
     }
 
     const fullText = data.responses
