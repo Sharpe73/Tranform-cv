@@ -1,30 +1,71 @@
 const fs = require("fs");
+const path = require("path");
+const sharp = require("sharp");
 const axios = require("axios");
+const { PDFDocument } = require("pdf-lib");
 
-async function extraerTextoDesdePDF(pdfPath) {
+const tempDir = path.join(__dirname, "../temp");
+if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+
+async function pdfToImages(pdfPath) {
   const pdfBuffer = fs.readFileSync(pdfPath);
-  const base64PDF = pdfBuffer.toString("base64");
+  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  const pageCount = pdfDoc.getPageCount();
+  const images = [];
 
-  const url = `https://vision.googleapis.com/v1/files:annotate?key=${process.env.GCP_VISION_API_KEY}`;
+  for (let i = 0; i < pageCount; i++) {
+    const singlePagePdf = await PDFDocument.create();
+    const [copiedPage] = await singlePagePdf.copyPages(pdfDoc, [i]);
+    singlePagePdf.addPage(copiedPage);
+    const singlePageBytes = await singlePagePdf.save();
+
+    const imageBuffer = await sharp(singlePageBytes, { density: 300 })
+      .resize({ width: 1200 })
+      .png()
+      .toBuffer();
+
+    const imgPath = path.join(tempDir, `page_${i + 1}.png`);
+    fs.writeFileSync(imgPath, imageBuffer);
+    images.push(imgPath);
+  }
+
+  return images;
+}
+
+async function enviarImagenAGoogleVision(imagePath) {
+  const imageBuffer = fs.readFileSync(imagePath);
+  const base64Image = imageBuffer.toString("base64");
+
+  const url = `https://vision.googleapis.com/v1/images:annotate?key=${process.env.GCP_VISION_API_KEY}`;
   const body = {
     requests: [
       {
-        inputConfig: {
-          content: base64PDF,
-          mimeType: "application/pdf",
-        },
-        features: [{ type: "DOCUMENT_TEXT_DETECTION" }],
-        pages: []  // todas las páginas
+        image: { content: base64Image },
+        features: [{ type: "DOCUMENT_TEXT_DETECTION" }]
       }
     ]
   };
 
   const response = await axios.post(url, body);
-  const fullText = response.data.responses
-    .map(r => r.fullTextAnnotation?.text || "")
-    .join("\n");
+  return response.data.responses[0]?.fullTextAnnotation?.text || "";
+}
 
-  return fullText;
+async function extraerTextoDesdePDF(pdfPath) {
+  console.log("📄 Convirtiendo PDF a imágenes...");
+  const imagenes = await pdfToImages(pdfPath);
+
+  let textoCompleto = "";
+
+  for (const imgPath of imagenes) {
+    try {
+      const texto = await enviarImagenAGoogleVision(imgPath);
+      textoCompleto += texto + "\n";
+    } catch (err) {
+      console.error("❌ Error procesando imagen:", imgPath, err.message);
+    }
+  }
+
+  return textoCompleto.trim();
 }
 
 module.exports = { extraerTextoDesdePDF };
