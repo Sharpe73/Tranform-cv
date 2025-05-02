@@ -1,14 +1,14 @@
 const fs = require("fs");
-const fetch = require("node-fetch");
+const axios = require("axios");
 
 async function extraerTextoDesdePDF(pdfPath) {
   const pdfBuffer = fs.readFileSync(pdfPath);
   const base64PDF = pdfBuffer.toString("base64");
 
-  const response = await fetch(`https://vision.googleapis.com/v1/files:annotate?key=${process.env.GCP_VISION_API_KEY}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+  const url = `https://vision.googleapis.com/v1/files:annotate?key=${process.env.GCP_VISION_API_KEY}`;
+
+  try {
+    const response = await axios.post(url, {
       requests: [
         {
           inputConfig: {
@@ -16,24 +16,27 @@ async function extraerTextoDesdePDF(pdfPath) {
             content: base64PDF
           },
           features: [{ type: "DOCUMENT_TEXT_DETECTION" }],
-          pages: [] // todas las páginas
+          pages: []
         }
       ]
-    }),
-  });
+    });
 
-  const data = await response.json();
-  console.log("🧾 Respuesta completa de Google Vision OCR:", JSON.stringify(data, null, 2));
+    const data = response.data;
+    console.log("🧾 Respuesta completa de Google Vision OCR:", JSON.stringify(data, null, 2));
 
-  if (!data.responses || !Array.isArray(data.responses)) {
-    throw new Error("OCR falló: respuesta inválida de Google Vision.");
+    if (!data.responses || !Array.isArray(data.responses)) {
+      throw new Error("OCR falló: respuesta inválida de Google Vision.");
+    }
+
+    const fullText = data.responses
+      .map(r => r.fullTextAnnotation?.text || "")
+      .join("\n");
+
+    return fullText;
+  } catch (error) {
+    console.error("❌ Error en solicitud OCR:", error.response?.data || error.message);
+    throw new Error("Fallo la solicitud OCR a Google Vision");
   }
-
-  const fullText = data.responses
-    .map(r => r.fullTextAnnotation?.text || "")
-    .join("\n");
-
-  return fullText;
 }
 
 module.exports = { extraerTextoDesdePDF };
