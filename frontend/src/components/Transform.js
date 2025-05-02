@@ -7,6 +7,7 @@ import UploadActions from "./UploadActions";
 import MessageDisplay from "./MessageDisplay";
 import DownloadLink from "./DownloadLink";
 import API_BASE_URL from "../apiConfig";
+import { getDocument } from "pdfjs-dist";
 
 function Transform() {
   const [file, setFile] = useState(null);
@@ -15,7 +16,7 @@ function Transform() {
   const [pdfLink, setPdfLink] = useState("");
   const [config, setConfig] = useState({});
   const [showConfig, setShowConfig] = useState(false);
-  const [bloqueado, setBloqueado] = useState(false); 
+  const [bloqueado, setBloqueado] = useState(false);
 
   useEffect(() => {
     const savedConfig = JSON.parse(localStorage.getItem("cvConfig"));
@@ -45,6 +46,43 @@ function Transform() {
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
 
+  const extractTextFromPDF = async (buffer) => {
+    const pdf = await getDocument({ data: buffer }).promise;
+    const page = await pdf.getPage(1);
+    const content = await page.getTextContent();
+    const text = content.items.map(item => item.str).join(" ");
+    return text;
+  };
+
+  const extraerTextoDesdeOCR = async (file) => {
+    const pdf = await getDocument({ data: await file.arrayBuffer() }).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 2.0 });
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    await page.render({ canvasContext: context, viewport }).promise;
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(async (blob) => {
+        if (!blob) return reject("No se pudo generar imagen desde PDF");
+
+        const formData = new FormData();
+        formData.append("imagen", blob, "pagina1.png");
+
+        try {
+          const res = await axios.post(`${API_BASE_URL}/ocr`, formData);
+          resolve(res.data.texto);
+        } catch (err) {
+          reject("Error al extraer texto por OCR.");
+        }
+      }, "image/png");
+    });
+  };
+
   const handleUpload = async () => {
     if (!file) {
       setMessage("⚠️ Por favor, selecciona un archivo.");
@@ -54,6 +92,29 @@ function Transform() {
     setIsUploading(true);
     setMessage("🔄 Procesando archivo...");
     setPdfLink("");
+
+    // 🔍 Validación OCR previa si es PDF
+    if (file.type === "application/pdf") {
+      const arrayBuffer = await file.arrayBuffer();
+      const text = await extractTextFromPDF(arrayBuffer);
+
+      if (!text || text.trim().length < 10) {
+        try {
+          const ocrText = await extraerTextoDesdeOCR(file);
+          if (!ocrText || ocrText.trim().length < 10) {
+            setMessage("⚠️ Este archivo parece escaneado y no contiene texto reconocible.");
+            setIsUploading(false);
+            return;
+          } else {
+            setMessage("ℹ️ El archivo fue escaneado. Se extrajo texto con OCR.");
+          }
+        } catch (e) {
+          setMessage("❌ No se pudo extraer texto por OCR.");
+          setIsUploading(false);
+          return;
+        }
+      }
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -126,7 +187,7 @@ function Transform() {
         <UploadActions
           isUploading={isUploading}
           handleUpload={handleUpload}
-          disabled={bloqueado} 
+          disabled={bloqueado}
         />
 
         {message && <MessageDisplay message={message} />}
