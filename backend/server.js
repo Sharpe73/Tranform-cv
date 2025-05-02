@@ -14,6 +14,7 @@ const LIMITE_MENSUAL = parseInt(process.env.LIMITE_MENSUAL) || 500;
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const ocrRoute = require("./routes/ocrRoute");
 
 app.use(cors({
   origin: "https://tranform-cv.vercel.app",
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+app.use("/", ocrRoute); // ✅ Montar ruta OCR
 
 const uploadsPath = path.join(__dirname, "uploads");
 console.log("📂 Serviendo archivos estáticos desde:", uploadsPath);
@@ -209,7 +211,6 @@ app.get("/cv/por-usuario", async (req, res) => {
   }
 });
 
-
 app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
@@ -234,7 +235,6 @@ app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
   }
 });
 
-// 🚀 Limpieza de CVs
 app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   console.log("🔐 Usuario autenticado:", req.user);
 
@@ -256,7 +256,6 @@ app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   }
 });
 
-// 🚀 Crear Usuario
 app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
   const { nombre, apellido, email, password, rol } = req.body;
 
@@ -295,7 +294,6 @@ app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 });
 
-// 🚀 Actualizar Usuario
 app.put("/users/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { nombre, apellido, rol } = req.body;

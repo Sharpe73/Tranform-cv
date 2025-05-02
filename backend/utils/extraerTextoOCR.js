@@ -1,26 +1,25 @@
-const { PDFDocument } = require("pdf-lib");
 const fs = require("fs");
-const sharp = require("sharp");
-const Tesseract = require("tesseract.js");
 const path = require("path");
+const { PdfConverter } = require("pdf-poppler");
+const Tesseract = require("tesseract.js");
 
-async function extraerTextoOCR(rutaPDF, pagina = 0) {
+async function extraerTextoOCR(rutaPDF) {
   try {
-    const buffer = fs.readFileSync(rutaPDF);
-    const tempImg = path.join(__dirname, `../uploads/temp_ocr.png`);
+    const outputImgPath = path.join(__dirname, "../uploads/ocr_page.png");
 
-    // Convertir PDF a imagen con sharp (resolución alta para mejor OCR)
-    await sharp(buffer, { density: 300 })
-      .png()
-      .toFile(tempImg);
+    const converter = new PdfConverter(rutaPDF);
+    await converter.convertPage(1, {
+      format: "png",
+      out_dir: path.join(__dirname, "../uploads"),
+      out_prefix: "ocr_page",
+      page: 1,
+    });
 
-    // Ejecutar OCR con Tesseract (español)
-    const resultado = await Tesseract.recognize(tempImg, "spa", {
+    const resultado = await Tesseract.recognize(outputImgPath, "spa", {
       logger: (m) => console.log(`[OCR] ${m.status} (${Math.floor(m.progress * 100)}%)`),
     });
 
-    // Eliminar la imagen temporal
-    fs.unlinkSync(tempImg);
+    fs.unlinkSync(outputImgPath); // borra la imagen temporal
 
     return resultado.data.text;
   } catch (error) {
