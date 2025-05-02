@@ -4,22 +4,16 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
-const { extraerTextoOCR } = require("./extraerTextoOCR");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
     const ext = path.extname(rutaArchivo).toLowerCase();
-    let textoExtraido = "";
+    let textoExtraido = ""
 
     if (ext === ".pdf") {
       const dataBuffer = fs.readFileSync(rutaArchivo);
       const data = await pdfParse(dataBuffer);
-      textoExtraido = data.text?.trim() || "";
-
-      if (!textoExtraido || textoExtraido.length < 10) {
-        console.log("📸 PDF parece escaneado o vacío. Aplicando OCR...");
-        textoExtraido = await extraerTextoOCR(rutaArchivo);
-      }
+      textoExtraido = data.text;
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
       const result = await mammoth.extractRawText({ buffer: data });
@@ -30,6 +24,7 @@ async function procesarCV(rutaArchivo, opciones) {
       throw error;
     }
 
+    
     if (!textoExtraido || textoExtraido.trim().length < 10) {
       const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
       error.statusCode = 404;
