@@ -4,12 +4,7 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
-const { extraerTextoImagenVision } = require("./googleOCR");
-const { convertirPDFaImagenes } = require("./convertirPDFaImagenes");
-
-// Crear carpeta temporal si no existe
-const tempDir = path.join(__dirname, "../temp");
-if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+const { extraerTextoDesdePDF } = require("./googlePDFVisionOCR");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -21,25 +16,10 @@ async function procesarCV(rutaArchivo, opciones) {
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
 
-      // Si no hay texto real en el PDF, aplicar OCR a todas las páginas
+      // Si no hay texto real en el PDF, aplicar OCR con Vision
       if (!textoExtraido || textoExtraido.trim().length < 10) {
-        console.log("🔎 PDF sin texto real. Aplicando OCR en todas las páginas...");
-        const imagenes = await convertirPDFaImagenes(rutaArchivo);
-
-        const textosPorPagina = [];
-        for (const imgPath of imagenes) {
-          const texto = await extraerTextoImagenVision(imgPath);
-          if (texto && texto.trim().length > 0) {
-            textosPorPagina.push(texto);
-          }
-
-          // Eliminar imagen temporal
-          if (fs.existsSync(imgPath)) {
-            fs.unlinkSync(imgPath);
-          }
-        }
-
-        textoExtraido = textosPorPagina.join("\n");
+        console.log("🔎 PDF sin texto real. Enviando a Google Vision OCR multipágina...");
+        textoExtraido = await extraerTextoDesdePDF(rutaArchivo);
 
         if (!textoExtraido || textoExtraido.trim().length < 10) {
           const error = new Error(`OCR no pudo extraer texto del archivo ${rutaArchivo}`);
