@@ -1,27 +1,43 @@
 const fs = require("fs");
 const path = require("path");
-const { PdfConverter } = require("pdf-poppler");
+const sharp = require("sharp");
+const { PDFDocument } = require("pdf-lib");
 const Tesseract = require("tesseract.js");
 
 async function extraerTextoOCR(rutaPDF) {
   try {
-    const outputImgPath = path.join(__dirname, "../uploads/ocr_page.png");
+    const pdfBytes = fs.readFileSync(rutaPDF);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const numPages = pdfDoc.getPageCount();
+    const textoCompleto = [];
 
-    const converter = new PdfConverter(rutaPDF);
-    await converter.convertPage(1, {
-      format: "png",
-      out_dir: path.join(__dirname, "../uploads"),
-      out_prefix: "ocr_page",
-      page: 1,
-    });
+    for (let i = 0; i < numPages; i++) {
+      const page = pdfDoc.getPage(i);
+      const viewport = { width: 1280, height: 1810 }; // tamaño estimado
 
-    const resultado = await Tesseract.recognize(outputImgPath, "spa", {
-      logger: (m) => console.log(`[OCR] ${m.status} (${Math.floor(m.progress * 100)}%)`),
-    });
+      const imgPath = path.join(__dirname, `../uploads/ocr_temp_page${i}.png`);
 
-    fs.unlinkSync(outputImgPath); // borra la imagen temporal
+      const pageAsPdf = await PDFDocument.create();
+      const [copiedPage] = await pageAsPdf.copyPages(pdfDoc, [i]);
+      pageAsPdf.addPage(copiedPage);
+      const singlePagePdfBytes = await pageAsPdf.save();
 
-    return resultado.data.text;
+      await sharp(singlePagePdfBytes)
+        .resize(viewport.width)
+        .flatten({ background: "#ffffff" })
+        .png()
+        .toFile(imgPath);
+
+      const resultado = await Tesseract.recognize(imgPath, "spa", {
+        logger: (m) =>
+          console.log(`[OCR - Página ${i + 1}] ${m.status} (${Math.floor(m.progress * 100)}%)`),
+      });
+
+      textoCompleto.push(resultado.data.text);
+      fs.unlinkSync(imgPath); // eliminar temporal
+    }
+
+    return textoCompleto.join("\n");
   } catch (error) {
     console.error("❌ Error al extraer texto con OCR:", error.message);
     return "";
