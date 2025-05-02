@@ -16,7 +16,7 @@ async function procesarCV(rutaArchivo, opciones) {
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
 
-      // Si no hay texto real en el PDF, aplicar OCR con Vision
+      
       if (!textoExtraido || textoExtraido.trim().length < 10) {
         console.log("🔎 PDF sin texto real. Enviando a Google Vision OCR multipágina...");
         textoExtraido = await extraerTextoDesdePDF(rutaArchivo);
