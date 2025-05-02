@@ -4,6 +4,28 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
+const { fromPath } = require("pdf2pic");
+const { extraerTextoImagenVision } = require("./googleOCR");
+
+// Crear carpeta temporal si no existe
+const tempDir = path.join(__dirname, "../temp");
+if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+
+// Convierte todas las páginas del PDF a imágenes PNG
+async function convertirTodasLasPaginas(pdfPath) {
+  const options = {
+    density: 150,
+    saveFilename: "pagina",
+    savePath: tempDir,
+    format: "png",
+    width: 1000,
+    height: 1300,
+  };
+
+  const convert = fromPath(pdfPath, options);
+  const result = await convert.bulk(-1); // -1 = todas las páginas
+  return result.map((r) => r.path); // devuelve array de rutas
+}
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -14,6 +36,34 @@ async function procesarCV(rutaArchivo, opciones) {
       const dataBuffer = fs.readFileSync(rutaArchivo);
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
+
+      // Si no hay texto real en el PDF, aplicar OCR a todas las páginas
+      if (!textoExtraido || textoExtraido.trim().length < 10) {
+        console.log("🔎 PDF sin texto real. Aplicando OCR en todas las páginas...");
+        const imagenes = await convertirTodasLasPaginas(rutaArchivo);
+
+        const textosPorPagina = [];
+        for (const imgPath of imagenes) {
+          const texto = await extraerTextoImagenVision(imgPath);
+          if (texto && texto.trim().length > 0) {
+            textosPorPagina.push(texto);
+          }
+
+          // Eliminar imagen después de usarla
+          if (fs.existsSync(imgPath)) {
+            fs.unlinkSync(imgPath);
+          }
+        }
+
+        textoExtraido = textosPorPagina.join("\n");
+
+        if (!textoExtraido || textoExtraido.trim().length < 10) {
+          const error = new Error(`OCR no pudo extraer texto del archivo ${rutaArchivo}`);
+          error.statusCode = 404;
+          throw error;
+        }
+      }
+
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
       const result = await mammoth.extractRawText({ buffer: data });
@@ -21,13 +71,6 @@ async function procesarCV(rutaArchivo, opciones) {
     } else {
       const error = new Error(`Formato no soportado (${rutaArchivo})`);
       error.statusCode = 400;
-      throw error;
-    }
-
-    
-    if (!textoExtraido || textoExtraido.trim().length < 10) {
-      const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
-      error.statusCode = 404;
       throw error;
     }
 
