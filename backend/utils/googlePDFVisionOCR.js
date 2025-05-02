@@ -1,36 +1,24 @@
 const fs = require("fs");
 const path = require("path");
-const { PDFDocument } = require("pdf-lib");
-const sharp = require("sharp");
 const axios = require("axios");
+const { convert } = require("pdf-poppler");
 
 const tempDir = path.join(__dirname, "../temp");
 if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
-async function pdfToImages(pdfPath) {
-  const pdfBuffer = fs.readFileSync(pdfPath);
-  const pdfDoc = await PDFDocument.load(pdfBuffer);
-  const pageCount = pdfDoc.getPageCount();
+async function convertirPDFaPNG(pdfPath) {
+  const outputBase = path.join(tempDir, "page");
 
-  const imagePaths = [];
+  await convert(pdfPath, {
+    format: "png",
+    out_dir: tempDir,
+    out_prefix: "page",
+    page: null, // convertir todas las páginas
+    scale: 300
+  });
 
-  for (let i = 0; i < pageCount; i++) {
-    const newPdf = await PDFDocument.create();
-    const [copiedPage] = await newPdf.copyPages(pdfDoc, [i]);
-    newPdf.addPage(copiedPage);
-    const singlePagePdf = await newPdf.save();
-
-    const imagePath = path.join(tempDir, `page_${i + 1}.png`);
-    const pngBuffer = await sharp(singlePagePdf, { density: 300 })
-      .resize(1200)
-      .png()
-      .toBuffer();
-
-    fs.writeFileSync(imagePath, pngBuffer);
-    imagePaths.push(imagePath);
-  }
-
-  return imagePaths;
+  const files = fs.readdirSync(tempDir).filter(f => f.startsWith("page") && f.endsWith(".png"));
+  return files.map(filename => path.join(tempDir, filename));
 }
 
 async function enviarImagenAGoogleVision(imagePath) {
@@ -52,7 +40,9 @@ async function enviarImagenAGoogleVision(imagePath) {
 }
 
 async function extraerTextoDesdePDF(pdfPath) {
-  const imagenes = await pdfToImages(pdfPath);
+  console.log("📄 Convirtiendo PDF a PNG con pdf-poppler...");
+  const imagenes = await convertirPDFaPNG(pdfPath);
+
   let textoCompleto = "";
 
   for (const imgPath of imagenes) {
