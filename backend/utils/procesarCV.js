@@ -4,28 +4,12 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
-const { fromPath } = require("pdf2pic");
 const { extraerTextoImagenVision } = require("./googleOCR");
+const { convertirPDFaImagenes } = require("./convertirPDFaImagenes");
 
 // Crear carpeta temporal si no existe
 const tempDir = path.join(__dirname, "../temp");
 if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
-
-// Convierte todas las páginas del PDF a imágenes PNG
-async function convertirTodasLasPaginas(pdfPath) {
-  const options = {
-    density: 150,
-    saveFilename: "pagina",
-    savePath: tempDir,
-    format: "png",
-    width: 1000,
-    height: 1300,
-  };
-
-  const convert = fromPath(pdfPath, options);
-  const result = await convert.bulk(-1);
-  return result.map((r) => r.path);
-}
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -40,7 +24,7 @@ async function procesarCV(rutaArchivo, opciones) {
       // Si no hay texto real en el PDF, aplicar OCR a todas las páginas
       if (!textoExtraido || textoExtraido.trim().length < 10) {
         console.log("🔎 PDF sin texto real. Aplicando OCR en todas las páginas...");
-        const imagenes = await convertirTodasLasPaginas(rutaArchivo);
+        const imagenes = await convertirPDFaImagenes(rutaArchivo);
 
         const textosPorPagina = [];
         for (const imgPath of imagenes) {
@@ -49,7 +33,7 @@ async function procesarCV(rutaArchivo, opciones) {
             textosPorPagina.push(texto);
           }
 
-          // Eliminar imagen después de usarla
+          // Eliminar imagen temporal
           if (fs.existsSync(imgPath)) {
             fs.unlinkSync(imgPath);
           }
