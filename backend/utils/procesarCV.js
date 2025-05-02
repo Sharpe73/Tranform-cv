@@ -23,8 +23,8 @@ async function convertirTodasLasPaginas(pdfPath) {
   };
 
   const convert = fromPath(pdfPath, options);
-  const result = await convert.bulk(-1); // -1 = todas las páginas
-  return result.map((r) => r.path); // devuelve array de rutas
+  const result = await convert.bulk(-1);
+  return result.map((r) => r.path);
 }
 
 async function procesarCV(rutaArchivo, opciones) {
