@@ -10,7 +10,7 @@ const verifyToken = require("./middleware/verifyToken");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const LIMITE_MENSUAL = parseInt(process.env.LIMITE_MENSUAL) || 500;
+const LIMITE_MENSUAL = parseInt(process.env.LIMITE_MENSUAL) || 500;//
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
