@@ -7,6 +7,7 @@ const path = require("path");
 const { procesarCV } = require("./utils/procesarCV");
 const db = require("./database");
 const verifyToken = require("./middleware/verifyToken");
+const ocrRoute = require("./routes/ocrRoute");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+app.use("/ocr", ocrRoute);
 
 const uploadsPath = path.join(__dirname, "uploads");
 console.log("📂 Serviendo archivos estáticos desde:", uploadsPath);
