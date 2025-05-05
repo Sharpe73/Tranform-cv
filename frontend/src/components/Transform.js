@@ -7,6 +7,7 @@ import UploadActions from "./UploadActions";
 import MessageDisplay from "./MessageDisplay";
 import DownloadLink from "./DownloadLink";
 import API_BASE_URL from "../apiConfig";
+import { pdfjs } from "react-pdf";
 
 function Transform() {
   const [file, setFile] = useState(null);
@@ -15,7 +16,7 @@ function Transform() {
   const [pdfLink, setPdfLink] = useState("");
   const [config, setConfig] = useState({});
   const [showConfig, setShowConfig] = useState(false);
-  const [bloqueado, setBloqueado] = useState(false); 
+  const [bloqueado, setBloqueado] = useState(false);
 
   useEffect(() => {
     const savedConfig = JSON.parse(localStorage.getItem("cvConfig"));
@@ -44,6 +45,20 @@ function Transform() {
   }, []);
 
   const handleFileChange = (e) => setFile(e.target.files[0]);
+
+  const convertirPrimeraPaginaAPNG = async (file) => {
+    const pdf = await pdfjs.getDocument(URL.createObjectURL(file)).promise;
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 2 });
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    await page.render({ canvasContext: context, viewport }).promise;
+    return canvas.toDataURL("image/png");
+  };
 
   const handleUpload = async () => {
     if (!file) {
@@ -93,7 +108,20 @@ function Transform() {
         setBloqueado(true);
         setMessage(error.response.data?.message || "❌ Límite mensual alcanzado.");
       } else if (error.response?.status === 404) {
-        setMessage("⚠️ Este archivo no contiene texto reconocible.");
+        setMessage("⚠️ Este archivo no contiene texto reconocible. Intentando OCR con IA...");
+
+        try {
+          const imageBase64 = await convertirPrimeraPaginaAPNG(file);
+          const ocrResponse = await axios.post(`${API_BASE_URL}/ocr`, { imageBase64 });
+          console.log("✅ OCR con IA resultó en:", ocrResponse.data);
+          setMessage("✅ Texto extraído correctamente con IA. PDF generado desde el backend.");
+          if (ocrResponse.data?.pdfPath) {
+            setPdfLink(`${API_BASE_URL}${ocrResponse.data.pdfPath}`);
+          }
+        } catch (ocrError) {
+          console.error("❌ Error en OCR con IA:", ocrError);
+          setMessage("❌ No se pudo extraer el texto ni con OCR.");
+        }
       } else if (error.response?.status === 401) {
         setMessage("❌ No tienes permisos. Inicia sesión nuevamente.");
       } else {
@@ -126,7 +154,7 @@ function Transform() {
         <UploadActions
           isUploading={isUploading}
           handleUpload={handleUpload}
-          disabled={bloqueado} 
+          disabled={bloqueado}
         />
 
         {message && <MessageDisplay message={message} />}
