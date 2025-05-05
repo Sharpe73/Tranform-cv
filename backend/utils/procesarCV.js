@@ -32,13 +32,17 @@ async function procesarCV(rutaArchivo, opciones) {
           newDoc.addPage(copiedPage);
           const singlePagePDF = await newDoc.save();
 
-          const imagePath = path.join(__dirname, `../uploads/temp_page_${i + 1}.png`);
-          await sharp(singlePagePDF).png().toFile(imagePath);
+          const tempPDFPath = path.join(__dirname, `../uploads/temp_page_${i + 1}.pdf`);
+          const tempPNGPath = path.join(__dirname, `../uploads/temp_page_${i + 1}.png`);
+          fs.writeFileSync(tempPDFPath, singlePagePDF);
 
-          const result = await Tesseract.recognize(imagePath, "spa");
+          await sharp(tempPDFPath, { density: 300 }).png().toFile(tempPNGPath);
+
+          const result = await Tesseract.recognize(tempPNGPath, "spa");
           textoExtraido += result.data.text + "\n";
 
-          fs.unlinkSync(imagePath); // Borrar imagen temporal
+          fs.unlinkSync(tempPDFPath);
+          fs.unlinkSync(tempPNGPath);
         }
       }
 
