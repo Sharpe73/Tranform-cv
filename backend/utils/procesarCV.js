@@ -5,9 +5,8 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
-const { PDFDocument } = require("pdf-lib");
-const sharp = require("sharp");
 const Tesseract = require("tesseract.js");
+const { fromPath } = require("pdf2pic");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -20,29 +19,33 @@ async function procesarCV(rutaArchivo, opciones) {
       textoExtraido = data.text;
 
       if (!textoExtraido || textoExtraido.trim().length < 10) {
-        console.log("⚠️ PDF sin texto extraíble, aplicando OCR...");
+        console.log("⚠️ PDF sin texto extraíble, aplicando OCR con pdf2pic...");
 
-        const pdfDoc = await PDFDocument.load(dataBuffer);
-        const numPages = Math.min(pdfDoc.getPageCount(), 3);
+        const convert = fromPath(rutaArchivo, {
+          density: 200,
+          saveFilename: "page",
+          savePath: path.join(__dirname, "../uploads"),
+          format: "png",
+          width: 1200,
+          height: 1600,
+        });
+
         textoExtraido = "";
+        const paginasOCR = 3;
 
-        for (let i = 0; i < numPages; i++) {
-          const newDoc = await PDFDocument.create();
-          const [copiedPage] = await newDoc.copyPages(pdfDoc, [i]);
-          newDoc.addPage(copiedPage);
-          const singlePagePDF = await newDoc.save();
+        for (let i = 1; i <= paginasOCR; i++) {
+          try {
+            const output = await convert(i);
+            const imagePath = output.path;
 
-          const tempPDFPath = path.join(__dirname, `../uploads/temp_page_${i + 1}.pdf`);
-          const tempPNGPath = path.join(__dirname, `../uploads/temp_page_${i + 1}.png`);
-          fs.writeFileSync(tempPDFPath, singlePagePDF);
+            const result = await Tesseract.recognize(imagePath, "spa");
+            textoExtraido += result.data.text + "\n";
 
-          await sharp(tempPDFPath, { density: 300 }).png().toFile(tempPNGPath);
-
-          const result = await Tesseract.recognize(tempPNGPath, "spa");
-          textoExtraido += result.data.text + "\n";
-
-          fs.unlinkSync(tempPDFPath);
-          fs.unlinkSync(tempPNGPath);
+            fs.unlinkSync(imagePath);
+          } catch (ocrError) {
+            console.warn(`⚠️ No se pudo procesar la página ${i}:`, ocrError.message);
+            break;
+          }
         }
       }
 
