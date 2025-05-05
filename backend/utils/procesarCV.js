@@ -27,9 +27,9 @@ async function procesarCV(rutaArchivo, opciones) {
         textoExtraido = "";
 
         for (let i = 0; i < numPages; i++) {
-          const page = await pdfDoc.copyPages(pdfDoc, [i]);
           const newDoc = await PDFDocument.create();
-          newDoc.addPage(page[0]);
+          const [copiedPage] = await newDoc.copyPages(pdfDoc, [i]);
+          newDoc.addPage(copiedPage);
           const singlePagePDF = await newDoc.save();
 
           const imagePath = path.join(__dirname, `../uploads/temp_page_${i + 1}.png`);
