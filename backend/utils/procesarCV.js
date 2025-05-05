@@ -1,9 +1,13 @@
+
 const fs = require("fs");
 const path = require("path");
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
+const { PDFDocument } = require("pdf-lib");
+const sharp = require("sharp");
+const Tesseract = require("tesseract.js");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -14,6 +18,30 @@ async function procesarCV(rutaArchivo, opciones) {
       const dataBuffer = fs.readFileSync(rutaArchivo);
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
+
+      if (!textoExtraido || textoExtraido.trim().length < 10) {
+        console.log("⚠️ PDF sin texto extraíble, aplicando OCR...");
+
+        const pdfDoc = await PDFDocument.load(dataBuffer);
+        const numPages = Math.min(pdfDoc.getPageCount(), 3);
+        textoExtraido = "";
+
+        for (let i = 0; i < numPages; i++) {
+          const page = await pdfDoc.copyPages(pdfDoc, [i]);
+          const newDoc = await PDFDocument.create();
+          newDoc.addPage(page[0]);
+          const singlePagePDF = await newDoc.save();
+
+          const imagePath = path.join(__dirname, `../uploads/temp_page_${i + 1}.png`);
+          await sharp(singlePagePDF).png().toFile(imagePath);
+
+          const result = await Tesseract.recognize(imagePath, "spa");
+          textoExtraido += result.data.text + "\n";
+
+          fs.unlinkSync(imagePath); // Borrar imagen temporal
+        }
+      }
+
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
       const result = await mammoth.extractRawText({ buffer: data });
@@ -24,7 +52,6 @@ async function procesarCV(rutaArchivo, opciones) {
       throw error;
     }
 
-    
     if (!textoExtraido || textoExtraido.trim().length < 10) {
       const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
       error.statusCode = 404;
