@@ -1,54 +1,19 @@
-
 const fs = require("fs");
 const path = require("path");
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
-const Tesseract = require("tesseract.js");
-const { fromPath } = require("pdf2pic");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
     const ext = path.extname(rutaArchivo).toLowerCase();
-    let textoExtraido = ""
+    let textoExtraido = "";
 
     if (ext === ".pdf") {
       const dataBuffer = fs.readFileSync(rutaArchivo);
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
-
-      if (!textoExtraido || textoExtraido.trim().length < 10) {
-        console.log("⚠️ PDF sin texto extraíble, aplicando OCR con pdf2pic...");
-
-        const convert = fromPath(rutaArchivo, {
-          density: 200,
-          saveFilename: "page",
-          savePath: path.join(__dirname, "../uploads"),
-          format: "png",
-          width: 1200,
-          height: 1600,
-        });
-
-        textoExtraido = "";
-        const paginasOCR = 3;
-
-        for (let i = 1; i <= paginasOCR; i++) {
-          try {
-            const output = await convert(i);
-            const imagePath = output.path;
-
-            const result = await Tesseract.recognize(imagePath, "spa");
-            textoExtraido += result.data.text + "\n";
-
-            fs.unlinkSync(imagePath);
-          } catch (ocrError) {
-            console.warn(`⚠️ No se pudo procesar la página ${i}:`, ocrError.message);
-            break;
-          }
-        }
-      }
-
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
       const result = await mammoth.extractRawText({ buffer: data });
@@ -59,6 +24,7 @@ async function procesarCV(rutaArchivo, opciones) {
       throw error;
     }
 
+    // Si no hay texto válido, el frontend se encargará de activar el OCR
     if (!textoExtraido || textoExtraido.trim().length < 10) {
       const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
       error.statusCode = 404;
