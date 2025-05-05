@@ -7,6 +7,7 @@ const { analizarConIA } = require("./analizarConIA");
 const { PDFDocument } = require("pdf-lib");
 const sharp = require("sharp");
 const Tesseract = require("tesseract.js");
+const { spawnSync } = require("child_process");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -22,31 +23,27 @@ async function procesarCV(rutaArchivo, opciones) {
         console.log("⚠️ PDF sin texto extraíble, aplicando OCR...");
 
         const pdfDoc = await PDFDocument.load(dataBuffer);
-        const page = pdfDoc.getPage(0);
-        const { width, height } = page.getSize();
+        const newPdf = await PDFDocument.create();
+        const [copiedPage] = await newPdf.copyPages(pdfDoc, [0]); // ✅ Uso correcto
+        newPdf.addPage(copiedPage);
+        const pdfBytes = await newPdf.save();
 
-        const pdfBytes = await PDFDocument.create()
-          .then(doc => {
-            const [copiedPage] = doc.copyPagesSync(pdfDoc, [0]);
-            doc.addPage(copiedPage);
-            return doc.save();
-          });
+        const tempPdfPath = path.join(__dirname, "../uploads/temp.pdf");
+        const tempImagePath = path.join(__dirname, "../uploads/temp.png");
 
-        const outputImagePath = path.join(__dirname, `../uploads/temp-page.png`);
-        const { spawnSync } = require("child_process");
-        fs.writeFileSync("temp.pdf", pdfBytes);
+        fs.writeFileSync(tempPdfPath, pdfBytes);
 
-        const convert = spawnSync("pdftoppm", ["temp.pdf", "temp", "-png", "-singlefile"]);
+        const convert = spawnSync("pdftoppm", [tempPdfPath, tempImagePath.replace(".png", ""), "-png", "-singlefile"]);
         if (convert.error) throw convert.error;
 
-        const buffer = fs.readFileSync("temp.png");
+        const buffer = fs.readFileSync(tempImagePath);
         const pngBuffer = await sharp(buffer).png().toBuffer();
 
         const result = await Tesseract.recognize(pngBuffer, "spa");
         textoExtraido = result.data.text;
 
-        fs.unlinkSync("temp.pdf");
-        fs.unlinkSync("temp.png");
+        fs.unlinkSync(tempPdfPath);
+        fs.unlinkSync(tempImagePath);
       }
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
@@ -66,7 +63,7 @@ async function procesarCV(rutaArchivo, opciones) {
 
     console.log("🔍 Texto extraído (primeros 300 caracteres):", textoExtraido.substring(0, 300));
 
-    let datosEstructurados = await analizarConIA(textoExtraido);
+    const datosEstructurados = await analizarConIA(textoExtraido);
 
     console.log("🧠 Respuesta OpenAI:", datosEstructurados);
 
