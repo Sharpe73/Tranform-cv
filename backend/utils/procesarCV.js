@@ -4,6 +4,9 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const { generarPDF } = require("./generarPDF");
 const { analizarConIA } = require("./analizarConIA");
+const { PDFDocument } = require("pdf-lib");
+const sharp = require("sharp");
+const Tesseract = require("tesseract.js");
 
 async function procesarCV(rutaArchivo, opciones) {
   try {
@@ -14,6 +17,37 @@ async function procesarCV(rutaArchivo, opciones) {
       const dataBuffer = fs.readFileSync(rutaArchivo);
       const data = await pdfParse(dataBuffer);
       textoExtraido = data.text;
+
+      if (!textoExtraido || textoExtraido.trim().length < 10) {
+        console.log("⚠️ PDF sin texto extraíble, aplicando OCR...");
+
+        const pdfDoc = await PDFDocument.load(dataBuffer);
+        const page = pdfDoc.getPage(0);
+        const { width, height } = page.getSize();
+
+        const pdfBytes = await PDFDocument.create()
+          .then(doc => {
+            const [copiedPage] = doc.copyPagesSync(pdfDoc, [0]);
+            doc.addPage(copiedPage);
+            return doc.save();
+          });
+
+        const outputImagePath = path.join(__dirname, `../uploads/temp-page.png`);
+        const { spawnSync } = require("child_process");
+        fs.writeFileSync("temp.pdf", pdfBytes);
+
+        const convert = spawnSync("pdftoppm", ["temp.pdf", "temp", "-png", "-singlefile"]);
+        if (convert.error) throw convert.error;
+
+        const buffer = fs.readFileSync("temp.png");
+        const pngBuffer = await sharp(buffer).png().toBuffer();
+
+        const result = await Tesseract.recognize(pngBuffer, "spa");
+        textoExtraido = result.data.text;
+
+        fs.unlinkSync("temp.pdf");
+        fs.unlinkSync("temp.png");
+      }
     } else if (ext === ".docx") {
       const data = fs.readFileSync(rutaArchivo);
       const result = await mammoth.extractRawText({ buffer: data });
@@ -24,7 +58,6 @@ async function procesarCV(rutaArchivo, opciones) {
       throw error;
     }
 
-    // Si no hay texto válido, el frontend se encargará de activar el OCR
     if (!textoExtraido || textoExtraido.trim().length < 10) {
       const error = new Error(`El archivo ${rutaArchivo} no contiene texto válido.`);
       error.statusCode = 404;
