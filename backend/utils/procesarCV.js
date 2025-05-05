@@ -24,7 +24,7 @@ async function procesarCV(rutaArchivo, opciones) {
 
         const pdfDoc = await PDFDocument.load(dataBuffer);
         const newPdf = await PDFDocument.create();
-        const [copiedPage] = await newPdf.copyPages(pdfDoc, [0]); // ✅ Uso correcto
+        const [copiedPage] = await newPdf.copyPages(pdfDoc, [0]);
         newPdf.addPage(copiedPage);
         const pdfBytes = await newPdf.save();
 

@@ -200,9 +200,20 @@ async function generarPDF(datos, nombreArchivo, opciones) {
 
   agregarSeccionSimple("Información Personal", `Nombre: ${corregirTexto(datos.informacion_personal?.nombre)}`);
   agregarSeccionSimple("Educación", formatearEducacionConFechas(datos.educacion));
-  if (datos.certificaciones && datos.certificaciones.length > 0) {
+
+
+  if (
+    Array.isArray(datos.certificaciones) &&
+    datos.certificaciones.length > 0 &&
+    datos.certificaciones.some(cert =>
+      typeof cert === "string"
+        ? cert.trim() !== ""
+        : Object.values(cert).some(v => (v || "").toString().trim() !== "")
+    )
+  ) {
     agregarSeccionSimple("Certificaciones", formatearCertificaciones(datos.certificaciones));
   }
+
   agregarExperienciaLaboral("Experiencia Laboral", datos.experiencia_laboral);
   agregarSeccionSimple("Idiomas", formatearListaConFormato(datos.idiomas, "idioma", "nivel"));
   agregarSeccionSimple("Conocimientos Informáticos", formatearConocimientos(datos.conocimientos_informaticos));
