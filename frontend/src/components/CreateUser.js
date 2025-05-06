@@ -24,6 +24,8 @@ const CreateUser = () => {
 
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
+  const [emailValido, setEmailValido] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,11 +35,18 @@ const CreateUser = () => {
     }
   }, [navigate]);
 
+  const validarEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "email") {
+      setEmailValido(validarEmail(value));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -66,6 +75,7 @@ const CreateUser = () => {
         password: "",
         rol: "user",
       });
+      setEmailValido(true);
     } catch (err) {
       if (
         err.response?.data?.message?.includes("duplicate key value") ||
@@ -77,6 +87,9 @@ const CreateUser = () => {
       }
     }
   };
+
+  const formularioInvalido =
+    !form.nombre || !form.apellido || !form.email || !form.password || !emailValido;
 
   return (
     <Container maxWidth="sm" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
@@ -124,6 +137,12 @@ const CreateUser = () => {
             margin="normal"
             required
             type="email"
+            error={!emailValido && form.email !== ""}
+            helperText={
+              !emailValido && form.email !== ""
+                ? "Correo no válido. Por favor, ingrese un correo válido."
+                : ""
+            }
           />
           <TextField
             fullWidth
@@ -149,7 +168,7 @@ const CreateUser = () => {
             <MenuItem value="admin">Administrador</MenuItem>
           </TextField>
 
-          <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }} disabled={formularioInvalido}>
             Crear Usuario
           </Button>
         </form>
