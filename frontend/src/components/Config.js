@@ -12,7 +12,6 @@ import {
   Snackbar,
   Alert,
   Paper,
-  Container,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -80,11 +79,14 @@ function Config({ setConfig }) {
   };
 
   return (
-    <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
+    <Box sx={{ pt: { xs: 2, md: 3 }, pb: 6, display: "flex", justifyContent: "flex-start" }}>
       <Paper
         elevation={4}
         sx={{
           p: { xs: 3, md: 5 },
+          width: "100%",
+          maxWidth: 700,
+          ml: { xs: 0, md: 2 },
           borderRadius: 4,
           backgroundColor: "#fff",
         }}
@@ -239,7 +241,7 @@ function Config({ setConfig }) {
           </Alert>
         </Snackbar>
       </Paper>
-    </Container>
+    </Box>
   );
 }
 
