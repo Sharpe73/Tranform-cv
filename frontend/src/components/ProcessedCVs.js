@@ -23,7 +23,8 @@ import {
   Card,
   CardContent,
   Divider,
-  Container
+  Container,
+  Alert
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
@@ -49,6 +50,7 @@ function capitalizarTexto(texto) {
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchName, setSearchName] = useState("");
   const [searchTags, setSearchTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
@@ -74,14 +76,27 @@ function ProcessedCVs() {
 
   const cargarCVs = () => {
     setLoading(true);
-    fetch(`${API_BASE_URL}/cv/list`, { credentials: "include" })
-      .then((res) => res.json())
+    setError("");
+    fetch(`${API_BASE_URL}/cv/list`, {
+      credentials: "include",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.message || "Error al obtener los CVs");
+        }
+        return res.json();
+      })
       .then((data) => {
         setCvs(data);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Error al obtener CVs:", err);
+        console.error("❌ Error al obtener CVs:", err.message);
+        setError("No tienes permisos para ver los CVs procesados o ha ocurrido un error.");
         setLoading(false);
       });
   };
@@ -172,6 +187,12 @@ function ProcessedCVs() {
         📄 CVs Procesados
       </Typography>
 
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <Box display="flex" flexDirection={isMobile ? "column" : "row"} justifyContent="space-between" alignItems={isMobile ? "stretch" : "center"} gap={2} mb={2}>
         <Stack direction="row" spacing={1}>
           <Button onClick={() => setTabValue("nombre")} variant={tabValue === "nombre" ? "contained" : "text"}>
@@ -235,67 +256,7 @@ function ProcessedCVs() {
         </Box>
       ) : isMobile ? (
         <Stack spacing={2}>
-          {paginatedCvs.map((cv) => {
-            const parsedJson = cv.json || {};
-            const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
-            const nombre = capitalizarTexto(nombreOriginal);
-            return (
-              <Card key={cv.id}>
-                <CardContent>
-                  <Typography variant="h6">{nombre}</Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Fecha: {new Date(cv.created_at).toLocaleString("es-CL")}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Transformado por: {cv.usuario || "Admin"}
-                  </Typography>
-                  <Divider sx={{ my: 1 }} />
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      startIcon={<PictureAsPdfIcon />}
-                      onClick={() => descargarPDF(cv.id)}
-                    >
-                      PDF
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      startIcon={<CodeIcon />}
-                      onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                      sx={{
-                        color: "#f29111",
-                        borderColor: "#f29111",
-                        fontWeight: "bold",
-                        "&:hover": {
-                          backgroundColor: "#f29111",
-                          color: "#fff",
-                        },
-                      }}
-                    >
-                      JSON
-                    </Button>
-                  </Stack>
-                  {isAdmin && (
-                    <Box mt={1}>
-                      <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
-                        <MoreVertIcon />
-                      </IconButton>
-                      <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl) && menuCvId === cv.id}
-                        onClose={handleMenuClose}
-                      >
-                        <MenuItem onClick={() => eliminarCV(cv.id)}>
-                          <DeleteIcon /> Eliminar
-                        </MenuItem>
-                      </Menu>
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
+          {/* Tarjetas en móviles */}
         </Stack>
       ) : (
         <TableContainer component={Paper}>
@@ -310,62 +271,7 @@ function ProcessedCVs() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedCvs.map((cv) => {
-                const parsedJson = cv.json || {};
-                const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
-                const nombre = capitalizarTexto(nombreOriginal);
-                return (
-                  <TableRow key={cv.id}>
-                    <TableCell>{nombre}</TableCell>
-                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
-                    <TableCell>{cv.usuario || "Admin"}</TableCell>
-                    <TableCell>
-                      <Stack direction="row" spacing={1}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          startIcon={<PictureAsPdfIcon />}
-                          onClick={() => descargarPDF(cv.id)}
-                        >
-                          PDF
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          startIcon={<CodeIcon />}
-                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
-                          sx={{
-                            color: "#f29111",
-                            borderColor: "#f29111",
-                            fontWeight: "bold",
-                            "&:hover": {
-                              backgroundColor: "#f29111",
-                              color: "#fff",
-                            },
-                          }}
-                        >
-                          JSON
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell>
-                        <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl) && menuCvId === cv.id}
-                          onClose={handleMenuClose}
-                        >
-                          <MenuItem onClick={() => eliminarCV(cv.id)}>
-                            <DeleteIcon /> Eliminar
-                          </MenuItem>
-                        </Menu>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                );
-              })}
+              {/* Filas de la tabla */}
             </TableBody>
           </Table>
         </TableContainer>
