@@ -7,6 +7,7 @@ import {
   Paper,
   Alert,
   MenuItem,
+  Container,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -78,17 +79,9 @@ const CreateUser = () => {
   };
 
   return (
-    <Box sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      <Paper
-        elevation={3}
-        sx={{
-          p: { xs: 3, md: 4 },
-          maxWidth: 500,
-          mx: "auto",
-          borderRadius: 3,
-        }}
-      >
-        <Typography variant="h4" gutterBottom color="primary">
+    <Container maxWidth="sm" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
+      <Paper elevation={4} sx={{ p: 4, borderRadius: 4 }}>
+        <Typography variant="h4" gutterBottom color="primary" textAlign="center">
           🧑 Crear nuevo usuario
         </Typography>
 
@@ -161,7 +154,7 @@ const CreateUser = () => {
           </Button>
         </form>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 

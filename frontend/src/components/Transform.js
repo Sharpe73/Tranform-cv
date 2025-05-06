@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Paper, Typography } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Container,
+} from "@mui/material";
 import UploadSection from "./UploadSection";
 import ConfigCard from "./ConfigCard";
 import UploadActions from "./UploadActions";
@@ -94,7 +99,7 @@ function Transform() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        withCredentials: true
+        withCredentials: true,
       });
 
       setMessage("✅ Archivo procesado con éxito.");
@@ -133,9 +138,15 @@ function Transform() {
   };
 
   return (
-    <Box sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, maxWidth: 700, margin: "auto" }}>
-        <Typography variant="h4" color="primary" gutterBottom align="center">
+    <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
+      <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
+        <Typography
+          variant="h4"
+          color="primary"
+          gutterBottom
+          align="center"
+          fontWeight="bold"
+        >
           🖹 Transformar Documento
         </Typography>
 
@@ -158,10 +169,9 @@ function Transform() {
         />
 
         {message && <MessageDisplay message={message} />}
-
         {pdfLink && <DownloadLink pdfLink={pdfLink} />}
       </Paper>
-    </Box>
+    </Container>
   );
 }
 

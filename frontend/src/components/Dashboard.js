@@ -8,6 +8,7 @@ import {
   Stack,
   useMediaQuery,
   useTheme,
+  Container,
 } from "@mui/material";
 import {
   PieChart,
@@ -63,7 +64,7 @@ function Dashboard() {
   ];
 
   return (
-    <Box>
+    <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
       <Typography
         variant={esMovil ? "h5" : "h4"}
         fontWeight="bold"
@@ -77,21 +78,24 @@ function Dashboard() {
         sx={{
           display: "flex",
           flexDirection: esMovil ? "column" : "row",
-          gap: 2,
-          justifyContent: "center",
+          gap: 3,
+          justifyContent: "space-between",
           alignItems: "stretch",
           flexWrap: "wrap",
         }}
       >
+        {/* PieChart de Consumo */}
         <Paper
-          elevation={4}
+          elevation={3}
           sx={{
             flex: 1,
             minWidth: 300,
-            maxWidth: 600,
-            p: 2,
+            p: 3,
             borderRadius: 4,
-            height: esMovil ? "auto" : 430,
+            height: esMovil ? "auto" : 450,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
           }}
         >
           <Typography variant="h6" align="center" fontWeight="bold" mb={1}>
@@ -139,17 +143,18 @@ function Dashboard() {
           </Box>
         </Paper>
 
+        {/* BarChart de uso por usuario */}
         <Paper
-          elevation={4}
+          elevation={3}
           sx={{
             flex: 1,
             minWidth: 300,
-            maxWidth: 600,
-            p: 2,
+            p: 3,
             borderRadius: 4,
-            height: esMovil ? "auto" : 430,
+            height: esMovil ? "auto" : 450,
             display: "flex",
             flexDirection: "column",
+            justifyContent: "space-between",
           }}
         >
           <Typography variant="h6" align="center" fontWeight="bold" mb={1}>
@@ -198,7 +203,7 @@ function Dashboard() {
           </ResponsiveContainer>
         </Paper>
       </Box>
-    </Box>
+    </Container>
   );
 }
 

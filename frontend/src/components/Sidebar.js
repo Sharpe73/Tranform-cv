@@ -28,6 +28,8 @@ import BusinessIcon from "@mui/icons-material/Business";
 import { jwtDecode } from "jwt-decode";
 import { verificarSesionActiva } from "./api";
 
+const drawerWidth = 250;
+
 function Sidebar() {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -77,10 +79,10 @@ function Sidebar() {
         variant="permanent"
         anchor="left"
         sx={{
-          width: 250,
+          width: drawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: 250,
+            width: drawerWidth,
             boxSizing: "border-box",
             backgroundColor: "#f5f5f5",
             boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
@@ -88,7 +90,14 @@ function Sidebar() {
           },
         }}
       >
-        <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            height: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
           <Box>
             <Box
               sx={{
@@ -117,24 +126,32 @@ function Sidebar() {
 
             <List>
               <ListItem button onClick={() => handleNavigate("/dashboard")}>
-                <ListItemIcon><BarChartIcon /></ListItemIcon>
+                <ListItemIcon>
+                  <BarChartIcon />
+                </ListItemIcon>
                 <ListItemText primary="Dashboard" />
               </ListItem>
 
               <ListItem button onClick={() => handleNavigate("/transform")}>
-                <ListItemIcon><DescriptionIcon /></ListItemIcon>
+                <ListItemIcon>
+                  <DescriptionIcon />
+                </ListItemIcon>
                 <ListItemText primary="Transformar Documento" />
               </ListItem>
 
               <ListItem button onClick={() => handleNavigate("/procesados")}>
-                <ListItemIcon><AssignmentIcon /></ListItemIcon>
+                <ListItemIcon>
+                  <AssignmentIcon />
+                </ListItemIcon>
                 <ListItemText primary="CVs Procesados" />
               </ListItem>
 
               {isAdmin && (
                 <>
                   <ListItem button onClick={() => setOpenAjustes(!openAjustes)}>
-                    <ListItemIcon><SettingsIcon /></ListItemIcon>
+                    <ListItemIcon>
+                      <SettingsIcon />
+                    </ListItemIcon>
                     <ListItemText primary="Ajustes" />
                     {openAjustes ? <ExpandLess /> : <ExpandMore />}
                   </ListItem>
@@ -145,7 +162,9 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         onClick={() => handleNavigate("/ajustes/organizacion")}
                       >
-                        <ListItemIcon><BusinessIcon /></ListItemIcon>
+                        <ListItemIcon>
+                          <BusinessIcon />
+                        </ListItemIcon>
                         <ListItemText primary="Mi Organización" />
                       </ListItem>
                       <ListItem
@@ -153,7 +172,9 @@ function Sidebar() {
                         sx={{ pl: 4 }}
                         onClick={() => handleNavigate("/ajustes/equipo")}
                       >
-                        <ListItemIcon><GroupIcon /></ListItemIcon>
+                        <ListItemIcon>
+                          <GroupIcon />
+                        </ListItemIcon>
                         <ListItemText primary="Mi Equipo" />
                       </ListItem>
                     </List>
@@ -163,14 +184,18 @@ function Sidebar() {
 
               {isAdmin && (
                 <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
-                  <ListItemIcon><PersonAddIcon /></ListItemIcon>
+                  <ListItemIcon>
+                    <PersonAddIcon />
+                  </ListItemIcon>
                   <ListItemText primary="Crear Usuario" />
                 </ListItem>
               )}
 
               {hayUsuario && (
                 <ListItem button onClick={() => setOpenLogoutDialog(true)}>
-                  <ListItemIcon><LogoutIcon /></ListItemIcon>
+                  <ListItemIcon>
+                    <LogoutIcon />
+                  </ListItemIcon>
                   <ListItemText primary="Cerrar Sesión" />
                 </ListItem>
               )}

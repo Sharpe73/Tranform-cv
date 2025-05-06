@@ -12,12 +12,14 @@ import {
   Snackbar,
   Alert,
   Paper,
+  Container,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { CloudUpload, PhotoCamera, Close } from "@mui/icons-material";
 
 function Config({ setConfig }) {
   const storedConfig = JSON.parse(localStorage.getItem("cvConfig")) || {};
-
   const [organizationName, setOrganizationName] = useState(storedConfig.organizationName || "");
   const [logoBase64, setLogoBase64] = useState(storedConfig.logo || null);
   const [logoFileName, setLogoFileName] = useState(storedConfig.logoName || "No definido");
@@ -26,8 +28,10 @@ function Config({ setConfig }) {
   const [fontSize, setFontSize] = useState(storedConfig.fontSize || 12);
   const [colorHeader, setColorHeader] = useState(storedConfig.colorHeader || "#000000");
   const [colorParagraph, setColorParagraph] = useState(storedConfig.colorParagraph || "#000000");
-
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     if (storedConfig.logo) {
@@ -71,27 +75,21 @@ function Config({ setConfig }) {
     };
 
     localStorage.setItem("cvConfig", JSON.stringify(newConfig));
-
-    if (setConfig) {
-      setConfig(newConfig);
-    }
-
+    if (setConfig) setConfig(newConfig);
     alert("✅ Configuración guardada correctamente");
   };
 
   return (
-    <Box sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
+    <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
       <Paper
-        elevation={3}
+        elevation={4}
         sx={{
-          p: { xs: 3, md: 4 },
-          maxWidth: 700,
-          margin: "auto",
-          borderRadius: 3,
+          p: { xs: 3, md: 5 },
+          borderRadius: 4,
           backgroundColor: "#fff",
         }}
       >
-        <Typography variant="h4" gutterBottom color="primary">
+        <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
           📄 Configuración del PDF
         </Typography>
 
@@ -103,7 +101,7 @@ function Config({ setConfig }) {
           sx={{ mt: 2 }}
         />
 
-        <Box sx={{ mt: 3 }}>
+        <Box sx={{ mt: 4 }}>
           <Typography variant="h6" gutterBottom>
             🖼️ Logo
           </Typography>
@@ -114,6 +112,7 @@ function Config({ setConfig }) {
           <Box
             sx={{
               display: "flex",
+              flexDirection: isMobile ? "column" : "row",
               alignItems: "center",
               gap: 2,
               border: "1px solid #ccc",
@@ -130,7 +129,9 @@ function Config({ setConfig }) {
               Subir Logo
               <input type="file" hidden onChange={handleLogoChange} />
             </Button>
-            <Typography variant="body2">{logoFileName}</Typography>
+            <Typography variant="body2" noWrap>
+              {logoFileName}
+            </Typography>
             {logoBase64 && (
               <IconButton color="error" size="small" onClick={handleLogoDelete}>
                 <Close />
@@ -144,7 +145,13 @@ function Config({ setConfig }) {
             🔤 Fuentes y Colores
           </Typography>
 
-          <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
+              gap: 2,
+            }}
+          >
             <FormControl fullWidth>
               <InputLabel>Fuente del Encabezado</InputLabel>
               <Select
@@ -168,7 +175,14 @@ function Config({ setConfig }) {
             />
           </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "row", gap: 2, mt: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
+              gap: 2,
+              mt: 2,
+            }}
+          >
             <FormControl fullWidth>
               <InputLabel>Fuente del Párrafo</InputLabel>
               <Select
@@ -225,7 +239,7 @@ function Config({ setConfig }) {
           </Alert>
         </Snackbar>
       </Paper>
-    </Box>
+    </Container>
   );
 }
 

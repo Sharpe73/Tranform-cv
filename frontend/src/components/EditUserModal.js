@@ -8,6 +8,7 @@ import {
   TextField,
   MenuItem,
   Stack,
+  Typography,
 } from "@mui/material";
 
 function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
@@ -15,8 +16,10 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontWeight: "bold", color: "primary.main" }}>
-        ✏️ Editar Usuario
+      <DialogTitle>
+        <Typography variant="h6" fontWeight="bold" color="primary">
+          ✏️ Editar Usuario
+        </Typography>
       </DialogTitle>
 
       <DialogContent dividers>
@@ -40,10 +43,8 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
           <TextField
             label="Proyecto"
             value="Todos los proyectos"
-            InputProps={{
-              readOnly: true,
-            }}
             fullWidth
+            InputProps={{ readOnly: true }}
           />
           <TextField
             select
@@ -60,7 +61,7 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
         </Stack>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2 }}>
+      <DialogActions sx={{ px: 3, py: 2 }}>
         <Button onClick={onClose} variant="outlined" color="secondary">
           Cancelar
         </Button>

@@ -23,6 +23,7 @@ import {
   Card,
   CardContent,
   Divider,
+  Container
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
@@ -166,7 +167,7 @@ function ProcessedCVs() {
   };
 
   return (
-    <Box sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
+    <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
@@ -370,7 +371,7 @@ function ProcessedCVs() {
         </TableContainer>
       )}
 
-      <Box mt={2} display="flex" justifyContent="center">
+      <Box mt={3} display="flex" justifyContent="center">
         <Pagination
           count={totalPages}
           page={currentPage}
@@ -378,7 +379,7 @@ function ProcessedCVs() {
           color="primary"
         />
       </Box>
-    </Box>
+    </Container>
   );
 }
 

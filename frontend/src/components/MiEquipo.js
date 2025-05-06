@@ -17,6 +17,7 @@ import {
   CardContent,
   Stack,
   Button,
+  Container,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
@@ -136,7 +137,7 @@ function MiEquipo() {
   };
 
   return (
-    <Box sx={{ py: 4, px: 2, maxWidth: "1200px", mx: "auto", minHeight: "100vh" }}>
+    <Container maxWidth="xl" sx={{ py: 4, minHeight: "100vh" }}>
       <Typography variant="h4" gutterBottom textAlign="center" color="primary">
         👥 Mi Equipo
       </Typography>
@@ -219,7 +220,7 @@ function MiEquipo() {
         onChange={handleChangeUsuario}
         onSave={handleGuardarCambios}
       />
-    </Box>
+    </Container>
   );
 }
 
