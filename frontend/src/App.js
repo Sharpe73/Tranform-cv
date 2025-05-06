@@ -78,8 +78,6 @@ function App() {
           sx={{
             flexGrow: 1,
             padding: "32px 24px",
-            marginLeft: !isLogin ? "250px" : 0,
-            maxWidth: !isLogin ? "calc(100% - 250px)" : "100%",
             backgroundColor: "#f9fafc",
             minHeight: "100vh",
           }}
