@@ -139,12 +139,14 @@ function Sidebar() {
                 <ListItemText primary="Transformar Documento" />
               </ListItem>
 
-              <ListItem button onClick={() => handleNavigate("/procesados")}>
-                <ListItemIcon>
-                  <AssignmentIcon />
-                </ListItemIcon>
-                <ListItemText primary="CVs Procesados" />
-              </ListItem>
+              {isAdmin && (
+                <ListItem button onClick={() => handleNavigate("/procesados")}>
+                  <ListItemIcon>
+                    <AssignmentIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="CVs Procesados" />
+                </ListItem>
+              )}
 
               {isAdmin && (
                 <>
