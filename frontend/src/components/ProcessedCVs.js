@@ -160,9 +160,18 @@ function ProcessedCVs() {
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
-    return tabValue === "nombre"
-      ? nombre.toLowerCase().includes(searchName.toLowerCase())
-      : searchTags.every((tag) => conocimientos.toLowerCase().includes(tag.toLowerCase()));
+
+    if (tabValue === "nombre") {
+      return searchName.trim() === ""
+        ? true
+        : nombre.toLowerCase().includes(searchName.toLowerCase());
+    } else {
+      return searchTags.length === 0
+        ? true
+        : searchTags.every((tag) =>
+            conocimientos.toLowerCase().includes(tag.toLowerCase())
+          );
+    }
   });
 
   const totalPages = Math.ceil(filteredCvs.length / itemsPerPage);
@@ -193,12 +202,25 @@ function ProcessedCVs() {
         </Alert>
       )}
 
-      <Box display="flex" flexDirection={isMobile ? "column" : "row"} justifyContent="space-between" alignItems={isMobile ? "stretch" : "center"} gap={2} mb={2}>
+      <Box
+        display="flex"
+        flexDirection={isMobile ? "column" : "row"}
+        justifyContent="space-between"
+        alignItems={isMobile ? "stretch" : "center"}
+        gap={2}
+        mb={2}
+      >
         <Stack direction="row" spacing={1}>
-          <Button onClick={() => setTabValue("nombre")} variant={tabValue === "nombre" ? "contained" : "text"}>
+          <Button
+            onClick={() => setTabValue("nombre")}
+            variant={tabValue === "nombre" ? "contained" : "text"}
+          >
             BUSCAR POR NOMBRE
           </Button>
-          <Button onClick={() => setTabValue("tags")} variant={tabValue === "tags" ? "contained" : "text"}>
+          <Button
+            onClick={() => setTabValue("tags")}
+            variant={tabValue === "tags" ? "contained" : "text"}
+          >
             BUSCAR POR TAGS
           </Button>
         </Stack>
@@ -241,7 +263,9 @@ function ProcessedCVs() {
               <Chip
                 key={index}
                 label={tag}
-                onDelete={() => setSearchTags(searchTags.filter((_, i) => i !== index))}
+                onDelete={() =>
+                  setSearchTags(searchTags.filter((_, i) => i !== index))
+                }
                 color="primary"
               />
             ))}
@@ -256,7 +280,70 @@ function ProcessedCVs() {
         </Box>
       ) : isMobile ? (
         <Stack spacing={2}>
-          {/* Tarjetas en móviles */}
+          {paginatedCvs.map((cv) => {
+            const parsedJson = cv.json || {};
+            const nombreOriginal =
+              parsedJson?.informacion_personal?.nombre || "Desconocido";
+            const nombre = capitalizarTexto(nombreOriginal);
+            return (
+              <Card key={cv.id}>
+                <CardContent>
+                  <Typography variant="h6">{nombre}</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Fecha: {new Date(cv.created_at).toLocaleString("es-CL")}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Transformado por: {cv.usuario || "Admin"}
+                  </Typography>
+                  <Divider sx={{ my: 1 }} />
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<PictureAsPdfIcon />}
+                      onClick={() => descargarPDF(cv.id)}
+                    >
+                      PDF
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      startIcon={<CodeIcon />}
+                      onClick={() =>
+                        descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                      }
+                      sx={{
+                        color: "#f29111",
+                        borderColor: "#f29111",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          backgroundColor: "#f29111",
+                          color: "#fff",
+                        },
+                      }}
+                    >
+                      JSON
+                    </Button>
+                  </Stack>
+                  {isAdmin && (
+                    <Box mt={1}>
+                      <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
+                        <MoreVertIcon />
+                      </IconButton>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl) && menuCvId === cv.id}
+                        onClose={handleMenuClose}
+                      >
+                        <MenuItem onClick={() => eliminarCV(cv.id)}>
+                          <DeleteIcon /> Eliminar
+                        </MenuItem>
+                      </Menu>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </Stack>
       ) : (
         <TableContainer component={Paper}>
@@ -271,7 +358,65 @@ function ProcessedCVs() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {/* Filas de la tabla */}
+              {paginatedCvs.map((cv) => {
+                const parsedJson = cv.json || {};
+                const nombreOriginal =
+                  parsedJson?.informacion_personal?.nombre || "Desconocido";
+                const nombre = capitalizarTexto(nombreOriginal);
+                return (
+                  <TableRow key={cv.id}>
+                    <TableCell>{nombre}</TableCell>
+                    <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
+                    <TableCell>{cv.usuario || "Admin"}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          startIcon={<PictureAsPdfIcon />}
+                          onClick={() => descargarPDF(cv.id)}
+                        >
+                          PDF
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          startIcon={<CodeIcon />}
+                          onClick={() =>
+                            descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                          }
+                          sx={{
+                            color: "#f29111",
+                            borderColor: "#f29111",
+                            fontWeight: "bold",
+                            "&:hover": {
+                              backgroundColor: "#f29111",
+                              color: "#fff",
+                            },
+                          }}
+                        >
+                          JSON
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                    {isAdmin && (
+                      <TableCell>
+                        <IconButton onClick={(e) => handleMenuOpen(e, cv.id)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl) && menuCvId === cv.id}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={() => eliminarCV(cv.id)}>
+                            <DeleteIcon /> Eliminar
+                          </MenuItem>
+                        </Menu>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
