@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
@@ -141,7 +142,11 @@ app.get("/cv/pdf/:id", async (req, res) => {
   }
 });
 
-app.get("/cv/list", async (req, res) => {
+app.get("/cv/list", verifyToken, async (req, res) => {
+  if (req.user?.rol !== "admin") {
+    return res.status(403).json({ message: "Acceso denegado: solo administradores pueden ver esta información." });
+  }
+
   try {
     const result = await db.query(
       `SELECT cv.id, cv.json_data, cv.pdf_url, cv.created_at, u.nombre, u.apellido, r.nombre AS rol
@@ -168,7 +173,6 @@ app.get("/cv/list", async (req, res) => {
     res.status(500).json({ message: "Error al obtener CVs desde la base de datos." });
   }
 });
-
 app.get("/cv/consumo", async (req, res) => {
   try {
     const inicioMes = new Date();
@@ -336,3 +340,4 @@ app.put("/users/:id", verifyToken, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
+
