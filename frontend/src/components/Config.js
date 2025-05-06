@@ -81,16 +81,18 @@ function Config({ setConfig }) {
   return (
     <Box
       sx={{
-        pt: { xs: 2, md: 3 },
+        pt: { xs: 2, md: 4 },
         pb: 6,
         minHeight: "100vh",
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "flex-start",
       }}
     >
       <Paper
         elevation={4}
         sx={{
+          mt: 2,
+          ml: { xs: 2, md: 10 },
           p: { xs: 3, md: 5 },
           width: "100%",
           maxWidth: 700,
