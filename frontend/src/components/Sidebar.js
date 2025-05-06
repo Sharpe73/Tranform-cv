@@ -83,6 +83,8 @@ function Sidebar() {
             width: 250,
             boxSizing: "border-box",
             backgroundColor: "#f5f5f5",
+            boxShadow: "2px 0 8px rgba(0, 0, 0, 0.1)",
+            borderRight: "1px solid #ddd",
           },
         }}
       >

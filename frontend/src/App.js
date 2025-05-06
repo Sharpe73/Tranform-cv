@@ -80,9 +80,11 @@ function App() {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            padding: "32px 24px",
             marginLeft: !isLogin ? "250px" : 0,
-            transition: "margin 0.3s ease",
+            maxWidth: !isLogin ? "calc(100% - 250px)" : "100%",
+            backgroundColor: "#f9fafc",
+            minHeight: "100vh",
           }}
         >
           {children}
