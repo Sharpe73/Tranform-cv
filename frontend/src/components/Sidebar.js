@@ -6,7 +6,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  IconButton,
   Typography,
   Box,
   Dialog,
@@ -16,12 +15,10 @@ import {
   Button,
   Collapse,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import CloseIcon from "@mui/icons-material/Close";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ExpandLess from "@mui/icons-material/ExpandLess";
@@ -33,7 +30,6 @@ import { verificarSesionActiva } from "./api";
 
 function Sidebar() {
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [usuarioNombre, setUsuarioNombre] = useState("");
@@ -54,22 +50,17 @@ function Sidebar() {
     }
   }, []);
 
-  const toggleDrawer = (open) => () => setIsOpen(open);
-
   const verificarSesion = async () => {
     try {
       await verificarSesionActiva();
-      // Si pasa, sigue normalmente
     } catch (error) {
       console.error("❌ Sesión no válida:", error);
-      // El interceptor de api.js ya se encarga de redirigir
     }
   };
 
   const handleNavigate = async (path) => {
-    await verificarSesion(); // ✅ verifica la sesión antes de navegar
+    await verificarSesion();
     navigate(path);
-    setIsOpen(false);
   };
 
   const handleLogout = () => {
@@ -82,31 +73,32 @@ function Sidebar() {
 
   return (
     <>
-      <IconButton
-        onClick={toggleDrawer(true)}
-        sx={{ position: "fixed", top: 20, left: 20, zIndex: 1300 }}
+      <Drawer
+        variant="permanent"
+        anchor="left"
+        sx={{
+          width: 250,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: 250,
+            boxSizing: "border-box",
+            backgroundColor: "#f5f5f5",
+          },
+        }}
       >
-        <MenuIcon sx={{ fontSize: 30, color: "black" }} />
-      </IconButton>
-
-      <Drawer anchor="left" open={isOpen} onClose={toggleDrawer(false)}>
-        <Box sx={{ width: 250, bgcolor: "#f5f5f5", height: "100vh" }}>
+        <Box sx={{ height: "100vh" }}>
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
-              padding: "1px 20px",
+              justifyContent: "center",
+              padding: "16px 20px",
               borderBottom: "1px solid #ddd",
-              position: "relative",
             }}
           >
             <Typography variant="h6" fontWeight="bold">
               Opciones
             </Typography>
-            <IconButton onClick={toggleDrawer(false)}>
-              <CloseIcon />
-            </IconButton>
           </Box>
 
           {usuarioNombre && (

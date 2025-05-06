@@ -76,7 +76,15 @@ function App() {
     return (
       <Box display="flex">
         {!isLogin && <Sidebar />}
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            marginLeft: !isLogin ? "250px" : 0,
+            transition: "margin 0.3s ease",
+          }}
+        >
           {children}
         </Box>
       </Box>
@@ -112,7 +120,7 @@ function App() {
             {isAdmin && (
               <>
                 <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
-                <Route path="/ajustes/equipo" element={<MiEquipo />} /> 
+                <Route path="/ajustes/equipo" element={<MiEquipo />} />
                 <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
