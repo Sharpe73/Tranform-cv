@@ -34,7 +34,7 @@ function Config({ setConfig }) {
 
   useEffect(() => {
     if (storedConfig.logo) {
-      setLogoBase64(storedConfig.logo);//
+      setLogoBase64(storedConfig.logo);
     }
   }, [storedConfig.logo]);
 
@@ -79,14 +79,21 @@ function Config({ setConfig }) {
   };
 
   return (
-    <Box sx={{ pt: { xs: 2, md: 3 }, pb: 6, display: "flex", justifyContent: "flex-start" }}>
+    <Box
+      sx={{
+        pt: { xs: 2, md: 3 },
+        pb: 6,
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
       <Paper
         elevation={4}
         sx={{
           p: { xs: 3, md: 5 },
           width: "100%",
           maxWidth: 700,
-          ml: { xs: 0, md: 2 },
           borderRadius: 4,
           backgroundColor: "#fff",
         }}
