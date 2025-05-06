@@ -34,7 +34,7 @@ function Config({ setConfig }) {
 
   useEffect(() => {
     if (storedConfig.logo) {
-      setLogoBase64(storedConfig.logo);
+      setLogoBase64(storedConfig.logo);//
     }
   }, [storedConfig.logo]);
 
