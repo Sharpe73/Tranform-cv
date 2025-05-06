@@ -166,7 +166,7 @@ function ProcessedCVs() {
   };
 
   return (
-    <Box sx={{ px: 2, py: 4, maxWidth: "1200px", mx: "auto", minHeight: "100vh", pb: 8 }}>
+    <Box sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
       <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>

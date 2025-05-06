@@ -44,7 +44,6 @@ function App() {
             setIsAuthenticated(false);
           }
         } catch (err) {
-          console.error("❌ Token inválido:", err.message);
           setIsAuthenticated(false);
         }
       } else {
@@ -61,9 +60,7 @@ function App() {
             templateStyle: res.data.templateStyle || "default",
           }));
         }
-      } catch (err) {
-        console.error("Error cargando estilos:", err);
-      }
+      } catch (err) {}
     };
 
     Promise.all([validarToken(), cargarEstilos()]).finally(() => setLoading(false));

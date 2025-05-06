@@ -88,92 +88,94 @@ function Sidebar() {
           },
         }}
       >
-        <Box sx={{ height: "100vh" }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "16px 20px",
-              borderBottom: "1px solid #ddd",
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold">
-              Opciones
-            </Typography>
-          </Box>
-
-          {usuarioNombre && (
-            <Box sx={{ px: 2, py: 1 }}>
-              <Typography variant="body2" color="textSecondary">
-                Bienvenido,
-              </Typography>
-              <Typography variant="subtitle1" fontWeight="bold">
-                {usuarioNombre}
+        <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "12px 16px",
+                borderBottom: "1px solid #ddd",
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Opciones
               </Typography>
             </Box>
-          )}
 
-          <List>
-            <ListItem button onClick={() => handleNavigate("/dashboard")}>
-              <ListItemIcon><BarChartIcon /></ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItem>
+            {usuarioNombre && (
+              <Box sx={{ px: 2, py: 1 }}>
+                <Typography variant="body2" color="textSecondary">
+                  Bienvenido,
+                </Typography>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  {usuarioNombre}
+                </Typography>
+              </Box>
+            )}
 
-            <ListItem button onClick={() => handleNavigate("/transform")}>
-              <ListItemIcon><DescriptionIcon /></ListItemIcon>
-              <ListItemText primary="Transformar Documento" />
-            </ListItem>
+            <List>
+              <ListItem button onClick={() => handleNavigate("/dashboard")}>
+                <ListItemIcon><BarChartIcon /></ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
 
-            <ListItem button onClick={() => handleNavigate("/procesados")}>
-              <ListItemIcon><AssignmentIcon /></ListItemIcon>
-              <ListItemText primary="CVs Procesados" />
-            </ListItem>
+              <ListItem button onClick={() => handleNavigate("/transform")}>
+                <ListItemIcon><DescriptionIcon /></ListItemIcon>
+                <ListItemText primary="Transformar Documento" />
+              </ListItem>
 
-            {isAdmin && (
-              <>
-                <ListItem button onClick={() => setOpenAjustes(!openAjustes)}>
-                  <ListItemIcon><SettingsIcon /></ListItemIcon>
-                  <ListItemText primary="Ajustes" />
-                  {openAjustes ? <ExpandLess /> : <ExpandMore />}
+              <ListItem button onClick={() => handleNavigate("/procesados")}>
+                <ListItemIcon><AssignmentIcon /></ListItemIcon>
+                <ListItemText primary="CVs Procesados" />
+              </ListItem>
+
+              {isAdmin && (
+                <>
+                  <ListItem button onClick={() => setOpenAjustes(!openAjustes)}>
+                    <ListItemIcon><SettingsIcon /></ListItemIcon>
+                    <ListItemText primary="Ajustes" />
+                    {openAjustes ? <ExpandLess /> : <ExpandMore />}
+                  </ListItem>
+                  <Collapse in={openAjustes} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        onClick={() => handleNavigate("/ajustes/organizacion")}
+                      >
+                        <ListItemIcon><BusinessIcon /></ListItemIcon>
+                        <ListItemText primary="Mi Organización" />
+                      </ListItem>
+                      <ListItem
+                        button
+                        sx={{ pl: 4 }}
+                        onClick={() => handleNavigate("/ajustes/equipo")}
+                      >
+                        <ListItemIcon><GroupIcon /></ListItemIcon>
+                        <ListItemText primary="Mi Equipo" />
+                      </ListItem>
+                    </List>
+                  </Collapse>
+                </>
+              )}
+
+              {isAdmin && (
+                <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
+                  <ListItemIcon><PersonAddIcon /></ListItemIcon>
+                  <ListItemText primary="Crear Usuario" />
                 </ListItem>
-                <Collapse in={openAjustes} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    <ListItem
-                      button
-                      sx={{ pl: 4 }}
-                      onClick={() => handleNavigate("/ajustes/organizacion")}
-                    >
-                      <ListItemIcon><BusinessIcon /></ListItemIcon>
-                      <ListItemText primary="Mi Organización" />
-                    </ListItem>
-                    <ListItem
-                      button
-                      sx={{ pl: 4 }}
-                      onClick={() => handleNavigate("/ajustes/equipo")}
-                    >
-                      <ListItemIcon><GroupIcon /></ListItemIcon>
-                      <ListItemText primary="Mi Equipo" />
-                    </ListItem>
-                  </List>
-                </Collapse>
-              </>
-            )}
+              )}
 
-            {isAdmin && (
-              <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
-                <ListItemIcon><PersonAddIcon /></ListItemIcon>
-                <ListItemText primary="Crear Usuario" />
-              </ListItem>
-            )}
-
-            {hayUsuario && (
-              <ListItem button onClick={() => setOpenLogoutDialog(true)}>
-                <ListItemIcon><LogoutIcon /></ListItemIcon>
-                <ListItemText primary="Cerrar Sesión" />
-              </ListItem>
-            )}
-          </List>
+              {hayUsuario && (
+                <ListItem button onClick={() => setOpenLogoutDialog(true)}>
+                  <ListItemIcon><LogoutIcon /></ListItemIcon>
+                  <ListItemText primary="Cerrar Sesión" />
+                </ListItem>
+              )}
+            </List>
+          </Box>
         </Box>
       </Drawer>
 

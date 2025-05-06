@@ -63,10 +63,9 @@ function Dashboard() {
   ];
 
   return (
-    <Box sx={{ p: esMovil ? 1 : 4, backgroundColor: "#f9fafc", minHeight: "100vh" }}>
+    <Box>
       <Typography
         variant={esMovil ? "h5" : "h4"}
-        align="center"
         fontWeight="bold"
         color="primary"
         gutterBottom

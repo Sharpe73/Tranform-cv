@@ -16,7 +16,7 @@ import {
   Card,
   CardContent,
   Stack,
-  Button
+  Button,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
@@ -136,8 +136,8 @@ function MiEquipo() {
   };
 
   return (
-    <Box sx={{ padding: 3, maxWidth: "1200px", margin: "0 auto" }}>
-      <Typography variant="h4" gutterBottom textAlign="center">
+    <Box sx={{ py: 4, px: 2, maxWidth: "1200px", mx: "auto", minHeight: "100vh" }}>
+      <Typography variant="h4" gutterBottom textAlign="center" color="primary">
         👥 Mi Equipo
       </Typography>
 

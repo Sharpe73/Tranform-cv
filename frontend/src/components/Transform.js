@@ -133,9 +133,9 @@ function Transform() {
   };
 
   return (
-    <Box sx={{ maxWidth: 700, margin: "auto", mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h4" color="primary" gutterBottom>
+    <Box sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
+      <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, maxWidth: 700, margin: "auto" }}>
+        <Typography variant="h4" color="primary" gutterBottom align="center">
           🖹 Transformar Documento
         </Typography>
 

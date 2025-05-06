@@ -15,15 +15,19 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Editar Usuario</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} mt={1}>
+      <DialogTitle sx={{ fontWeight: "bold", color: "primary.main" }}>
+        ✏️ Editar Usuario
+      </DialogTitle>
+
+      <DialogContent dividers>
+        <Stack spacing={3} mt={1}>
           <TextField
             label="Nombre"
             name="nombre"
             value={usuario.nombre}
             onChange={onChange}
             fullWidth
+            required
           />
           <TextField
             label="Apellido"
@@ -31,6 +35,7 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
             value={usuario.apellido}
             onChange={onChange}
             fullWidth
+            required
           />
           <TextField
             label="Proyecto"
@@ -42,19 +47,21 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
           />
           <TextField
             select
-            label="Nivel de Acceso"
+            label="Rol de Usuario"
             name="rol"
             value={usuario.rol}
             onChange={onChange}
             fullWidth
+            required
           >
             <MenuItem value="admin">Administrador</MenuItem>
             <MenuItem value="user">Usuario</MenuItem>
           </TextField>
         </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
+
+      <DialogActions sx={{ p: 2 }}>
+        <Button onClick={onClose} variant="outlined" color="secondary">
           Cancelar
         </Button>
         <Button onClick={onSave} variant="contained" color="primary">

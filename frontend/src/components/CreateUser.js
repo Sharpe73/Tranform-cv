@@ -78,14 +78,30 @@ const CreateUser = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper elevation={4} sx={{ p: 4, maxWidth: 500, mx: "auto" }}>
-        <Typography variant="h5" gutterBottom>
-          Crear nuevo usuario
+    <Box sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 3, md: 4 },
+          maxWidth: 500,
+          mx: "auto",
+          borderRadius: 3,
+        }}
+      >
+        <Typography variant="h4" gutterBottom color="primary">
+          🧑 Crear nuevo usuario
         </Typography>
 
-        {mensaje && <Alert severity="success">{mensaje}</Alert>}
-        {error && <Alert severity="error" sx={{ mt: 1 }}>{error}</Alert>}
+        {mensaje && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {mensaje}
+          </Alert>
+        )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <form onSubmit={handleSubmit}>
           <TextField
@@ -140,7 +156,7 @@ const CreateUser = () => {
             <MenuItem value="admin">Administrador</MenuItem>
           </TextField>
 
-          <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+          <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
             Crear Usuario
           </Button>
         </form>
