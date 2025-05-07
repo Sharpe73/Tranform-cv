@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,8 +10,30 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import API_BASE_URL from "../apiConfig";
 
 function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
+  const [roles, setRoles] = useState([]);
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${API_BASE_URL}/users/roles`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setRoles(data);
+      } catch (error) {
+        console.error("Error al obtener roles:", error);
+      }
+    };
+
+    if (open) fetchRoles();
+  }, [open]);
+
   if (!usuario) return null;
 
   return (
@@ -55,8 +77,11 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
             fullWidth
             required
           >
-            <MenuItem value="admin">Administrador</MenuItem>
-            <MenuItem value="user">Usuario</MenuItem>
+            {roles.map((rol) => (
+              <MenuItem key={rol} value={rol}>
+                {rol.charAt(0).toUpperCase() + rol.slice(1)}
+              </MenuItem>
+            ))}
           </TextField>
         </Stack>
       </DialogContent>
