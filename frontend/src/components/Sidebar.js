@@ -25,6 +25,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import GroupIcon from "@mui/icons-material/Group";
 import BusinessIcon from "@mui/icons-material/Business";
+import SecurityIcon from "@mui/icons-material/Security";
 import { jwtDecode } from "jwt-decode";
 import { verificarSesionActiva } from "./api";
 
@@ -72,7 +73,6 @@ function Sidebar() {
   const hayUsuario = !!localStorage.getItem("token");
   const esAdmin = rolUsuario === "admin";
   const esGerente = rolUsuario === "gerente de proyecto";
-  const esUsuario = rolUsuario === "usuario" || rolUsuario === "miembro";
 
   return (
     <>
@@ -138,6 +138,10 @@ function Sidebar() {
                       <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/equipo")}>
                         <ListItemIcon><GroupIcon /></ListItemIcon>
                         <ListItemText primary="Mi Equipo" />
+                      </ListItem>
+                      <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/roles-permisos")}>
+                        <ListItemIcon><SecurityIcon /></ListItemIcon>
+                        <ListItemText primary="Roles y Permisos" />
                       </ListItem>
                     </List>
                   </Collapse>
