@@ -166,6 +166,7 @@ const CreateUser = () => {
           >
             <MenuItem value="user">Usuario</MenuItem>
             <MenuItem value="admin">Administrador</MenuItem>
+            <MenuItem value="gerente de proyecto">Gerente de Proyecto</MenuItem>
           </TextField>
 
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }} disabled={formularioInvalido}>

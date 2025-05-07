@@ -30,6 +30,7 @@ const COLORS = ["#1976d2", "#ffb74d"];
 const ROLE_COLORS = {
   admin: "#1976d2",
   user: "#4caf50",
+  "gerente de proyecto": "#9c27b0",
 };
 
 function Dashboard() {
@@ -169,6 +170,10 @@ function Dashboard() {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS.user, mr: 1 }} />
               <Typography variant="caption">Usuario</Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box sx={{ width: 16, height: 16, borderRadius: "50%", backgroundColor: ROLE_COLORS["gerente de proyecto"], mr: 1 }} />
+              <Typography variant="caption">Gerente</Typography>
             </Box>
           </Stack>
 

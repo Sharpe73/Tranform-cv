@@ -24,7 +24,7 @@ function App() {
     templateStyle: "default",
   });
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [rolUsuario, setRolUsuario] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +36,7 @@ function App() {
           const decoded = jwtDecode(token);
           const now = Date.now() / 1000;
           if (decoded.exp && decoded.exp > now) {
-            setIsAdmin(decoded.rol === "admin");
+            setRolUsuario(decoded.rol);
             setIsAuthenticated(true);
           } else {
             localStorage.removeItem("token");
@@ -92,37 +92,49 @@ function App() {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Cargando aplicación...</div>;
   }
 
+  const esAdmin = rolUsuario === "admin";
+  const esGerente = rolUsuario === "gerente de proyecto";
+  const esUsuario = rolUsuario === "usuario" || rolUsuario === "miembro";
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
         <Layout>
           <Routes>
+            {/* Root solo para admin */}
             <Route
               path="/"
-              element={isAuthenticated ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
+              element={isAuthenticated && esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
+
+            {/* Acceso compartido: todos los roles */}
             <Route
               path="/transform"
               element={isAuthenticated ? <Transform config={config} /> : <Navigate to="/login" />}
             />
             <Route
-              path="/procesados"
-              element={isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
-            />
-            <Route
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
             />
-            {isAdmin && (
+
+            {/* Solo admin y gerente */}
+            <Route
+              path="/procesados"
+              element={(esAdmin || esGerente) ? <ProcessedCVs /> : <Navigate to="/login" />}
+            />
+
+            {/* Solo admin */}
+            {esAdmin && (
               <>
                 <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
                 <Route path="/ajustes/equipo" element={<MiEquipo />} />
                 <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
+
             <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+            <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
           </Routes>
         </Layout>
       </Router>

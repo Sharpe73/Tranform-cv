@@ -47,6 +47,16 @@ function capitalizarTexto(texto) {
   return texto;
 }
 
+function formatearTransformadoPor(cv) {
+  if (!cv.usuario || typeof cv.usuario !== "string") return "Admin";
+
+  if (cv.usuario.includes("(admin)")) return cv.usuario.replace("(admin)", "(Administrador)");
+  if (cv.usuario.includes("(gerente de proyecto)")) return cv.usuario.replace("(gerente de proyecto)", "(Gerente de Proyecto)");
+  if (cv.usuario.includes("(user)")) return cv.usuario.replace("(user)", "(Usuario)");
+
+  return cv.usuario;
+}
+
 function ProcessedCVs() {
   const [cvs, setCvs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -293,7 +303,7 @@ function ProcessedCVs() {
                     Fecha: {new Date(cv.created_at).toLocaleString("es-CL")}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    Transformado por: {cv.usuario || "Admin"}
+                    Transformado por: {formatearTransformadoPor(cv)}
                   </Typography>
                   <Divider sx={{ my: 1 }} />
                   <Stack direction="row" spacing={1}>
@@ -367,7 +377,7 @@ function ProcessedCVs() {
                   <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
                     <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
-                    <TableCell>{cv.usuario || "Admin"}</TableCell>
+                    <TableCell>{formatearTransformadoPor(cv)}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <Button
