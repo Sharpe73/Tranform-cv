@@ -37,14 +37,18 @@ function Sidebar() {
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [usuarioNombre, setUsuarioNombre] = useState("");
   const [openAjustes, setOpenAjustes] = useState(false);
+  const [permisos, setPermisos] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (token && usuario) {
       try {
         const decoded = jwtDecode(token);
         setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
         setRolUsuario(decoded.rol);
+        setPermisos(usuario.permisos || {});
       } catch (error) {
         console.error("❌ Error al decodificar token:", error.message);
       }
@@ -72,7 +76,6 @@ function Sidebar() {
 
   const hayUsuario = !!localStorage.getItem("token");
   const esAdmin = rolUsuario === "admin";
-  const esGerente = rolUsuario === "gerente de proyecto";
 
   return (
     <>
@@ -105,17 +108,19 @@ function Sidebar() {
             )}
 
             <List>
-              <ListItem button onClick={() => handleNavigate("/dashboard")}>
-                <ListItemIcon><BarChartIcon /></ListItemIcon>
-                <ListItemText primary="Dashboard" />
-              </ListItem>
+              {permisos.acceso_dashboard && (
+                <ListItem button onClick={() => handleNavigate("/dashboard")}>
+                  <ListItemIcon><BarChartIcon /></ListItemIcon>
+                  <ListItemText primary="Dashboard" />
+                </ListItem>
+              )}
 
               <ListItem button onClick={() => handleNavigate("/transform")}>
                 <ListItemIcon><DescriptionIcon /></ListItemIcon>
                 <ListItemText primary="Transformar Documento" />
               </ListItem>
 
-              {(esAdmin || esGerente) && (
+              {permisos.acceso_cvs && (
                 <ListItem button onClick={() => handleNavigate("/procesados")}>
                   <ListItemIcon><AssignmentIcon /></ListItemIcon>
                   <ListItemText primary="CVs Procesados" />
