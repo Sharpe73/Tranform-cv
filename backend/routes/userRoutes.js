@@ -16,7 +16,10 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 
   try {
-    const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
+    const rolResult = await db.query(
+      "SELECT id FROM roles WHERE LOWER(TRIM(nombre)) = LOWER(TRIM($1))",
+      [rol]
+    );
 
     if (rolResult.rows.length === 0) {
       return res.status(400).json({ message: `El rol '${rol}' no existe` });
@@ -83,7 +86,10 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 
   try {
-    const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
+    const rolResult = await db.query(
+      "SELECT id FROM roles WHERE LOWER(TRIM(nombre)) = LOWER(TRIM($1))",
+      [rol]
+    );
 
     if (rolResult.rows.length === 0) {
       return res.status(400).json({ message: `El rol '${rol}' no existe.` });
