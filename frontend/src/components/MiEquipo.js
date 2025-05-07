@@ -136,12 +136,6 @@ function MiEquipo() {
     }
   };
 
-  const mapearRol = (rol) => {
-    if (rol === "admin") return "Administrador";
-    if (rol === "gerente") return "Gerente de Proyecto";
-    return "Usuario";
-  };
-
   return (
     <Container maxWidth="xl" sx={{ py: 4, minHeight: "100vh" }}>
       <Typography variant="h4" gutterBottom textAlign="center" color="primary">
@@ -163,7 +157,7 @@ function MiEquipo() {
                   Proyecto: Todos los proyectos
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Acceso: {mapearRol(usuario.rol)}
+                  Acceso: {usuario.rol_nombre || "Usuario"}
                 </Typography>
                 {usuario.id !== currentUserId && (
                   <Box mt={1}>
@@ -199,7 +193,7 @@ function MiEquipo() {
                   <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
                   <TableCell>{usuario.email || "-"}</TableCell>
                   <TableCell>Todos los proyectos</TableCell>
-                  <TableCell>{mapearRol(usuario.rol)}</TableCell>
+                  <TableCell>{usuario.rol_nombre || "Usuario"}</TableCell>
                   <TableCell>
                     {usuario.id !== currentUserId && (
                       <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
