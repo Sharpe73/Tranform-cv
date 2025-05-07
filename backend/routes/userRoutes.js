@@ -2,18 +2,16 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database");
 const verifyToken = require("../middleware/verifyToken");
-const crypto = require("crypto");
-const { enviarCorreoInvitacion } = require("../utils/sendEmail");
 
-// 🔹 Invitar Usuario (admin)
-router.post("/admin/invitar-usuario", verifyToken, async (req, res) => {
-  const { nombre, apellido, email, rol } = req.body;
+// 🔹 Crear Usuario (admin)
+router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
+  const { nombre, apellido, email, password, rol } = req.body;
 
   if (req.user?.rol !== "admin") {
-    return res.status(403).json({ message: "Acceso denegado: solo el administrador puede invitar usuarios." });
+    return res.status(403).json({ message: "Acceso denegado: solo el administrador puede crear usuarios." });
   }
 
-  if (!nombre || !apellido || !email || !rol) {
+  if (!nombre || !apellido || !email || !password || !rol) {
     return res.status(400).json({ message: "Faltan campos obligatorios" });
   }
 
@@ -25,20 +23,16 @@ router.post("/admin/invitar-usuario", verifyToken, async (req, res) => {
     }
 
     const rol_id = rolResult.rows[0].id;
-    const contrasenaTemporal = crypto.randomBytes(4).toString("hex");
 
     await db.query(
-      `INSERT INTO usuarios (nombre, apellido, email, password, rol_id, temporal)
-       VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, true)`,
-      [nombre, apellido, email, contrasenaTemporal, rol_id]
+      `INSERT INTO usuarios (nombre, apellido, email, password, rol_id)
+       VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5)`,
+      [nombre, apellido, email, password, rol_id]
     );
 
-    const adminNombre = `${req.user.nombre} ${req.user.apellido}`;
-    await enviarCorreoInvitacion(email, nombre, contrasenaTemporal, adminNombre);
-
-    res.status(201).json({ message: "✅ Invitación enviada correctamente" });
+    res.status(201).json({ message: "✅ Usuario creado correctamente" });
   } catch (error) {
-    console.error("❌ Error al invitar usuario:", error.message);
+    console.error("❌ Error al crear usuario:", error.message);
 
     if (error.code === "23505" && error.constraint === "usuarios_email_key") {
       return res.status(400).json({
@@ -46,9 +40,10 @@ router.post("/admin/invitar-usuario", verifyToken, async (req, res) => {
       });
     }
 
-    res.status(500).json({ message: "Error interno al invitar el usuario" });
+    res.status(500).json({ message: "Error interno al crear el usuario" });
   }
 });
+
 
 router.get("/", verifyToken, async (req, res) => {
   try {
@@ -73,6 +68,7 @@ router.get("/", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Error al obtener usuarios." });
   }
 });
+
 
 router.put("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
@@ -109,7 +105,7 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Eliminar un usuario (No puede eliminarse a sí mismo)
+
 router.delete("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
@@ -127,30 +123,6 @@ router.delete("/:id", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("❌ Error al eliminar usuario:", error.message);
     res.status(500).json({ message: "Error interno al eliminar el usuario." });
-  }
-});
-
-// 🔹 Cambiar contraseña temporal
-router.put("/cambiar-password", verifyToken, async (req, res) => {
-  const { nuevaPassword } = req.body;
-  const userId = req.user?.id;
-
-  if (!nuevaPassword || !userId) {
-    return res.status(400).json({ message: "Datos incompletos para cambiar la contraseña." });
-  }
-
-  try {
-    await db.query(
-      `UPDATE usuarios
-       SET password = crypt($1, gen_salt('bf')), temporal = false
-       WHERE id = $2`,
-      [nuevaPassword, userId]
-    );
-
-    res.json({ message: "✅ Contraseña actualizada correctamente." });
-  } catch (error) {
-    console.error("❌ Error al actualizar contraseña:", error.message);
-    res.status(500).json({ message: "Error interno al actualizar contraseña." });
   }
 });
 

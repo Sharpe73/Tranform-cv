@@ -21,17 +21,9 @@ async function login(req, res) {
     const passwordValida = await bcrypt.compare(password, user.password);
     if (!passwordValida) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-    const requiereCambio = user.temporal === true;
-
-    const token = jwt.sign(
-      {
-        id: user.id,
-        rol: user.rol,
-        requiereCambio
-      },
-      process.env.ADMIN_SECRET,
-      { expiresIn: "8h" }
-    );
+    const token = jwt.sign({ id: user.id, rol: user.rol }, process.env.ADMIN_SECRET, {
+      expiresIn: "8h",
+    });
 
     res.json({
       token,
@@ -41,7 +33,6 @@ async function login(req, res) {
         apellido: user.apellido,
         email: user.email,
         rol: user.rol,
-        requiereCambio,
       },
     });
   } catch (error) {
@@ -51,3 +42,4 @@ async function login(req, res) {
 }
 
 module.exports = { login };
+

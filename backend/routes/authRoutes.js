@@ -3,18 +3,13 @@ const router = express.Router();
 const db = require("../database");
 const jwt = require("jsonwebtoken");
 
-// 🔐 Login
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const result = await db.query(
-      `SELECT u.id, u.nombre, u.apellido, u.email, r.nombre AS rol, 
-              u.password = crypt($2, u.password) AS match,
-              u.temporal
-       FROM usuarios u 
-       JOIN roles r ON u.rol_id = r.id 
-       WHERE u.email = $1`,
+      "SELECT u.id, u.nombre, u.apellido, u.email, r.nombre as rol, u.password = crypt($2, u.password) as match FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE u.email = $1",
       [email, password]
     );
 
@@ -30,7 +25,6 @@ router.post("/login", async (req, res) => {
         nombre: user.nombre,
         apellido: user.apellido,
         rol: user.rol,
-        temporal: user.temporal,
       },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
@@ -45,7 +39,6 @@ router.post("/login", async (req, res) => {
         apellido: user.apellido,
         email: user.email,
         rol: user.rol,
-        temporal: user.temporal,
       },
     });
   } catch (error) {
@@ -54,7 +47,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// 🔍 Validar sesión activa
+// 🔹 Validar sesión activa
 router.get("/validar", async (req, res) => {
   const authHeader = req.headers.authorization;
 
