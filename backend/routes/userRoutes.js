@@ -44,7 +44,7 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 });
 
-
+// 🔹 Obtener todos los usuarios
 router.get("/", verifyToken, async (req, res) => {
   try {
     const result = await db.query(
@@ -59,7 +59,7 @@ router.get("/", verifyToken, async (req, res) => {
       nombre: user.nombre,
       apellido: user.apellido,
       email: user.email,
-      rol: user.rol === "admin" ? "admin" : "user",
+      rol: user.rol,
     }));
 
     res.json(usuarios);
@@ -69,7 +69,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-
+// 🔹 Actualizar usuario
 router.put("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { nombre, apellido, rol } = req.body;
@@ -105,7 +105,7 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 });
 
-
+// 🔹 Eliminar usuario
 router.delete("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
