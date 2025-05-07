@@ -11,8 +11,7 @@ import {
   TableRow,
   Paper,
   Checkbox,
-  Chip,
-  Button,
+  Chip
 } from "@mui/material";
 import API_BASE_URL from "../apiConfig";
 
@@ -31,45 +30,6 @@ function RolesPermisos() {
     } catch (error) {
       console.error("Error al obtener permisos:", error);
     }
-  };
-
-  const handleChange = (index, field) => {
-    const updated = [...permisos];
-    updated[index][field] = !updated[index][field];
-    setPermisos(updated);
-  };
-
-  const handleGuardar = async () => {
-    for (const p of permisos) {
-      const { rol, acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes } = p;
-
-      if (!acceso_dashboard && !acceso_cvs && !acceso_repositorios && !acceso_ajustes) {
-        return alert(`❌ El rol "${rol}" no puede quedar sin ningún permiso asignado.`);
-      }
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/permisos/${rol}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            acceso_dashboard,
-            acceso_cvs,
-            acceso_repositorios,
-            acceso_ajustes,
-          }),
-        });
-
-        if (!response.ok) {
-          return alert(`❌ Error al guardar los permisos del rol "${rol}".`);
-        }
-      } catch (error) {
-        console.error(`Error al guardar permisos del rol "${rol}":`, error);
-        return alert(`❌ Error al guardar permisos del rol "${rol}".`);
-      }
-    }
-
-    alert("✅ Permisos actualizados correctamente.");
-    fetchPermisos();
   };
 
   const getColorChip = (rol) => {
@@ -91,7 +51,7 @@ function RolesPermisos() {
         🔐 Roles y Permisos
       </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 4, mb: 3 }}>
+      <TableContainer component={Paper} sx={{ borderRadius: 4 }}>
         <Table>
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
@@ -107,44 +67,22 @@ function RolesPermisos() {
               <TableRow key={index}>
                 <TableCell>{getColorChip(row.rol)}</TableCell>
                 <TableCell align="center">
-                  <Checkbox
-                    checked={row.acceso_dashboard}
-                    onChange={() => handleChange(index, "acceso_dashboard")}
-                    disabled={row.rol === "admin"}
-                  />
+                  <Checkbox checked={row.acceso_dashboard} disabled />
                 </TableCell>
                 <TableCell align="center">
-                  <Checkbox
-                    checked={row.acceso_cvs}
-                    onChange={() => handleChange(index, "acceso_cvs")}
-                    disabled={row.rol === "admin"}
-                  />
+                  <Checkbox checked={row.acceso_cvs} disabled />
                 </TableCell>
                 <TableCell align="center">
-                  <Checkbox
-                    checked={row.acceso_repositorios}
-                    onChange={() => handleChange(index, "acceso_repositorios")}
-                    disabled={row.rol === "admin"}
-                  />
+                  <Checkbox checked={row.acceso_repositorios} disabled />
                 </TableCell>
                 <TableCell align="center">
-                  <Checkbox
-                    checked={row.acceso_ajustes}
-                    onChange={() => handleChange(index, "acceso_ajustes")}
-                    disabled={row.rol === "admin"}
-                  />
+                  <Checkbox checked={row.acceso_ajustes} disabled />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Box textAlign="center">
-        <Button variant="contained" color="primary" onClick={handleGuardar}>
-          Guardar Cambios
-        </Button>
-      </Box>
     </Container>
   );
 }

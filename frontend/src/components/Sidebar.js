@@ -37,28 +37,14 @@ function Sidebar() {
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [usuarioNombre, setUsuarioNombre] = useState("");
   const [openAjustes, setOpenAjustes] = useState(false);
-  const [permisos, setPermisos] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-    if (token && usuario) {
+    if (token) {
       try {
         const decoded = jwtDecode(token);
         setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
         setRolUsuario(decoded.rol);
-
-        if (decoded.rol === "admin") {
-          setPermisos({
-            acceso_dashboard: true,
-            acceso_cvs: true,
-            acceso_repositorios: true,
-            acceso_ajustes: true,
-          });
-        } else {
-          setPermisos(usuario.permisos || {});
-        }
       } catch (error) {
         console.error("❌ Error al decodificar token:", error.message);
       }
@@ -86,6 +72,7 @@ function Sidebar() {
 
   const hayUsuario = !!localStorage.getItem("token");
   const esAdmin = rolUsuario === "admin";
+  const esGerente = rolUsuario === "gerente de proyecto";
 
   return (
     <>
@@ -118,26 +105,24 @@ function Sidebar() {
             )}
 
             <List>
-              {permisos.acceso_dashboard && (
-                <ListItem button onClick={() => handleNavigate("/dashboard")}>
-                  <ListItemIcon><BarChartIcon /></ListItemIcon>
-                  <ListItemText primary="Dashboard" />
-                </ListItem>
-              )}
+              <ListItem button onClick={() => handleNavigate("/dashboard")}>
+                <ListItemIcon><BarChartIcon /></ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
 
               <ListItem button onClick={() => handleNavigate("/transform")}>
                 <ListItemIcon><DescriptionIcon /></ListItemIcon>
                 <ListItemText primary="Transformar Documento" />
               </ListItem>
 
-              {permisos.acceso_cvs && (
+              {(esAdmin || esGerente) && (
                 <ListItem button onClick={() => handleNavigate("/procesados")}>
                   <ListItemIcon><AssignmentIcon /></ListItemIcon>
                   <ListItemText primary="CVs Procesados" />
                 </ListItem>
               )}
 
-              {permisos.acceso_ajustes && esAdmin && (
+              {esAdmin && (
                 <>
                   <ListItem button onClick={() => setOpenAjustes(!openAjustes)}>
                     <ListItemIcon><SettingsIcon /></ListItemIcon>
