@@ -98,7 +98,10 @@ function App() {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Cargando aplicación...</div>;
   }
 
-  const esAdmin = usuario?.rol === "admin";
+  const rol = usuario?.rol;
+  const esAdmin = rol === "admin";
+  const esGerente = rol === "gerente de proyecto";
+  const esUsuario = rol === "usuario";
 
   return (
     <ThemeProvider theme={theme}>
@@ -108,11 +111,7 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={
-                isAuthenticated && usuario?.acceso_ajustes
-                  ? <Config config={config} setConfig={setConfig} />
-                  : <Navigate to="/login" />
-              }
+              element={isAuthenticated && esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
 
             <Route
@@ -121,14 +120,14 @@ function App() {
             />
             <Route
               path="/dashboard"
-              element={isAuthenticated && usuario?.acceso_dashboard ? <Dashboard /> : <Navigate to="/login" />}
+              element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
             />
             <Route
               path="/procesados"
-              element={isAuthenticated && usuario?.acceso_cvs ? <ProcessedCVs /> : <Navigate to="/login" />}
+              element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
             />
 
-            {usuario?.acceso_ajustes && (
+            {esAdmin && (
               <>
                 <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
                 <Route path="/ajustes/equipo" element={<MiEquipo />} />
