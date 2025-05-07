@@ -48,7 +48,17 @@ function Sidebar() {
         const decoded = jwtDecode(token);
         setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
         setRolUsuario(decoded.rol);
-        setPermisos(usuario.permisos || {});
+
+        if (decoded.rol === "admin") {
+          setPermisos({
+            acceso_dashboard: true,
+            acceso_cvs: true,
+            acceso_repositorios: true,
+            acceso_ajustes: true,
+          });
+        } else {
+          setPermisos(usuario.permisos || {});
+        }
       } catch (error) {
         console.error("❌ Error al decodificar token:", error.message);
       }
