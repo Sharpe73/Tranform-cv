@@ -140,12 +140,18 @@ function MiEquipo() {
   const mapearRol = (rol) => {
     switch (rol) {
       case "admin":
-        return <Chip label="Administrador" color="primary" />;
+        return <Chip label="Administrador" color="primary" size="small" />;
       case "gerente de proyecto":
-        return <Chip label="Gerente de Proyecto" sx={{ backgroundColor: "#9c27b0", color: "#fff" }} />;
+        return (
+          <Chip
+            label="Gerente de Proyecto"
+            size="small"
+            sx={{ backgroundColor: "#9c27b0", color: "#fff" }}
+          />
+        );
       case "user":
       default:
-        return <Chip label="Usuario" color="success" />;
+        return <Chip label="Usuario" color="success" size="small" />;
     }
   };
 
