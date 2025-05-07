@@ -18,6 +18,7 @@ import {
   Stack,
   Button,
   Container,
+  Chip,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
@@ -136,16 +137,15 @@ function MiEquipo() {
     }
   };
 
-  // ✅ Función corregida para mostrar correctamente todos los roles
   const mapearRol = (rol) => {
     switch (rol) {
       case "admin":
-        return "Administrador";
+        return <Chip label="Administrador" color="primary" />;
       case "gerente de proyecto":
-        return "Gerente de Proyecto";
+        return <Chip label="Gerente de Proyecto" sx={{ backgroundColor: "#9c27b0", color: "#fff" }} />;
       case "user":
       default:
-        return "Usuario";
+        return <Chip label="Usuario" color="success" />;
     }
   };
 
@@ -169,9 +169,7 @@ function MiEquipo() {
                 <Typography variant="body2" color="textSecondary">
                   Proyecto: Todos los proyectos
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Acceso: {mapearRol(usuario.rol)}
-                </Typography>
+                <Box mt={1}>{mapearRol(usuario.rol)}</Box>
                 {usuario.id !== currentUserId && (
                   <Box mt={1}>
                     <Button
