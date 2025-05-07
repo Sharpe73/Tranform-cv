@@ -8,7 +8,6 @@ import Dashboard from "./components/Dashboard";
 import CreateUser from "./components/CreateUser";
 import MiEquipo from "./components/MiEquipo";
 import Login from "./components/Login";
-import CambiarPassword from "./components/CambiarPassword";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ThemeProvider } from "@mui/material/styles";
@@ -69,11 +68,11 @@ function App() {
 
   const Layout = ({ children }) => {
     const location = useLocation();
-    const sinSidebar = ["/login", "/cambiar-password"].includes(location.pathname);
+    const isLogin = location.pathname === "/login";
 
     return (
       <Box display="flex">
-        {!sinSidebar && <Sidebar />}
+        {!isLogin && <Sidebar />}
         <Box
           component="main"
           sx={{
@@ -114,16 +113,6 @@ function App() {
             <Route
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/cambiar-password"
-              element={
-                isAuthenticated ? (
-                  <CambiarPassword usuario={JSON.parse(localStorage.getItem("usuario"))} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
             />
             {isAdmin && (
               <>

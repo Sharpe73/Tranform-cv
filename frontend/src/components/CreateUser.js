@@ -18,6 +18,7 @@ const CreateUser = () => {
     nombre: "",
     apellido: "",
     email: "",
+    password: "",
     rol: "user",
   });
 
@@ -57,7 +58,7 @@ const CreateUser = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        `${API_BASE_URL}/users/admin/invitar-usuario`,
+        `${API_BASE_URL}/users/admin/crear-usuario`,
         form,
         {
           headers: {
@@ -71,6 +72,7 @@ const CreateUser = () => {
         nombre: "",
         apellido: "",
         email: "",
+        password: "",
         rol: "user",
       });
       setEmailValido(true);
@@ -81,19 +83,19 @@ const CreateUser = () => {
       ) {
         setError("El correo ya existe en la base de datos. Por favor, ingrese otro.");
       } else {
-        setError(err.response?.data?.message || "Error al invitar usuario");
+        setError(err.response?.data?.message || "Error al crear usuario");
       }
     }
   };
 
   const formularioInvalido =
-    !form.nombre || !form.apellido || !form.email || !emailValido;
+    !form.nombre || !form.apellido || !form.email || !form.password || !emailValido;
 
   return (
     <Container maxWidth="sm" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 4 }}>
         <Typography variant="h4" gutterBottom color="primary" textAlign="center">
-          ✉️ Invitar nuevo usuario
+          🧑 Crear nuevo usuario
         </Typography>
 
         {mensaje && (
@@ -144,6 +146,16 @@ const CreateUser = () => {
           />
           <TextField
             fullWidth
+            label="Contraseña"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            margin="normal"
+            required
+            type="password"
+          />
+          <TextField
+            fullWidth
             select
             label="Rol"
             name="rol"
@@ -157,7 +169,7 @@ const CreateUser = () => {
           </TextField>
 
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }} disabled={formularioInvalido}>
-            Enviar Invitación
+            Crear Usuario
           </Button>
         </form>
       </Paper>
