@@ -126,4 +126,16 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
+// 🔹 Obtener todos los roles disponibles
+router.get("/roles", verifyToken, async (req, res) => {
+  try {
+    const result = await db.query("SELECT nombre FROM roles ORDER BY id ASC");
+    const roles = result.rows.map((row) => row.nombre);
+    res.json(roles);
+  } catch (error) {
+    console.error("❌ Error al obtener roles:", error.message);
+    res.status(500).json({ message: "Error al obtener los roles." });
+  }
+});
+
 module.exports = router;
