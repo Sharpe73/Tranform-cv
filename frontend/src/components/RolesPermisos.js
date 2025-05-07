@@ -35,11 +35,11 @@ function RolesPermisos() {
   const getColorChip = (rol) => {
     switch (rol) {
       case "admin":
-        return <Chip label="Administrador" color="primary" />;
+        return <Chip label="Administrador" sx={{ backgroundColor: "#1976d2", color: "#fff" }} />;
       case "gerente de proyecto":
-        return <Chip label="Gerente de Proyecto" sx={{ backgroundColor: "#1976d2", color: "#fff" }} />;
+        return <Chip label="Gerente de Proyecto" sx={{ backgroundColor: "#9c27b0", color: "#fff" }} />;
       case "usuario":
-        return <Chip label="Usuario" color="success" />;
+        return <Chip label="Usuario" sx={{ backgroundColor: "#388e3c", color: "#fff" }} />;
       default:
         return <Chip label={rol} />;
     }
