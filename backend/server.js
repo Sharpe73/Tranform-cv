@@ -336,32 +336,6 @@ app.get("/permisos", async (_, res) => {
   }
 });
 
-app.put("/permisos/:rol", async (req, res) => {
-  const { rol } = req.params;
-  const { acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes } = req.body;
-
-  if (!rol) {
-    return res.status(400).json({ message: "El rol es requerido." });
-  }
-
-  try {
-    await db.query(
-      `UPDATE permisos_por_rol 
-       SET acceso_dashboard = $1, 
-           acceso_cvs = $2, 
-           acceso_repositorios = $3, 
-           acceso_ajustes = $4
-       WHERE rol = $5`,
-      [acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes, rol]
-    );
-
-    res.status(200).json({ message: "✅ Permisos actualizados correctamente." });
-  } catch (error) {
-    console.error("❌ Error al actualizar permisos:", error.message);
-    res.status(500).json({ message: "Error al actualizar permisos en la base de datos." });
-  }
-});
-
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);

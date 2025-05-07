@@ -21,26 +21,7 @@ async function login(req, res) {
     const passwordValida = await bcrypt.compare(password, user.password);
     if (!passwordValida) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-    // Obtener permisos según rol
-    let permisos = {};
-    if (user.rol === "admin") {
-      permisos = {
-        acceso_dashboard: true,
-        acceso_cvs: true,
-        acceso_repositorios: true,
-        acceso_ajustes: true,
-      };
-    } else {
-      const permisosResult = await db.query(
-        `SELECT acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes
-         FROM permisos_por_rol
-         WHERE rol = $1`,
-        [user.rol]
-      );
-      permisos = permisosResult.rows[0] || {};
-    }
-
-    // Crear token
+    // Firmar el token usando JWT_SECRET, no ADMIN_SECRET
     const token = jwt.sign(
       {
         id: user.id,
@@ -63,7 +44,6 @@ async function login(req, res) {
         apellido: user.apellido,
         email: user.email,
         rol: user.rol,
-        permisos,
       },
     });
   } catch (error) {
