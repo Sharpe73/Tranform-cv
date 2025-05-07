@@ -18,7 +18,6 @@ import API_BASE_URL from "../apiConfig";
 
 function RolesPermisos() {
   const [permisos, setPermisos] = useState([]);
-  const [original, setOriginal] = useState([]);
 
   useEffect(() => {
     fetchPermisos();
@@ -29,7 +28,6 @@ function RolesPermisos() {
       const response = await fetch(`${API_BASE_URL}/permisos`);
       const data = await response.json();
       setPermisos(data);
-      setOriginal(data);
     } catch (error) {
       console.error("Error al obtener permisos:", error);
     }
@@ -43,28 +41,35 @@ function RolesPermisos() {
 
   const handleGuardar = async () => {
     for (const p of permisos) {
-      const { acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes } = p;
+      const { rol, acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes } = p;
+
       if (!acceso_dashboard && !acceso_cvs && !acceso_repositorios && !acceso_ajustes) {
-        return alert(`❌ El rol "${p.rol}" no puede quedar sin ningún permiso asignado.`);
+        return alert(`❌ El rol "${rol}" no puede quedar sin ningún permiso asignado.`);
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/permisos/${rol}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            acceso_dashboard,
+            acceso_cvs,
+            acceso_repositorios,
+            acceso_ajustes,
+          }),
+        });
+
+        if (!response.ok) {
+          return alert(`❌ Error al guardar los permisos del rol "${rol}".`);
+        }
+      } catch (error) {
+        console.error(`Error al guardar permisos del rol "${rol}":`, error);
+        return alert(`❌ Error al guardar permisos del rol "${rol}".`);
       }
     }
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/permisos`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(permisos),
-      });
-
-      if (response.ok) {
-        alert("✅ Permisos actualizados correctamente.");
-        fetchPermisos();
-      } else {
-        alert("❌ Error al guardar los permisos.");
-      }
-    } catch (error) {
-      console.error("Error al guardar permisos:", error);
-    }
+    alert("✅ Permisos actualizados correctamente.");
+    fetchPermisos();
   };
 
   const getColorChip = (rol) => {
