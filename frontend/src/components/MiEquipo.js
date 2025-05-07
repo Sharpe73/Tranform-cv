@@ -136,6 +136,19 @@ function MiEquipo() {
     }
   };
 
+  // Función para traducir rol
+  const mapearRol = (rol) => {
+    switch (rol) {
+      case "admin":
+        return "Administrador";
+      case "gerente":
+        return "Gerente de Proyecto";
+      case "usuario":
+      default:
+        return "Usuario";
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4, minHeight: "100vh" }}>
       <Typography variant="h4" gutterBottom textAlign="center" color="primary">
@@ -157,7 +170,7 @@ function MiEquipo() {
                   Proyecto: Todos los proyectos
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Acceso: {usuario.rol_nombre || "Usuario"}
+                  Acceso: {mapearRol(usuario.rol)}
                 </Typography>
                 {usuario.id !== currentUserId && (
                   <Box mt={1}>
@@ -193,7 +206,7 @@ function MiEquipo() {
                   <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
                   <TableCell>{usuario.email || "-"}</TableCell>
                   <TableCell>Todos los proyectos</TableCell>
-                  <TableCell>{usuario.rol_nombre || "Usuario"}</TableCell>
+                  <TableCell>{mapearRol(usuario.rol)}</TableCell>
                   <TableCell>
                     {usuario.id !== currentUserId && (
                       <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
