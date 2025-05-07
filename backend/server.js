@@ -326,6 +326,17 @@ app.put("/users/:id", verifyToken, async (req, res) => {
   }
 });
 
+app.get("/permisos", async (_, res) => {
+  try {
+    const result = await db.query("SELECT * FROM permisos_por_rol");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("❌ Error al obtener permisos:", error.message);
+    res.status(500).json({ message: "Error al obtener permisos desde la base de datos." });
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
