@@ -136,14 +136,14 @@ function MiEquipo() {
     }
   };
 
-  // Función para traducir rol
+  // ✅ Función corregida para mostrar correctamente todos los roles
   const mapearRol = (rol) => {
     switch (rol) {
       case "admin":
         return "Administrador";
-      case "gerente":
+      case "gerente de proyecto":
         return "Gerente de Proyecto";
-      case "usuario":
+      case "user":
       default:
         return "Usuario";
     }
