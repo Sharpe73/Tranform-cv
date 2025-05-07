@@ -127,7 +127,7 @@ function Sidebar() {
                 </ListItem>
               )}
 
-              {esAdmin && (
+              {permisos.acceso_ajustes && esAdmin && (
                 <>
                   <ListItem button onClick={() => setOpenAjustes(!openAjustes)}>
                     <ListItemIcon><SettingsIcon /></ListItemIcon>
