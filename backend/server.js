@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
@@ -143,8 +142,8 @@ app.get("/cv/pdf/:id", async (req, res) => {
 });
 
 app.get("/cv/list", verifyToken, async (req, res) => {
-  if (req.user?.rol !== "admin") {
-    return res.status(403).json({ message: "Acceso denegado: solo administradores pueden ver esta información." });
+  if (!req.user?.rol || !["admin", "gerente de proyecto"].includes(req.user.rol)) {
+    return res.status(403).json({ message: "Acceso denegado: solo administradores o gerentes pueden ver esta información." });
   }
 
   try {
@@ -163,7 +162,7 @@ app.get("/cv/list", verifyToken, async (req, res) => {
       created_at: row.created_at,
       usuario:
         row.nombre && row.apellido && row.rol
-          ? `${row.nombre} ${row.apellido} (${row.rol === "admin" ? "Admin" : "Usuario"})`
+          ? `${row.nombre} ${row.apellido} (${row.rol === "admin" ? "Admin" : row.rol})`
           : "Administrador Principal",
     }));
 
@@ -173,6 +172,8 @@ app.get("/cv/list", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Error al obtener CVs desde la base de datos." });
   }
 });
+
+
 app.get("/cv/consumo", async (req, res) => {
   try {
     const inicioMes = new Date();
@@ -215,17 +216,15 @@ app.get("/cv/por-usuario", async (req, res) => {
   }
 });
 
-
 app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-
   if (req.user?.rol !== "admin") {
     return res.status(403).json({ mensaje: "No autorizado: solo el administrador puede eliminar CVs." });
   }
 
+  const { id } = req.params;
+
   try {
     const existe = await db.query("SELECT id FROM cv_files WHERE id = $1", [id]);
-
     if (existe.rows.length === 0) {
       return res.status(404).json({ mensaje: "El CV no existe o ya fue eliminado." });
     }
@@ -240,14 +239,8 @@ app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
   }
 });
 
-// 🚀 Limpieza de CVs
 app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
-  console.log("🔐 Usuario autenticado:", req.user);
-
-  const rol = req.user?.rol;
-
-  if (rol !== "admin") {
-    console.warn("⛔ Usuario sin permisos intentó borrar CVs.");
+  if (req.user?.rol !== "admin") {
     return res.status(403).json({ mensaje: "No autorizado: solo el administrador puede borrar CVs." });
   }
 
@@ -262,7 +255,6 @@ app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   }
 });
 
-// 🚀 Crear Usuario
 app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
   const { nombre, apellido, email, password, rol } = req.body;
 
@@ -281,7 +273,6 @@ app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
     }
 
     const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
-
     if (rolResult.rows.length === 0) {
       return res.status(400).json({ message: `El rol '${rol}' no existe.` });
     }
@@ -301,7 +292,6 @@ app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
   }
 });
 
-// 🚀 Actualizar Usuario
 app.put("/users/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { nombre, apellido, rol } = req.body;
@@ -316,7 +306,6 @@ app.put("/users/:id", verifyToken, async (req, res) => {
 
   try {
     const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
-
     if (rolResult.rows.length === 0) {
       return res.status(400).json({ message: `El rol '${rol}' no existe.` });
     }
@@ -340,4 +329,3 @@ app.put("/users/:id", verifyToken, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
-
