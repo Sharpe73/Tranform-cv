@@ -11,8 +11,7 @@ import {
   TableRow,
   Paper,
   Checkbox,
-  Chip,
-  Button
+  Chip
 } from "@mui/material";
 import API_BASE_URL from "../apiConfig";
 
@@ -30,29 +29,6 @@ function RolesPermisos() {
       setPermisos(data);
     } catch (error) {
       console.error("Error al obtener permisos:", error);
-    }
-  };
-
-  const handleChange = (index, key) => {
-    const updated = [...permisos];
-    updated[index][key] = !updated[index][key];
-    setPermisos(updated);
-  };
-
-  const guardarCambios = async () => {
-    try {
-      for (const permiso of permisos) {
-        await fetch(`${API_BASE_URL}/permisos/actualizar`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(permiso),
-        });
-      }
-      alert("✅ Permisos actualizados correctamente");
-      fetchPermisos();
-    } catch (error) {
-      console.error("❌ Error al guardar cambios:", error);
-      alert("❌ Error al guardar los permisos");
     }
   };
 
@@ -91,28 +67,22 @@ function RolesPermisos() {
               <TableRow key={index}>
                 <TableCell>{getColorChip(row.rol)}</TableCell>
                 <TableCell align="center">
-                  <Checkbox checked={row.acceso_dashboard} onChange={() => handleChange(index, "acceso_dashboard")} />
+                  <Checkbox checked={row.acceso_dashboard} disabled />
                 </TableCell>
                 <TableCell align="center">
-                  <Checkbox checked={row.acceso_cvs} onChange={() => handleChange(index, "acceso_cvs")} />
+                  <Checkbox checked={row.acceso_cvs} disabled />
                 </TableCell>
                 <TableCell align="center">
-                  <Checkbox checked={row.acceso_repositorios} onChange={() => handleChange(index, "acceso_repositorios")} />
+                  <Checkbox checked={row.acceso_repositorios} disabled />
                 </TableCell>
                 <TableCell align="center">
-                  <Checkbox checked={row.acceso_ajustes} onChange={() => handleChange(index, "acceso_ajustes")} />
+                  <Checkbox checked={row.acceso_ajustes} disabled />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Box textAlign="center" mt={3}>
-        <Button variant="contained" color="primary" onClick={guardarCambios}>
-          Guardar Cambios
-        </Button>
-      </Box>
     </Container>
   );
 }
