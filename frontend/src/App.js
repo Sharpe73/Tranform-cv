@@ -99,9 +99,13 @@ function App() {
   }
 
   const rol = usuario?.rol;
+  const permisos = usuario?.permisos || {};
+
+  const puedeVerDashboard = permisos.acceso_dashboard;
+  const puedeVerCVs = permisos.acceso_cvs;
+  const puedeVerRepositorios = permisos.acceso_repositorios;
+  const puedeVerAjustes = permisos.acceso_ajustes;
   const esAdmin = rol === "admin";
-  const esGerente = rol === "gerente de proyecto";
-  const esUsuario = rol === "usuario";
 
   return (
     <ThemeProvider theme={theme}>
@@ -111,33 +115,36 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={isAuthenticated && esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerAjustes ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
 
             <Route
               path="/transform"
-              element={isAuthenticated ? <Transform config={config} /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/dashboard"
-              element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-            />
-            <Route
-              path="/procesados"
-              element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerCVs ? <Transform config={config} /> : <Navigate to="/login" />}
             />
 
-            {esAdmin && (
+            <Route
+              path="/dashboard"
+              element={isAuthenticated && puedeVerDashboard ? <Dashboard /> : <Navigate to="/login" />}
+            />
+
+            <Route
+              path="/procesados"
+              element={isAuthenticated && puedeVerRepositorios ? <ProcessedCVs /> : <Navigate to="/login" />}
+            />
+
+            {isAuthenticated && puedeVerAjustes && (
               <>
                 <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
                 <Route path="/ajustes/equipo" element={<MiEquipo />} />
                 <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />
-                <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
 
+            {esAdmin && <Route path="/crear-usuario" element={<CreateUser />} />}
+
             <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+            <Route path="*" element={<Navigate to={isAuthenticated ? "/transform" : "/login"} />} />
           </Routes>
         </Layout>
       </Router>

@@ -33,14 +33,22 @@ const Login = () => {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
       const { token, usuario } = response.data;
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("usuario", JSON.stringify(usuario));
+      // 🔄 Obtener los permisos actualizados desde el backend por el rol
+      const permisosResponse = await axios.get(`${API_BASE_URL}/permisos?rol=${usuario.rol}`);
+      const permisos = permisosResponse.data;
 
+      // 🧠 Combinar usuario con permisos actualizados
+      const usuarioConPermisos = { ...usuario, permisos };
+
+      // 💾 Guardar en localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("usuario", JSON.stringify(usuarioConPermisos));
+
+      // Redirigir a la vista principal
       setTimeout(() => {
         window.location.href = "/transform";
       }, 100);
     } catch (err) {
-      // Verifica si el error es de usuario eliminado
       if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
         setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");
       } else {
