@@ -42,7 +42,7 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // ✅ Se reemplaza redirección con recarga para asegurar lectura del localStorage
+      
       window.location.reload();
     } catch (err) {
       if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
