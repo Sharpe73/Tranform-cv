@@ -99,9 +99,15 @@ function App() {
   }
 
   const rol = usuario?.rol;
+  const permisos = usuario?.permisos || {};
+
   const esAdmin = rol === "admin";
   const esGerente = rol === "gerente de proyecto";
-  const esUsuario = rol === "usuario";
+
+  const puedeVerDashboard = permisos.acceso_dashboard;
+  const puedeVerCVs = permisos.acceso_cvs;
+  const puedeVerRepositorios = permisos.acceso_repositorios;
+  const puedeVerAjustes = permisos.acceso_ajustes;
 
   return (
     <ThemeProvider theme={theme}>
@@ -116,22 +122,22 @@ function App() {
 
             <Route
               path="/transform"
-              element={isAuthenticated ? <Transform config={config} /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerCVs ? <Transform config={config} /> : <Navigate to="/login" />}
             />
             <Route
               path="/dashboard"
-              element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerDashboard ? <Dashboard /> : <Navigate to="/login" />}
             />
             <Route
               path="/procesados"
-              element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerRepositorios ? <ProcessedCVs /> : <Navigate to="/login" />}
             />
 
             {esAdmin && (
               <>
-                <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
-                <Route path="/ajustes/equipo" element={<MiEquipo />} />
-                <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />
+                {puedeVerAjustes && <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />}
+                {puedeVerAjustes && <Route path="/ajustes/equipo" element={<MiEquipo />} />}
+                {puedeVerAjustes && <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />}
                 <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
