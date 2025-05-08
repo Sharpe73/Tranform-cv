@@ -39,7 +39,18 @@ function App() {
           if (decoded.exp && decoded.exp > now) {
             const usuarioGuardado = localStorage.getItem("usuario");
             if (usuarioGuardado) {
-              setUsuario(JSON.parse(usuarioGuardado));
+              const userData = JSON.parse(usuarioGuardado);
+
+              // Obtener los permisos actualizados por rol desde la base de datos
+              try {
+                const res = await axios.get(`${API_BASE_URL}/permisos?rol=${userData.rol}`);
+                userData.permisos = res.data;
+                localStorage.setItem("usuario", JSON.stringify(userData));
+              } catch (error) {
+                console.error("❌ Error al refrescar permisos:", error.message);
+              }
+
+              setUsuario(userData);
               setIsAuthenticated(true);
             } else {
               setIsAuthenticated(false);
@@ -99,9 +110,15 @@ function App() {
   }
 
   const rol = usuario?.rol;
+  const permisos = usuario?.permisos || {};
+
   const esAdmin = rol === "admin";
   const esGerente = rol === "gerente de proyecto";
-  const esUsuario = rol === "usuario";
+
+  const puedeVerDashboard = permisos.acceso_dashboard;
+  const puedeVerCVs = permisos.acceso_cvs;
+  const puedeVerRepositorios = permisos.acceso_repositorios;
+  const puedeVerAjustes = permisos.acceso_ajustes;
 
   return (
     <ThemeProvider theme={theme}>
@@ -113,29 +130,26 @@ function App() {
               path="/"
               element={isAuthenticated && esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
-
             <Route
               path="/transform"
-              element={isAuthenticated ? <Transform config={config} /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerCVs ? <Transform config={config} /> : <Navigate to="/login" />}
             />
             <Route
               path="/dashboard"
-              element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerDashboard ? <Dashboard /> : <Navigate to="/login" />}
             />
             <Route
               path="/procesados"
-              element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
+              element={isAuthenticated && puedeVerRepositorios ? <ProcessedCVs /> : <Navigate to="/login" />}
             />
-
             {esAdmin && (
               <>
-                <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
-                <Route path="/ajustes/equipo" element={<MiEquipo />} />
-                <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />
+                {puedeVerAjustes && <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />}
+                {puedeVerAjustes && <Route path="/ajustes/equipo" element={<MiEquipo />} />}
+                {puedeVerAjustes && <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />}
                 <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
-
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
           </Routes>
