@@ -46,6 +46,16 @@ async function login(req, res) {
       }
     );
 
+    
+    console.log("📦 Enviando usuario con permisos:", {
+      id: user.id,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      email: user.email,
+      rol: rolNormalizado,
+      permisos,
+    });
+
     res.json({
       token,
       usuario: {
@@ -54,7 +64,7 @@ async function login(req, res) {
         apellido: user.apellido,
         email: user.email,
         rol: rolNormalizado,
-        permisos, // 👈 aseguramos que viene acá
+        permisos,
       },
     });
   } catch (error) {
