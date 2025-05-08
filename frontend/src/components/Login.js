@@ -36,11 +36,11 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
+      // ✅ Recargar para forzar revalidación y carga del rol/permisos
       setTimeout(() => {
-        window.location.href = "/transform";
+        window.location.reload();
       }, 100);
     } catch (err) {
-      // Verifica si el error es de usuario eliminado
       if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
         setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");
       } else {
