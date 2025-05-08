@@ -33,7 +33,12 @@ const Login = () => {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
       const { token, usuario } = response.data;
 
-      
+      console.log("🟢 Login exitoso. Usuario recibido:", usuario);
+
+      if (!usuario.permisos) {
+        console.warn("⚠️ El usuario no tiene permisos definidos. Esto causará errores en la app.");
+      }
+
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
