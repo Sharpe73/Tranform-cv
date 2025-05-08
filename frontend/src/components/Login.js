@@ -33,26 +33,20 @@ const Login = () => {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
       const { token, usuario } = response.data;
 
-      // 🔄 Obtener permisos actualizados
-      const permisosResponse = await axios.get(`${API_BASE_URL}/permisos?rol=${usuario.rol}`);
-      const permisos = permisosResponse.data;
-
-      // 🧠 Combinar usuario con permisos
-      const usuarioConPermisos = { ...usuario, permisos };
-
-      // 💾 Guardar en localStorage
       localStorage.setItem("token", token);
-      localStorage.setItem("usuario", JSON.stringify(usuarioConPermisos));
+      localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      // 🚀 Redirigir a la vista de transformar CVs
       setTimeout(() => {
         window.location.href = "/transform";
       }, 100);
     } catch (err) {
+      // Verifica si el error es de usuario eliminado
       if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
         setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");
       } else {
-        setError(err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales.");
+        setError(
+          err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
+        );
       }
     } finally {
       setLoading(false);
