@@ -41,10 +41,9 @@ function App() {
             if (usuarioGuardado) {
               const userData = JSON.parse(usuarioGuardado);
 
-              // Obtener los permisos actualizados por rol desde la base de datos
               try {
                 const res = await axios.get(`${API_BASE_URL}/permisos?rol=${userData.rol}`);
-                userData.permisos = res.data;
+                userData.permisos = [res.data]; // asegúrate de que sea un array
                 localStorage.setItem("usuario", JSON.stringify(userData));
               } catch (error) {
                 console.error("❌ Error al refrescar permisos:", error.message);
@@ -110,7 +109,10 @@ function App() {
   }
 
   const rol = usuario?.rol;
-  const permisos = usuario?.permisos || {};
+  const permisosArray = usuario?.permisos || [];
+  const permisos = Array.isArray(permisosArray)
+    ? permisosArray.find((p) => p.rol === rol) || {}
+    : permisosArray;
 
   const esAdmin = rol === "admin";
   const esGerente = rol === "gerente de proyecto";
