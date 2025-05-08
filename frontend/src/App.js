@@ -46,6 +46,8 @@ function App() {
               // 🔄 Siempre actualizar permisos desde backend
               const res = await axios.get(`${API_BASE_URL}/permisos?rol=${parsedUsuario.rol}`);
               parsedUsuario.permisos = res.data || {};
+
+              // 💾 Guardar el usuario actualizado
               localStorage.setItem("usuario", JSON.stringify(parsedUsuario));
 
               setUsuario(parsedUsuario);
@@ -108,7 +110,7 @@ function App() {
   }
 
   const rol = usuario?.rol;
-  const permisos = usuario?.permisos || {};
+  const permisos = (usuario?.permisos && usuario.permisos[0]) || {};
 
   const puedeVerDashboard = permisos.acceso_dashboard;
   const puedeVerCVs = permisos.acceso_cvs;
@@ -126,22 +128,18 @@ function App() {
               path="/"
               element={isAuthenticated && puedeVerAjustes ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
-
             <Route
               path="/transform"
               element={isAuthenticated && puedeVerCVs ? <Transform config={config} /> : <Navigate to="/login" />}
             />
-
             <Route
               path="/dashboard"
               element={isAuthenticated && puedeVerDashboard ? <Dashboard /> : <Navigate to="/login" />}
             />
-
             <Route
               path="/procesados"
               element={isAuthenticated && puedeVerRepositorios ? <ProcessedCVs /> : <Navigate to="/login" />}
             />
-
             {isAuthenticated && puedeVerAjustes && (
               <>
                 <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
@@ -149,9 +147,7 @@ function App() {
                 <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />
               </>
             )}
-
             {esAdmin && <Route path="/crear-usuario" element={<CreateUser />} />}
-
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/transform" : "/login"} />} />
           </Routes>

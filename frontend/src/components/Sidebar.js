@@ -49,7 +49,10 @@ function Sidebar() {
         const user = JSON.parse(userRaw);
         setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
         setRolUsuario(decoded.rol);
-        setPermisos(user.permisos || {});
+
+        // ⚠️ Asegurarse de que permisos sea un objeto (no un array)
+        const permisosObj = Array.isArray(user.permisos) ? user.permisos[0] : user.permisos;
+        setPermisos(permisosObj || {});
       } catch (error) {
         console.error("❌ Error al decodificar token:", error.message);
       }
