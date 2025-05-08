@@ -21,12 +21,14 @@ async function login(req, res) {
     const passwordValida = await bcrypt.compare(password, user.password);
     if (!passwordValida) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-    
+    // Convertir "user" a "usuario"
+    const rolNormalizado = user.rol.toLowerCase() === "user" ? "usuario" : user.rol;
+
     const permisosResult = await db.query(
       `SELECT acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes
        FROM permisos_por_rol
        WHERE rol = $1`,
-      [user.rol]
+      [rolNormalizado]
     );
 
     const permisos = permisosResult.rows[0] || {};
@@ -37,7 +39,7 @@ async function login(req, res) {
         nombre: user.nombre,
         apellido: user.apellido,
         email: user.email,
-        rol: user.rol,
+        rol: rolNormalizado,
       },
       process.env.JWT_SECRET,
       {
@@ -52,7 +54,7 @@ async function login(req, res) {
         nombre: user.nombre,
         apellido: user.apellido,
         email: user.email,
-        rol: user.rol,
+        rol: rolNormalizado,
         permisos,
       },
     });
