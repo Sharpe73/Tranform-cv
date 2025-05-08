@@ -340,9 +340,6 @@ app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });
 
-app.get("/auth/verificar", verifyToken, (req, res) => {
-  res.status(200).json({ message: "Token válido", usuario: req.user });
-});
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
 });
