@@ -34,23 +34,17 @@ const drawerWidth = 250;
 function Sidebar() {
   const navigate = useNavigate();
   const [rolUsuario, setRolUsuario] = useState("");
-  const [permisos, setPermisos] = useState({});
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [usuarioNombre, setUsuarioNombre] = useState("");
   const [openAjustes, setOpenAjustes] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const usuarioGuardado = localStorage.getItem("usuario");
-
-    if (token && usuarioGuardado) {
+    if (token) {
       try {
         const decoded = jwtDecode(token);
         setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
         setRolUsuario(decoded.rol);
-
-        const usuario = JSON.parse(usuarioGuardado);
-        setPermisos(usuario.permisos || {});
       } catch (error) {
         console.error("❌ Error al decodificar token:", error.message);
       }
@@ -78,6 +72,7 @@ function Sidebar() {
 
   const hayUsuario = !!localStorage.getItem("token");
   const esAdmin = rolUsuario === "admin";
+  const esGerente = rolUsuario === "gerente de proyecto";
 
   return (
     <>
@@ -110,28 +105,24 @@ function Sidebar() {
             )}
 
             <List>
-              {permisos.acceso_dashboard && (
-                <ListItem button onClick={() => handleNavigate("/dashboard")}>
-                  <ListItemIcon><BarChartIcon /></ListItemIcon>
-                  <ListItemText primary="Dashboard" />
-                </ListItem>
-              )}
+              <ListItem button onClick={() => handleNavigate("/dashboard")}>
+                <ListItemIcon><BarChartIcon /></ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
 
-              {permisos.acceso_cvs && (
-                <ListItem button onClick={() => handleNavigate("/transform")}>
-                  <ListItemIcon><DescriptionIcon /></ListItemIcon>
-                  <ListItemText primary="Transformar Documento" />
-                </ListItem>
-              )}
+              <ListItem button onClick={() => handleNavigate("/transform")}>
+                <ListItemIcon><DescriptionIcon /></ListItemIcon>
+                <ListItemText primary="Transformar Documento" />
+              </ListItem>
 
-              {permisos.acceso_repositorios && (
+              {(esAdmin || esGerente) && (
                 <ListItem button onClick={() => handleNavigate("/procesados")}>
                   <ListItemIcon><AssignmentIcon /></ListItemIcon>
                   <ListItemText primary="CVs Procesados" />
                 </ListItem>
               )}
 
-              {permisos.acceso_ajustes && (
+              {esAdmin && (
                 <>
                   <ListItem button onClick={() => setOpenAjustes(!openAjustes)}>
                     <ListItemIcon><SettingsIcon /></ListItemIcon>
@@ -154,14 +145,12 @@ function Sidebar() {
                       </ListItem>
                     </List>
                   </Collapse>
-                </>
-              )}
 
-              {esAdmin && (
-                <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
-                  <ListItemIcon><PersonAddIcon /></ListItemIcon>
-                  <ListItemText primary="Crear Usuario" />
-                </ListItem>
+                  <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
+                    <ListItemIcon><PersonAddIcon /></ListItemIcon>
+                    <ListItemText primary="Crear Usuario" />
+                  </ListItem>
+                </>
               )}
 
               {hayUsuario && (
