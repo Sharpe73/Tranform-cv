@@ -8,7 +8,7 @@ async function login(req, res) {
 
   try {
     const result = await db.query(
-      `SELECT u.*, LOWER(r.nombre) as rol
+      `SELECT u.*, r.nombre as rol
        FROM usuarios u
        JOIN roles r ON u.rol_id = r.id
        WHERE u.email = $1`,
@@ -21,10 +21,8 @@ async function login(req, res) {
     const passwordValida = await bcrypt.compare(password, user.password);
     if (!passwordValida) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-    
-    const rolNormalizado = user.rol === "user" ? "usuario" : user.rol;
+    const rolNormalizado = user.rol.toLowerCase().trim();
 
-    
     const permisosResult = await db.query(
       `SELECT acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes
        FROM permisos_por_rol
@@ -32,10 +30,7 @@ async function login(req, res) {
       [rolNormalizado]
     );
 
-    const permisos = permisosResult.rows[0];
-    if (!permisos) {
-      return res.status(403).json({ error: `No se encontraron permisos para el rol '${rolNormalizado}'` });
-    }
+    const permisos = permisosResult.rows[0] || {};
 
     const token = jwt.sign(
       {
@@ -59,7 +54,7 @@ async function login(req, res) {
         apellido: user.apellido,
         email: user.email,
         rol: rolNormalizado,
-        permisos,
+        permisos, // 👈 aseguramos que viene acá
       },
     });
   } catch (error) {
