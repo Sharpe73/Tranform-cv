@@ -36,10 +36,19 @@ function App() {
         try {
           const decoded = jwtDecode(token);
           const now = Date.now() / 1000;
+
           if (decoded.exp && decoded.exp > now) {
             const usuarioGuardado = localStorage.getItem("usuario");
+
             if (usuarioGuardado) {
-              setUsuario(JSON.parse(usuarioGuardado));
+              const parsedUsuario = JSON.parse(usuarioGuardado);
+
+              // 🔄 Siempre actualizar permisos desde backend
+              const res = await axios.get(`${API_BASE_URL}/permisos?rol=${parsedUsuario.rol}`);
+              parsedUsuario.permisos = res.data || {};
+              localStorage.setItem("usuario", JSON.stringify(parsedUsuario));
+
+              setUsuario(parsedUsuario);
               setIsAuthenticated(true);
             } else {
               setIsAuthenticated(false);
