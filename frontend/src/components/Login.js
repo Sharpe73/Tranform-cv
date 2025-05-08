@@ -33,17 +33,18 @@ const Login = () => {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
       const { token, usuario } = response.data;
 
-      // 🔄 Obtener los permisos actualizados desde el backend
+      // 🔄 Obtener permisos actualizados
       const permisosResponse = await axios.get(`${API_BASE_URL}/permisos?rol=${usuario.rol}`);
       const permisos = permisosResponse.data;
 
-      // Combinar usuario con permisos
+      // 🧠 Combinar usuario con permisos
       const usuarioConPermisos = { ...usuario, permisos };
 
+      // 💾 Guardar en localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuarioConPermisos));
 
-      // Redirigir
+      // 🚀 Redirigir a la vista de transformar CVs
       setTimeout(() => {
         window.location.href = "/transform";
       }, 100);
