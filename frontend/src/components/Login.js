@@ -42,9 +42,8 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 100);
+      // ✅ Se reemplaza redirección con recarga para asegurar lectura del localStorage
+      window.location.reload();
     } catch (err) {
       if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
         setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");

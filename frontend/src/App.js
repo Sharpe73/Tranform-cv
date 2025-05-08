@@ -32,18 +32,16 @@ function App() {
   useEffect(() => {
     const validarToken = async () => {
       const token = localStorage.getItem("token");
-      if (token) {
+      const usuarioGuardado = localStorage.getItem("usuario");
+
+      if (token && usuarioGuardado) {
         try {
           const decoded = jwtDecode(token);
           const now = Date.now() / 1000;
+
           if (decoded.exp && decoded.exp > now) {
-            const usuarioGuardado = localStorage.getItem("usuario");
-            if (usuarioGuardado) {
-              setUsuario(JSON.parse(usuarioGuardado));
-              setIsAuthenticated(true);
-            } else {
-              setIsAuthenticated(false);
-            }
+            setUsuario(JSON.parse(usuarioGuardado));
+            setIsAuthenticated(true);
           } else {
             localStorage.removeItem("token");
             localStorage.removeItem("usuario");
@@ -119,7 +117,6 @@ function App() {
               path="/"
               element={isAuthenticated && esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
-
             <Route
               path="/transform"
               element={isAuthenticated && puedeVerCVs ? <Transform config={config} /> : <Navigate to="/login" />}
@@ -132,16 +129,16 @@ function App() {
               path="/procesados"
               element={isAuthenticated && puedeVerRepositorios ? <ProcessedCVs /> : <Navigate to="/login" />}
             />
-
             {esAdmin && (
               <>
-                {puedeVerAjustes && <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />}
+                {puedeVerAjustes && (
+                  <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
+                )}
                 {puedeVerAjustes && <Route path="/ajustes/equipo" element={<MiEquipo />} />}
                 {puedeVerAjustes && <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />}
                 <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
-
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
           </Routes>
