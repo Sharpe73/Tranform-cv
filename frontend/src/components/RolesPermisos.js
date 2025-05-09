@@ -51,38 +51,40 @@ function RolesPermisos() {
         🔐 Roles y Permisos
       </Typography>
 
-      <TableContainer component={Paper} sx={{ borderRadius: 4 }}>
-        <Table>
-          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-            <TableRow>
-              <TableCell><strong>Rol</strong></TableCell>
-              <TableCell align="center"><strong>Dashboard</strong></TableCell>
-              <TableCell align="center"><strong>CVs</strong></TableCell>
-              <TableCell align="center"><strong>Repositorios</strong></TableCell>
-              <TableCell align="center"><strong>Ajustes</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {permisos.map((row, index) => (
-              <TableRow key={index}>
-                <TableCell>{getColorChip(row.rol)}</TableCell>
-                <TableCell align="center">
-                  <Checkbox checked={row.acceso_dashboard} disabled />
-                </TableCell>
-                <TableCell align="center">
-                  <Checkbox checked={row.acceso_cvs} disabled />
-                </TableCell>
-                <TableCell align="center">
-                  <Checkbox checked={row.acceso_repositorios} disabled />
-                </TableCell>
-                <TableCell align="center">
-                  <Checkbox checked={row.acceso_ajustes} disabled />
-                </TableCell>
+      <Box sx={{ overflowX: "auto" }}>
+        <TableContainer component={Paper} sx={{ borderRadius: 4, minWidth: "600px" }}>
+          <Table>
+            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableRow>
+                <TableCell><strong>Rol</strong></TableCell>
+                <TableCell align="center"><strong>Dashboard</strong></TableCell>
+                <TableCell align="center"><strong>CVs</strong></TableCell>
+                <TableCell align="center"><strong>Repositorios</strong></TableCell>
+                <TableCell align="center"><strong>Ajustes</strong></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {permisos.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell>{getColorChip(row.rol)}</TableCell>
+                  <TableCell align="center">
+                    <Checkbox checked={row.acceso_dashboard} disabled />
+                  </TableCell>
+                  <TableCell align="center">
+                    <Checkbox checked={row.acceso_cvs} disabled />
+                  </TableCell>
+                  <TableCell align="center">
+                    <Checkbox checked={row.acceso_repositorios} disabled />
+                  </TableCell>
+                  <TableCell align="center">
+                    <Checkbox checked={row.acceso_ajustes} disabled />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Container>
   );
 }
