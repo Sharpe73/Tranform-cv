@@ -51,7 +51,7 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
 router.get("/", verifyToken, async (req, res) => {
   try {
     const result = await db.query(
-      `SELECT u.id, u.nombre, u.apellido, u.email, r.nombre AS rol
+      `SELECT u.id, u.nombre, u.apellido, u.email, r.nombre AS rol, u.es_dueno
        FROM usuarios u
        LEFT JOIN roles r ON u.rol_id = r.id
        ORDER BY u.id ASC`
@@ -63,6 +63,7 @@ router.get("/", verifyToken, async (req, res) => {
       apellido: user.apellido,
       email: user.email,
       rol: user.rol,
+      es_dueno: user.es_dueno
     }));
 
     res.json(usuarios);
@@ -86,6 +87,12 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 
   try {
+    const result = await db.query("SELECT es_dueno FROM usuarios WHERE id = $1", [id]);
+
+    if (result.rows[0]?.es_dueno) {
+      return res.status(403).json({ message: "No se puede modificar al dueño del sistema." });
+    }
+
     const rolResult = await db.query(
       "SELECT id FROM roles WHERE LOWER(TRIM(nombre)) = LOWER(TRIM($1))",
       [rol]
@@ -124,6 +131,16 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 
   try {
+    const result = await db.query("SELECT es_dueno FROM usuarios WHERE id = $1", [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado." });
+    }
+
+    if (result.rows[0].es_dueno) {
+      return res.status(403).json({ message: "No se puede eliminar al dueño del sistema." });
+    }
+
     await db.query("DELETE FROM usuarios WHERE id = $1", [id]);
     res.status(200).json({ message: "✅ Usuario eliminado correctamente." });
   } catch (error) {
