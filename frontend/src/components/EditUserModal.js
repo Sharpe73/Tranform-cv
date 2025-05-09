@@ -90,8 +90,8 @@ function EditUserModal({ open, onClose, usuario, onChange, onSave }) {
         <Button onClick={onClose} variant="outlined" color="secondary">
           Cancelar
         </Button>
-        <Button onClick={onSave} variant="contained" color="primary">
-          Guardar Cambios
+        <Button onClick={onSave} variant="contained" color="success">
+          Actualizar
         </Button>
       </DialogActions>
     </Dialog>
