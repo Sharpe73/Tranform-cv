@@ -11,7 +11,7 @@ import RolesPermisos from "./components/RolesPermisos";
 import Login from "./components/Login";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider, useMediaQuery } from "@mui/material";
 import theme from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
@@ -75,6 +75,7 @@ function App() {
   const Layout = ({ children }) => {
     const location = useLocation();
     const isLogin = location.pathname === "/login";
+    const isMobile = useMediaQuery("(max-width:600px)");
 
     return (
       <Box display="flex">
@@ -86,6 +87,7 @@ function App() {
             padding: "32px 24px",
             backgroundColor: "#f9fafc",
             minHeight: "100vh",
+            mt: isMobile ? "64px" : 0, // deja espacio al AppBar móvil
           }}
         >
           {children}
@@ -113,7 +115,6 @@ function App() {
               path="/"
               element={isAuthenticated && esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
             />
-
             <Route
               path="/transform"
               element={isAuthenticated ? <Transform config={config} /> : <Navigate to="/login" />}
@@ -126,7 +127,6 @@ function App() {
               path="/procesados"
               element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
             />
-
             {esAdmin && (
               <>
                 <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
@@ -135,7 +135,6 @@ function App() {
                 <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
-
             <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
           </Routes>
