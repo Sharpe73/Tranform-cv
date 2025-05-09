@@ -326,15 +326,30 @@ app.put("/users/:id", verifyToken, async (req, res) => {
   }
 });
 
-app.get("/permisos", async (_, res) => {
+app.get("/permisos", async (req, res) => {
+  const { rol } = req.query;
+
+  if (!rol) {
+    return res.status(400).json({ message: "Falta el parámetro 'rol'" });
+  }
+
   try {
-    const result = await db.query("SELECT * FROM permisos_por_rol");
-    res.json(result.rows);
+    const result = await db.query(
+      "SELECT acceso_dashboard, acceso_cvs, acceso_repositorios, acceso_ajustes FROM permisos_por_rol WHERE LOWER(rol) = LOWER($1)",
+      [rol]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: `No se encontraron permisos para el rol '${rol}'` });
+    }
+
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("❌ Error al obtener permisos:", error.message);
     res.status(500).json({ message: "Error al obtener permisos desde la base de datos." });
   }
 });
+
 
 app.get("/ping", (req, res) => {
   res.status(200).send("pong");
@@ -360,7 +375,6 @@ app.put("/permisos/actualizar", async (req, res) => {
     res.status(500).json({ message: "Error interno al actualizar permisos" });
   }
 });
-
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
