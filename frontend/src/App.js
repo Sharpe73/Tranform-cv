@@ -110,7 +110,7 @@ function App() {
   }
 
   const rol = usuario?.rol;
-  const permisos = (usuario?.permisos && usuario.permisos[0]) || {};
+  const permisos = usuario?.permisos || {};
 
   const puedeVerDashboard = permisos.acceso_dashboard;
   const puedeVerCVs = permisos.acceso_cvs;
