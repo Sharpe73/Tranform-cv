@@ -137,22 +137,36 @@ function MiEquipo() {
     }
   };
 
-  const mapearRol = (rol) => {
-    switch (rol) {
-      case "admin":
-        return <Chip label="Administrador" color="primary" size="small" />;
-      case "gerente de proyecto":
-        return (
-          <Chip
-            label="Gerente de Proyecto"
-            size="small"
-            sx={{ backgroundColor: "#9c27b0", color: "#fff" }}
-          />
-        );
-      case "user":
-      default:
-        return <Chip label="Usuario" color="success" size="small" />;
+  const mapearRol = (rol, es_dueno) => {
+    const chips = [];
+
+    if (rol === "admin") {
+      chips.push(<Chip key="admin" label="Administrador" color="primary" size="small" />);
+    } else if (rol === "gerente de proyecto") {
+      chips.push(
+        <Chip
+          key="gerente"
+          label="Gerente de Proyecto"
+          size="small"
+          sx={{ backgroundColor: "#9c27b0", color: "#fff" }}
+        />
+      );
+    } else {
+      chips.push(<Chip key="user" label="Usuario" color="success" size="small" />);
     }
+
+    if (es_dueno) {
+      chips.push(
+        <Chip
+          key="dueno"
+          label="Dueño"
+          size="small"
+          sx={{ backgroundColor: "#000", color: "#fff", ml: 1 }}
+        />
+      );
+    }
+
+    return <Box display="flex" gap={1}>{chips}</Box>;
   };
 
   return (
@@ -175,8 +189,8 @@ function MiEquipo() {
                 <Typography variant="body2" color="textSecondary">
                   Proyecto: Todos los proyectos
                 </Typography>
-                <Box mt={1}>{mapearRol(usuario.rol)}</Box>
-                {usuario.id !== currentUserId && (
+                <Box mt={1}>{mapearRol(usuario.rol, usuario.es_dueno)}</Box>
+                {!usuario.es_dueno && usuario.id !== currentUserId && (
                   <Box mt={1}>
                     <Button
                       variant="outlined"
@@ -210,9 +224,9 @@ function MiEquipo() {
                   <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
                   <TableCell>{usuario.email || "-"}</TableCell>
                   <TableCell>Todos los proyectos</TableCell>
-                  <TableCell>{mapearRol(usuario.rol)}</TableCell>
+                  <TableCell>{mapearRol(usuario.rol, usuario.es_dueno)}</TableCell>
                   <TableCell>
-                    {usuario.id !== currentUserId && (
+                    {!usuario.es_dueno && usuario.id !== currentUserId && (
                       <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
                         <MoreVertIcon />
                       </IconButton>
