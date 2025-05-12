@@ -224,6 +224,11 @@ app.get("/cv/por-usuario", async (req, res) => {
   }
 });
 
+app.get("/cv/limite", (req, res) => {
+  res.json({ limite: LIMITE_MENSUAL });
+});
+
+
 app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
   if (req.user?.rol !== "admin") {
     return res.status(403).json({ mensaje: "No autorizado: solo el administrador puede eliminar CVs." });
