@@ -16,7 +16,7 @@ import theme from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import API_BASE_URL from "./apiConfig";
-import DashboardNuevo from "./components/DashboardNuevo";
+
 
 
 function App() {
@@ -125,10 +125,7 @@ function App() {
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
             />
-            <Route
-              path="/dashboard-nuevo"
-              element={isAuthenticated ? <DashboardNuevo /> : <Navigate to="/login" />}
-/>
+
             <Route
               path="/procesados"
               element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
