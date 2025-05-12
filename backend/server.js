@@ -48,25 +48,12 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     return res.status(400).json({ message: "No se recibió ningún archivo." });
   }
 
-  const inicioMes = new Date();
-  inicioMes.setUTCDate(1);
-  inicioMes.setUTCHours(0, 0, 0, 0);
-  const finMes = new Date(inicioMes);
-  finMes.setUTCMonth(finMes.getUTCMonth() + 1);
-
   try {
-    const consumoGlobal = await db.query(
-      `SELECT COUNT(*) AS total FROM cv_files WHERE created_at >= $1 AND created_at < $2`,
-      [inicioMes.toISOString(), finMes.toISOString()]
-    );
-
-    const totalConsumido = parseInt(consumoGlobal.rows[0].total, 10);
-
-    if (totalConsumido >= LIMITE_MENSUAL) {
-      return res.status(403).json({
-        message: `❌ Has alcanzado el límite mensual de ${LIMITE_MENSUAL} CVs procesados. Intenta nuevamente el próximo mes.`,
-      });
-    }
+    const inicioMes = new Date();
+    inicioMes.setUTCDate(1);
+    inicioMes.setUTCHours(0, 0, 0, 0);
+    const finMes = new Date(inicioMes);
+    finMes.setUTCMonth(finMes.getUTCMonth() + 1);
 
     const filePath = path.join(uploadsPath, req.files["file"][0].filename);
     const logoPath = req.files["logo"] ? path.join(uploadsPath, req.files["logo"][0].filename) : null;
@@ -91,11 +78,31 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     const pdfBuffer = fs.readFileSync(pdfPath);
     const timestamp = new Date().toISOString();
 
-    await db.query(
+    const result = await db.query(
       `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [jsonData, pdfUrl, pdfBuffer, timestamp, req.user.id]
+       SELECT $1, $2, $3, $4, $5
+       WHERE (
+         SELECT COUNT(*) FROM cv_files 
+         WHERE created_at >= $6 AND created_at < $7
+       ) < $8
+       RETURNING id`,
+      [
+        jsonData,
+        pdfUrl,
+        pdfBuffer,
+        timestamp,
+        req.user.id,
+        inicioMes.toISOString(),
+        finMes.toISOString(),
+        LIMITE_MENSUAL
+      ]
     );
+
+    if (result.rowCount === 0) {
+      return res.status(403).json({
+        message: `❌ Has alcanzado el límite mensual global de ${LIMITE_MENSUAL} CVs procesados.`,
+      });
+    }
 
     console.log("✅ Datos guardados en la base de datos.");
     res.json({ message: "Archivo procesado con éxito.", pdfPath: pdfUrl });
@@ -105,6 +112,7 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     res.status(status).json({ message: error.message || "Error al procesar el archivo." });
   }
 });
+
 
 app.get("/styles", (req, res) => {
   const estilosPath = path.join(__dirname, "plantillas.json");
