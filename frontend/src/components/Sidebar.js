@@ -24,6 +24,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ExpandLess from "@mui/icons-material/ExpandLess";
@@ -100,6 +101,11 @@ function Sidebar() {
           <ListItem button onClick={() => handleNavigate("/dashboard")}>
             <ListItemIcon><BarChartIcon /></ListItemIcon>
             <ListItemText primary="Dashboard" />
+          </ListItem>
+
+          <ListItem button onClick={() => handleNavigate("/dashboard-nuevo")}>
+            <ListItemIcon><DashboardCustomizeIcon /></ListItemIcon>
+            <ListItemText primary="Dashboard Nuevo" />
           </ListItem>
 
           <ListItem button onClick={() => handleNavigate("/transform")}>
