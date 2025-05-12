@@ -25,7 +25,7 @@ import {
 } from "recharts";
 import API_BASE_URL from "../apiConfig";
 
-const CONSUMO_MAXIMO = 100;
+const CONSUMO_MAXIMO = 5;
 const COLORS = ["#1976d2", "#ffb74d"];
 const ROLE_COLORS = {
   admin: "#1976d2",
