@@ -25,7 +25,6 @@ import {
 } from "recharts";
 import API_BASE_URL from "../apiConfig";
 
-const CONSUMO_MAXIMO = 5;
 const COLORS = ["#1976d2", "#ffb74d"];
 const ROLE_COLORS = {
   admin: "#1976d2",
@@ -35,16 +34,24 @@ const ROLE_COLORS = {
 
 function Dashboard() {
   const [consumo, setConsumo] = useState(0);
+  const [consumoMaximo, setConsumoMaximo] = useState(null);
   const [dataPorUsuario, setDataPorUsuario] = useState([]);
   const theme = useTheme();
   const esMovil = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
+    fetch(`${API_BASE_URL}/cv/limite`)
+      .then((res) => res.json())
+      .then((data) => setConsumoMaximo(data?.limite))
+      .catch((error) => console.error("❌ Error al obtener límite:", error));
+
+    
     fetch(`${API_BASE_URL}/cv/consumo`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setConsumo(data?.total || 0))
       .catch((error) => console.error("❌ Error al obtener consumo:", error));
 
+    
     fetch(`${API_BASE_URL}/cv/por-usuario`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
@@ -57,8 +64,12 @@ function Dashboard() {
       .catch((error) => console.error("❌ Error al obtener datos por usuario:", error));
   }, []);
 
-  const restante = Math.max(CONSUMO_MAXIMO - consumo, 0);
-  const porcentaje = Math.min((consumo / CONSUMO_MAXIMO) * 100, 100).toFixed(2);
+  if (consumoMaximo === null) {
+    return <Typography align="center">Cargando límite mensual...</Typography>;
+  }
+
+  const restante = Math.max(consumoMaximo - consumo, 0);
+  const porcentaje = Math.min((consumo / consumoMaximo) * 100, 100).toFixed(2);
   const data = [
     { name: "CVs usados", value: consumo },
     { name: "CVs restantes", value: restante },
@@ -125,7 +136,7 @@ function Dashboard() {
 
           <Box mt={2}>
             <Typography variant="subtitle1" align="center">
-              Progreso mensual: {consumo} de {CONSUMO_MAXIMO} CVs ({porcentaje}%)
+              Progreso mensual: {consumo} de {consumoMaximo} CVs ({porcentaje}%)
             </Typography>
             <MuiTooltip title={`${porcentaje}% utilizado`} arrow>
               <LinearProgress
