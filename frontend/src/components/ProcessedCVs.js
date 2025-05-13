@@ -24,7 +24,7 @@ import {
   CardContent,
   Divider,
   Container,
-  Alert,
+  Alert
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
@@ -49,9 +49,11 @@ function capitalizarTexto(texto) {
 
 function formatearTransformadoPor(cv) {
   if (!cv.usuario || typeof cv.usuario !== "string") return "Admin";
+
   if (cv.usuario.includes("(admin)")) return cv.usuario.replace("(admin)", "(Administrador)");
   if (cv.usuario.includes("(gerente de proyecto)")) return cv.usuario.replace("(gerente de proyecto)", "(Gerente de Proyecto)");
   if (cv.usuario.includes("(user)")) return cv.usuario.replace("(user)", "(Usuario)");
+
   return cv.usuario;
 }
 
@@ -116,11 +118,14 @@ function ProcessedCVs() {
   const eliminarCV = async (cvId) => {
     const confirmar = window.confirm("¿Estás seguro que deseas eliminar este CV?");
     if (!confirmar) return;
+
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/cv/eliminar/${cvId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         credentials: "include",
       });
       const data = await res.json();
@@ -165,12 +170,17 @@ function ProcessedCVs() {
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
+
     if (tabValue === "nombre") {
-      return searchName.trim() === "" || nombre.toLowerCase().includes(searchName.toLowerCase());
+      return searchName.trim() === ""
+        ? true
+        : nombre.toLowerCase().includes(searchName.toLowerCase());
     } else {
-      return searchTags.length === 0 || searchTags.every((tag) =>
-        conocimientos.toLowerCase().includes(tag.toLowerCase())
-      );
+      return searchTags.length === 0
+        ? true
+        : searchTags.every((tag) =>
+            conocimientos.toLowerCase().includes(tag.toLowerCase())
+          );
     }
   });
 
@@ -192,11 +202,15 @@ function ProcessedCVs() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
+      <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
 
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Box
         display="flex"
@@ -209,21 +223,20 @@ function ProcessedCVs() {
         <Stack direction="row" spacing={1}>
           <Button
             onClick={() => setTabValue("nombre")}
-            variant={tabValue === "nombre" ? "contained" : "outlined"}
-            sx={{ fontWeight: "bold", textTransform: "none" }}
+            variant={tabValue === "nombre" ? "contained" : "text"}
           >
-            Buscar por Nombre
+            BUSCAR POR NOMBRE
           </Button>
           <Button
             onClick={() => setTabValue("tags")}
-            variant={tabValue === "tags" ? "contained" : "outlined"}
-            sx={{ fontWeight: "bold", textTransform: "none" }}
+            variant={tabValue === "tags" ? "contained" : "text"}
           >
-            Buscar por Tags
+            BUSCAR POR TAGS
           </Button>
         </Stack>
       </Box>
- {tabValue === "nombre" ? (
+
+      {tabValue === "nombre" ? (
         <TextField
           variant="outlined"
           placeholder="Buscar por nombre"
