@@ -32,7 +32,6 @@ import GroupIcon from "@mui/icons-material/Group";
 import BusinessIcon from "@mui/icons-material/Business";
 import SecurityIcon from "@mui/icons-material/Security";
 import { jwtDecode } from "jwt-decode";
-import { verificarSesionActiva } from "./api";
 
 const drawerWidth = 250;
 
@@ -58,16 +57,7 @@ function Sidebar() {
     }
   }, []);
 
-  const verificarSesion = async () => {
-    try {
-      await verificarSesionActiva();
-    } catch (error) {
-      console.error("❌ Sesión no válida:", error);
-    }
-  };
-
-  const handleNavigate = async (path) => {
-    await verificarSesion();
+  const handleNavigate = (path) => {
     navigate(path);
     if (isMobile) setMobileOpen(false);
   };
