@@ -2,139 +2,142 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
+  Container,
   TextField,
   Typography,
   Paper,
-  Alert,
   InputAdornment,
-  Avatar,
+  IconButton,
+  CircularProgress,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LockIcon from "@mui/icons-material/Lock";
-import EmailIcon from "@mui/icons-material/Email";
-import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import axios from "axios";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import API_BASE_URL from "../apiConfig";
 
 const Login = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [mostrarContrasena, setMostrarContrasena] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const manejarEnvio = async (e) => {
     e.preventDefault();
+    setCargando(true);
     setError("");
-    setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
-      const { token, usuario } = response.data;
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, contrasena }),
+      });
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("usuario", JSON.stringify(usuario));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Error en login");
 
-      setTimeout(() => {
-        window.location.href = "/transform";
-      }, 100);
+      localStorage.setItem("token", data.token);
+      window.location.href = "/";
     } catch (err) {
-      // Verifica si el error es de usuario eliminado
-      if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
-        setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");
-      } else {
-        setError(
-          err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales."
-        );
-      }
+      setError(err.message);
     } finally {
-      setLoading(false);
+      setCargando(false);
     }
   };
 
   return (
     <Box
       sx={{
-        height: "100vh",
+        minHeight: "100vh",
+        background: "linear-gradient(to right, #eef2f3, #d9e2ec)",
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg, #e3f2fd, #fce4ec)",
+        justifyContent: "center",
       }}
     >
-      <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          maxWidth: 400,
-          width: "100%",
-          borderRadius: 4,
-          textAlign: "center",
-        }}
-      >
-        <Avatar sx={{ bgcolor: "#1976d2", mx: "auto", mb: 2 }}>
-          <LockIcon />
-        </Avatar>
-        <Typography variant="h5" fontWeight="bold" color="primary" gutterBottom>
-          Iniciar Sesión
-        </Typography>
+      <Container maxWidth="xs">
+        <Paper elevation={6} sx={{ p: 4, borderRadius: 3 }}>
+          <Box textAlign="center" mb={3}>
+            <img
+              src="/logo192.png"
+              alt="Logo"
+              style={{ width: 60, marginBottom: 10 }}
+            />
+            <Typography variant="h5" fontWeight="bold">
+              Iniciar Sesión
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              Accede a tu cuenta de Transform CV
+            </Typography>
+          </Box>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+          <form onSubmit={manejarEnvio}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Correo electrónico"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              margin="normal"
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <AccountCircle />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Usuario"
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            margin="normal"
-            required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Contraseña"
+              type={mostrarContrasena ? "text" : "password"}
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
+              margin="normal"
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setMostrarContrasena((prev) => !prev)}
+                      edge="end"
+                    >
+                      {mostrarContrasena ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-          <TextField
-            fullWidth
-            label="Contraseña"
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            margin="normal"
-            required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <VpnKeyIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+            {error && (
+              <Typography color="error" mt={1}>
+                {error}
+              </Typography>
+            )}
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2, py: 1.2, fontWeight: "bold" }}
-            disabled={loading}
-          >
-            {loading ? "Cargando..." : "Ingresar"}
-          </Button>
-        </form>
-      </Paper>
+            <Button
+              fullWidth
+              variant="contained"
+              color="primary"
+              type="submit"
+              sx={{ mt: 3, fontWeight: "bold" }}
+              disabled={cargando}
+            >
+              {cargando ? <CircularProgress size={24} color="inherit" /> : "Ingresar"}
+            </Button>
+          </form>
+        </Paper>
+      </Container>
     </Box>
   );
 };
