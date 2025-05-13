@@ -24,7 +24,7 @@ import {
   CardContent,
   Divider,
   Container,
-  Alert,
+  Alert
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CodeIcon from "@mui/icons-material/Code";
@@ -49,9 +49,11 @@ function capitalizarTexto(texto) {
 
 function formatearTransformadoPor(cv) {
   if (!cv.usuario || typeof cv.usuario !== "string") return "Admin";
+
   if (cv.usuario.includes("(admin)")) return cv.usuario.replace("(admin)", "(Administrador)");
   if (cv.usuario.includes("(gerente de proyecto)")) return cv.usuario.replace("(gerente de proyecto)", "(Gerente de Proyecto)");
   if (cv.usuario.includes("(user)")) return cv.usuario.replace("(user)", "(Usuario)");
+
   return cv.usuario;
 }
 
@@ -116,11 +118,14 @@ function ProcessedCVs() {
   const eliminarCV = async (cvId) => {
     const confirmar = window.confirm("¿Estás seguro que deseas eliminar este CV?");
     if (!confirmar) return;
+
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(`${API_BASE_URL}/cv/eliminar/${cvId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         credentials: "include",
       });
       const data = await res.json();
@@ -165,12 +170,17 @@ function ProcessedCVs() {
   const filteredCvs = cvs.filter((cv) => {
     const nombre = cv.json?.informacion_personal?.nombre || "";
     const conocimientos = cv.json?.conocimientos_informaticos?.join(" ") || "";
+
     if (tabValue === "nombre") {
-      return searchName.trim() === "" || nombre.toLowerCase().includes(searchName.toLowerCase());
+      return searchName.trim() === ""
+        ? true
+        : nombre.toLowerCase().includes(searchName.toLowerCase());
     } else {
-      return searchTags.length === 0 || searchTags.every((tag) =>
-        conocimientos.toLowerCase().includes(tag.toLowerCase())
-      );
+      return searchTags.length === 0
+        ? true
+        : searchTags.every((tag) =>
+            conocimientos.toLowerCase().includes(tag.toLowerCase())
+          );
     }
   });
 
@@ -192,11 +202,15 @@ function ProcessedCVs() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
+      <Typography variant="h4" gutterBottom>
         📄 CVs Procesados
       </Typography>
 
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Box
         display="flex"
@@ -209,17 +223,15 @@ function ProcessedCVs() {
         <Stack direction="row" spacing={1}>
           <Button
             onClick={() => setTabValue("nombre")}
-            variant={tabValue === "nombre" ? "contained" : "outlined"}
-            sx={{ fontWeight: "bold", textTransform: "none" }}
+            variant={tabValue === "nombre" ? "contained" : "text"}
           >
-            Buscar por Nombre
+            BUSCAR POR NOMBRE
           </Button>
           <Button
             onClick={() => setTabValue("tags")}
-            variant={tabValue === "tags" ? "contained" : "outlined"}
-            sx={{ fontWeight: "bold", textTransform: "none" }}
+            variant={tabValue === "tags" ? "contained" : "text"}
           >
-            Buscar por Tags
+            BUSCAR POR TAGS
           </Button>
         </Stack>
       </Box>
@@ -274,13 +286,14 @@ function ProcessedCVs() {
       {loading ? (
         <Box mt={4} textAlign="center">
           <CircularProgress />
-          <Typography mt={2}>Cargando CVs procesados...</Typography>
+          <Typography>Cargando CVs procesados...</Typography>
         </Box>
       ) : isMobile ? (
         <Stack spacing={2}>
           {paginatedCvs.map((cv) => {
             const parsedJson = cv.json || {};
-            const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
+            const nombreOriginal =
+              parsedJson?.informacion_personal?.nombre || "Desconocido";
             const nombre = capitalizarTexto(nombreOriginal);
             return (
               <Card key={cv.id}>
@@ -305,7 +318,9 @@ function ProcessedCVs() {
                     <Button
                       variant="outlined"
                       startIcon={<CodeIcon />}
-                      onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                      onClick={() =>
+                        descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                      }
                       sx={{
                         color: "#f29111",
                         borderColor: "#f29111",
@@ -341,24 +356,25 @@ function ProcessedCVs() {
           })}
         </Stack>
       ) : (
-        <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 3 }}>
+        <TableContainer component={Paper}>
           <Table>
-            <TableHead sx={{ backgroundColor: "#1976d2" }}>
+            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
               <TableRow>
-                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>🧑 Nombre</TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>🗓️ Fecha</TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>👤 Transformado por</TableCell>
-                <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>📄 PDF / JSON</TableCell>
-                {isAdmin && <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>Acciones</TableCell>}
+                <TableCell><strong>🧑 Nombre</strong></TableCell>
+                <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                <TableCell><strong>👤 Transformado por</strong></TableCell>
+                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
+                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
               {paginatedCvs.map((cv) => {
                 const parsedJson = cv.json || {};
-                const nombreOriginal = parsedJson?.informacion_personal?.nombre || "Desconocido";
+                const nombreOriginal =
+                  parsedJson?.informacion_personal?.nombre || "Desconocido";
                 const nombre = capitalizarTexto(nombreOriginal);
                 return (
-                  <TableRow key={cv.id} hover>
+                  <TableRow key={cv.id}>
                     <TableCell>{nombre}</TableCell>
                     <TableCell>{new Date(cv.created_at).toLocaleString("es-CL")}</TableCell>
                     <TableCell>{formatearTransformadoPor(cv)}</TableCell>
@@ -366,18 +382,18 @@ function ProcessedCVs() {
                       <Stack direction="row" spacing={1}>
                         <Button
                           variant="contained"
-                          size="small"
+                          color="primary"
                           startIcon={<PictureAsPdfIcon />}
                           onClick={() => descargarPDF(cv.id)}
-                          sx={{ fontWeight: "bold" }}
                         >
                           PDF
                         </Button>
                         <Button
                           variant="outlined"
-                          size="small"
                           startIcon={<CodeIcon />}
-                          onClick={() => descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))}
+                          onClick={() =>
+                            descargarJSON(parsedJson, nombre.replace(/\s/g, "_"))
+                          }
                           sx={{
                             color: "#f29111",
                             borderColor: "#f29111",
