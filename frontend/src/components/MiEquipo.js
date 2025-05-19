@@ -44,6 +44,7 @@ function MiEquipo() {
   const [nuevoUsuario, setNuevoUsuario] = useState({ nombre: "", apellido: "", email: "", rol: "" });
   const [errorInvitacion, setErrorInvitacion] = useState("");
   const [modalErrorOpen, setModalErrorOpen] = useState(false);
+  const [formatoCorreoInvalido, setFormatoCorreoInvalido] = useState(false);
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
@@ -156,6 +157,10 @@ function MiEquipo() {
     const { name, value } = e.target;
     setNuevoUsuario((prev) => ({ ...prev, [name]: value }));
     setErrorInvitacion("");
+    if (name === "email") {
+      const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setFormatoCorreoInvalido(!regexCorreo.test(value));
+    }
   };
 
   const handleEnviarInvitacion = async () => {
@@ -355,6 +360,8 @@ function MiEquipo() {
             name="email"
             value={nuevoUsuario.email}
             onChange={handleChangeNuevoUsuario}
+            error={formatoCorreoInvalido}
+            helperText={formatoCorreoInvalido ? "Ingrese un correo válido (ej: usuario@dominio.cl)" : ""}
           />
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id="rol-label">Rol</InputLabel>
@@ -377,7 +384,7 @@ function MiEquipo() {
             onClick={handleEnviarInvitacion}
             variant="contained"
             color="success"
-            disabled={!camposCompletos()}
+            disabled={!camposCompletos() || formatoCorreoInvalido}
           >
             Enviar Invitación
           </Button>
