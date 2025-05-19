@@ -5,22 +5,29 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const verifyToken = require("../middleware/verifyToken");
 
-// 🔹 Login
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const result = await db.query(
-      `SELECT u.*, r.nombre as rol, u.password = crypt($2, u.password) as match
+      `SELECT u.*, r.nombre as rol 
        FROM usuarios u
        JOIN roles r ON u.rol_id = r.id
        WHERE u.email = $1`,
-      [email, password]
+      [email]
     );
 
     const user = result.rows[0];
 
-    if (!user || !user.match) {
+    if (!user) {
+      return res.status(401).json({ message: "Credenciales inválidas" });
+    }
+
+    
+    const esValida = await bcrypt.compare(password, user.password);
+
+    if (!esValida) {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
 
@@ -53,7 +60,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// 🔹 Cambiar clave temporal
+
 router.post("/cambiar-clave", verifyToken, async (req, res) => {
   const { nuevaClave } = req.body;
 
@@ -76,7 +83,7 @@ router.post("/cambiar-clave", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Validar sesión activa
+
 router.get("/validar", async (req, res) => {
   const authHeader = req.headers.authorization;
 
