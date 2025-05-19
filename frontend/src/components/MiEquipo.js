@@ -38,6 +38,7 @@ function MiEquipo() {
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserRol, setCurrentUserRol] = useState(null);
   const [openInvitar, setOpenInvitar] = useState(false);
   const [nuevoUsuario, setNuevoUsuario] = useState({ nombre: "", apellido: "", email: "", rol: "" });
   const isMobile = useMediaQuery("(max-width:600px)");
@@ -48,6 +49,7 @@ function MiEquipo() {
     if (token) {
       const decoded = JSON.parse(atob(token.split(".")[1]));
       setCurrentUserId(decoded.id);
+      setCurrentUserRol(decoded.rol?.toLowerCase());
     }
   }, []);
 
@@ -215,13 +217,12 @@ function MiEquipo() {
         👥 Mi Equipo
       </Typography>
 
-      {usuarios.length > 0 &&
-        usuarios.find(u => u.id === currentUserId && u.rol === "admin") && (
-          <Box display="flex" justifyContent="flex-end" mb={2}>
-            <Button variant="contained" color="success" onClick={() => setOpenInvitar(true)}>
-              Invitar a un Miembro
-            </Button>
-          </Box>
+      {currentUserRol === "admin" && (
+        <Box display="flex" justifyContent="flex-end" mb={2}>
+          <Button variant="contained" color="success" onClick={() => setOpenInvitar(true)}>
+            Invitar a un Miembro
+          </Button>
+        </Box>
       )}
 
       {isMobile ? (
