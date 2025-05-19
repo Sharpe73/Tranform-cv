@@ -215,11 +215,14 @@ function MiEquipo() {
         👥 Mi Equipo
       </Typography>
 
-      <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button variant="contained" color="success" onClick={() => setOpenInvitar(true)}>
-          Invitar a un Miembro
-        </Button>
-      </Box>
+      {usuarios.length > 0 &&
+        usuarios.find(u => u.id === currentUserId && u.rol === "admin") && (
+          <Box display="flex" justifyContent="flex-end" mb={2}>
+            <Button variant="contained" color="success" onClick={() => setOpenInvitar(true)}>
+              Invitar a un Miembro
+            </Button>
+          </Box>
+      )}
 
       {isMobile ? (
         <Stack spacing={2}>
