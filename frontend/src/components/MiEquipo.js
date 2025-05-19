@@ -1,4 +1,3 @@
-// ✅ Este es el archivo completo y actualizado
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -212,6 +211,15 @@ function MiEquipo() {
     return <Box display="flex" gap={1}>{chips}</Box>;
   };
 
+  const camposCompletos = () => {
+    return (
+      nuevoUsuario.nombre.trim() !== "" &&
+      nuevoUsuario.apellido.trim() !== "" &&
+      nuevoUsuario.email.trim() !== "" &&
+      nuevoUsuario.rol.trim() !== ""
+    );
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4, minHeight: "100vh" }}>
       <Typography variant="h4" gutterBottom textAlign="center" color="primary">
@@ -351,7 +359,14 @@ function MiEquipo() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenInvitar(false)}>Cancelar</Button>
-          <Button onClick={handleEnviarInvitacion} variant="contained" color="success">Enviar Invitación</Button>
+          <Button
+            onClick={handleEnviarInvitacion}
+            variant="contained"
+            color="success"
+            disabled={!camposCompletos()}
+          >
+            Enviar Invitación
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
