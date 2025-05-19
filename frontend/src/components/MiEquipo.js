@@ -43,6 +43,7 @@ function MiEquipo() {
   const [openInvitar, setOpenInvitar] = useState(false);
   const [nuevoUsuario, setNuevoUsuario] = useState({ nombre: "", apellido: "", email: "", rol: "" });
   const [errorInvitacion, setErrorInvitacion] = useState("");
+  const [modalErrorOpen, setModalErrorOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
@@ -154,7 +155,7 @@ function MiEquipo() {
   const handleChangeNuevoUsuario = (e) => {
     const { name, value } = e.target;
     setNuevoUsuario((prev) => ({ ...prev, [name]: value }));
-    setErrorInvitacion(""); 
+    setErrorInvitacion("");
   };
 
   const handleEnviarInvitacion = async () => {
@@ -175,7 +176,7 @@ function MiEquipo() {
           response.status === 400 &&
           errorData.message?.includes("correo ya está registrado")
         ) {
-          setErrorInvitacion("❌ El correo ya está registrado en la base de datos. Por favor, ingrese otro.");
+          setModalErrorOpen(true);
         } else {
           throw new Error("Error al enviar invitación");
         }
@@ -354,8 +355,6 @@ function MiEquipo() {
             name="email"
             value={nuevoUsuario.email}
             onChange={handleChangeNuevoUsuario}
-            error={!!errorInvitacion}
-            helperText={errorInvitacion}
           />
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id="rol-label">Rol</InputLabel>
@@ -381,6 +380,20 @@ function MiEquipo() {
             disabled={!camposCompletos()}
           >
             Enviar Invitación
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={modalErrorOpen} onClose={() => setModalErrorOpen(false)}>
+        <DialogTitle>Correo ya registrado</DialogTitle>
+        <DialogContent>
+          <Typography>
+            ❌ El correo ingresado ya está registrado en la base de datos. Por favor, intente con otro.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalErrorOpen(false)} variant="contained" color="primary">
+            Aceptar
           </Button>
         </DialogActions>
       </Dialog>
