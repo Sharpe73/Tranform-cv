@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database");
 const verifyToken = require("../middleware/verifyToken");
+const { invitarUsuario } = require("../controllers/userController"); // 👈 nueva línea
 
 // 🔹 Crear Usuario (admin)
 router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
@@ -46,6 +47,9 @@ router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Error interno al crear el usuario" });
   }
 });
+
+// 🔹 INVITAR USUARIO (nuevo)
+router.post("/invitar", verifyToken, invitarUsuario); // 👈 NUEVA RUTA
 
 // 🔹 Obtener todos los usuarios
 router.get("/", verifyToken, async (req, res) => {

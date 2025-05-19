@@ -8,7 +8,6 @@ const pool = new Pool({
   },
 });
 
-
 const createCVFilesTable = `
   CREATE TABLE IF NOT EXISTS cv_files (
     id SERIAL PRIMARY KEY,
@@ -19,14 +18,12 @@ const createCVFilesTable = `
   );
 `;
 
-
 const createRolesTable = `
   CREATE TABLE IF NOT EXISTS roles (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
   );
 `;
-
 
 const createUsuariosTable = `
   CREATE TABLE IF NOT EXISTS usuarios (
@@ -36,7 +33,8 @@ const createUsuariosTable = `
     email VARCHAR(150) UNIQUE NOT NULL,
     password TEXT NOT NULL,
     rol_id INTEGER REFERENCES roles(id),
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    requiere_cambio_clave BOOLEAN DEFAULT false -- 👈 CAMPO AGREGADO
   );
 `;
 
