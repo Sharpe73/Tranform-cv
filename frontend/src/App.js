@@ -9,7 +9,7 @@ import CreateUser from "./components/CreateUser";
 import MiEquipo from "./components/MiEquipo";
 import RolesPermisos from "./components/RolesPermisos";
 import Login from "./components/Login";
-import CambiarClave from "./components/CambiarClave"; // ✅ NUEVA IMPORTACIÓN
+import CambiarClave from "./components/CambiarClave";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ThemeProvider, useMediaQuery } from "@mui/material";
