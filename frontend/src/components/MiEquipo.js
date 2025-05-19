@@ -27,6 +27,7 @@ import {
   Select,
   InputLabel,
   FormControl,
+  FormHelperText,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
@@ -41,6 +42,7 @@ function MiEquipo() {
   const [currentUserRol, setCurrentUserRol] = useState(null);
   const [openInvitar, setOpenInvitar] = useState(false);
   const [nuevoUsuario, setNuevoUsuario] = useState({ nombre: "", apellido: "", email: "", rol: "" });
+  const [errorInvitacion, setErrorInvitacion] = useState("");
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
@@ -152,6 +154,7 @@ function MiEquipo() {
   const handleChangeNuevoUsuario = (e) => {
     const { name, value } = e.target;
     setNuevoUsuario((prev) => ({ ...prev, [name]: value }));
+    setErrorInvitacion(""); 
   };
 
   const handleEnviarInvitacion = async () => {
@@ -167,12 +170,22 @@ function MiEquipo() {
       });
 
       if (!response.ok) {
-        throw new Error("Error al enviar invitación");
+        const errorData = await response.json();
+        if (
+          response.status === 400 &&
+          errorData.message?.includes("correo ya está registrado")
+        ) {
+          setErrorInvitacion("❌ El correo ya está registrado en la base de datos. Por favor, ingrese otro.");
+        } else {
+          throw new Error("Error al enviar invitación");
+        }
+        return;
       }
 
       alert("✅ Invitación enviada exitosamente");
       setOpenInvitar(false);
       setNuevoUsuario({ nombre: "", apellido: "", email: "", rol: "" });
+      setErrorInvitacion("");
       fetchUsuarios();
     } catch (error) {
       console.error("Error al enviar invitación:", error);
@@ -341,6 +354,8 @@ function MiEquipo() {
             name="email"
             value={nuevoUsuario.email}
             onChange={handleChangeNuevoUsuario}
+            error={!!errorInvitacion}
+            helperText={errorInvitacion}
           />
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel id="rol-label">Rol</InputLabel>
