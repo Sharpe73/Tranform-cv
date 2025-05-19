@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../apiConfig";
 
-export default function CambiarClave({ token, onClaveCambiada }) {
+export default function CambiarClave() {
   const [nuevaClave, setNuevaClave] = useState("");
   const [confirmacion, setConfirmacion] = useState("");
   const navigate = useNavigate();
@@ -20,6 +20,8 @@ export default function CambiarClave({ token, onClaveCambiada }) {
       alert("❗ Las contraseñas no coinciden.");
       return;
     }
+
+    const token = localStorage.getItem("token");
 
     try {
       const response = await fetch(`${API_BASE_URL}/auth/cambiar-clave`, {
@@ -36,12 +38,7 @@ export default function CambiarClave({ token, onClaveCambiada }) {
       }
 
       alert("✅ Contraseña actualizada. Ya puedes usar la aplicación.");
-
-      if (onClaveCambiada) {
-        onClaveCambiada();
-      } else {
-        navigate("/dashboard");
-      }
+      navigate("/transform");
     } catch (error) {
       console.error("Error:", error);
       alert("❌ Hubo un error al cambiar la contraseña.");
