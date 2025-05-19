@@ -157,8 +157,9 @@ function MiEquipo() {
     const { name, value } = e.target;
     setNuevoUsuario((prev) => ({ ...prev, [name]: value }));
     setErrorInvitacion("");
+
     if (name === "email") {
-      const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       setFormatoCorreoInvalido(!regexCorreo.test(value));
     }
   };
