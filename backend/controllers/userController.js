@@ -1,5 +1,6 @@
 const db = require("../database");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const { sendInvitationEmail } = require("../utils/sendEmail");
 
 // 🔹 INVITAR USUARIO
@@ -15,6 +16,12 @@ async function invitarUsuario(req, res) {
   }
 
   try {
+    // Verificar si el correo ya está registrado
+    const existe = await db.query("SELECT id FROM usuarios WHERE email = $1", [email]);
+    if (existe.rows.length > 0) {
+      return res.status(400).json({ message: "❗ El correo ya está registrado. Por favor, ingrese otro." });
+    }
+
     // Verificar si el rol existe
     const rolResult = await db.query(
       "SELECT id FROM roles WHERE LOWER(TRIM(nombre)) = LOWER(TRIM($1))",
@@ -27,18 +34,18 @@ async function invitarUsuario(req, res) {
 
     const rol_id = rolResult.rows[0].id;
 
-    // Generar clave temporal y encriptarla
-    const claveTemporal = Math.random().toString(36).slice(-8);
+    // Generar clave temporal aleatoria y encriptarla
+    const claveTemporal = crypto.randomBytes(4).toString("hex"); // 8 caracteres
     const claveHasheada = await bcrypt.hash(claveTemporal, 10);
 
-    // Insertar usuario con clave temporal y requiere_cambio_clave=true
+    // Insertar usuario con requiere_cambio_clave=true
     await db.query(
       `INSERT INTO usuarios (nombre, apellido, email, password, rol_id, requiere_cambio_clave)
        VALUES ($1, $2, $3, $4, $5, true)`,
       [nombre, apellido, email, claveHasheada, rol_id]
     );
 
-    // Enviar correo
+    // Enviar correo de invitación
     await sendInvitationEmail(email, nombre, claveTemporal);
 
     res.status(200).json({ message: "✅ Invitación enviada correctamente." });
