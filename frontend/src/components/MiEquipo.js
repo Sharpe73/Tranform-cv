@@ -19,6 +19,14 @@ import {
   Button,
   Container,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
@@ -30,6 +38,8 @@ function MiEquipo() {
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [openInvitar, setOpenInvitar] = useState(false);
+  const [nuevoUsuario, setNuevoUsuario] = useState({ nombre: "", apellido: "", email: "", rol: "" });
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
@@ -137,6 +147,36 @@ function MiEquipo() {
     }
   };
 
+  const handleChangeNuevoUsuario = (e) => {
+    const { name, value } = e.target;
+    setNuevoUsuario((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEnviarInvitacion = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${API_BASE_URL}/users/invitar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(nuevoUsuario),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al enviar invitación");
+      }
+
+      alert("✅ Invitación enviada exitosamente");
+      setOpenInvitar(false);
+      setNuevoUsuario({ nombre: "", apellido: "", email: "", rol: "" });
+      fetchUsuarios();
+    } catch (error) {
+      console.error("Error al enviar invitación:", error);
+    }
+  };
+
   const mapearRol = (rol, es_dueno) => {
     const chips = [];
 
@@ -174,6 +214,12 @@ function MiEquipo() {
       <Typography variant="h4" gutterBottom textAlign="center" color="primary">
         👥 Mi Equipo
       </Typography>
+
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Button variant="contained" color="success" onClick={() => setOpenInvitar(true)}>
+          Invitar a un Miembro
+        </Button>
+      </Box>
 
       {isMobile ? (
         <Stack spacing={2}>
@@ -251,6 +297,58 @@ function MiEquipo() {
         onChange={handleChangeUsuario}
         onSave={handleGuardarCambios}
       />
+
+      <Dialog open={openInvitar} onClose={() => setOpenInvitar(false)}>
+        <DialogTitle>Invitar a un nuevo miembro</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Nombre"
+            type="text"
+            fullWidth
+            name="nombre"
+            value={nuevoUsuario.nombre}
+            onChange={handleChangeNuevoUsuario}
+          />
+          <TextField
+            margin="dense"
+            label="Apellido"
+            type="text"
+            fullWidth
+            name="apellido"
+            value={nuevoUsuario.apellido}
+            onChange={handleChangeNuevoUsuario}
+          />
+          <TextField
+            margin="dense"
+            label="Correo"
+            type="email"
+            fullWidth
+            name="email"
+            value={nuevoUsuario.email}
+            onChange={handleChangeNuevoUsuario}
+          />
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="rol-label">Rol</InputLabel>
+            <Select
+              labelId="rol-label"
+              name="rol"
+              value={nuevoUsuario.rol}
+              label="Rol"
+              onChange={handleChangeNuevoUsuario}
+            >
+              <MenuItem value="admin">Administrador</MenuItem>
+              <MenuItem value="gerente de proyecto">Gerente de Proyecto</MenuItem>
+              <MenuItem value="usuario">Usuario</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenInvitar(false)}>Cancelar</Button>
+          <Button onClick={handleEnviarInvitacion} variant="contained" color="success">Enviar Invitación</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

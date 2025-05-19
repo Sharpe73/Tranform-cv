@@ -14,11 +14,13 @@ import EmailIcon from "@mui/icons-material/Email";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import axios from "axios";
 import API_BASE_URL from "../apiConfig";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,16 +33,19 @@ const Login = () => {
 
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/login`, form);
-      const { token, usuario } = response.data;
+      const { token, usuario, requiereCambioClave } = response.data;
 
       localStorage.setItem("token", token);
       localStorage.setItem("usuario", JSON.stringify(usuario));
 
       setTimeout(() => {
-        window.location.href = "/transform";
+        if (requiereCambioClave) {
+          navigate("/cambiar-clave");
+        } else {
+          window.location.href = "/transform";
+        }
       }, 100);
     } catch (err) {
-      // Verifica si el error es de usuario eliminado
       if (err.response?.data?.message === "Usuario eliminado o no encontrado") {
         setError("Tu cuenta ha sido eliminada. Por favor, inicia sesión nuevamente.");
       } else {

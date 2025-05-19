@@ -9,6 +9,7 @@ import CreateUser from "./components/CreateUser";
 import MiEquipo from "./components/MiEquipo";
 import RolesPermisos from "./components/RolesPermisos";
 import Login from "./components/Login";
+import CambiarClave from "./components/CambiarClave"; // ✅ NUEVA IMPORTACIÓN
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ThemeProvider, useMediaQuery } from "@mui/material";
@@ -16,8 +17,6 @@ import theme from "./theme";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import API_BASE_URL from "./apiConfig";
-
-
 
 function App() {
   const [config, setConfig] = useState({
@@ -89,7 +88,7 @@ function App() {
             padding: "32px 24px",
             backgroundColor: "#f9fafc",
             minHeight: "100vh",
-            mt: isMobile ? "64px" : 0, // deja espacio al AppBar móvil
+            mt: isMobile ? "64px" : 0,
           }}
         >
           {children}
@@ -125,7 +124,6 @@ function App() {
               path="/dashboard"
               element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
             />
-
             <Route
               path="/procesados"
               element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
@@ -139,6 +137,7 @@ function App() {
               </>
             )}
             <Route path="/login" element={<Login />} />
+            <Route path="/cambiar-clave" element={<CambiarClave token={localStorage.getItem("token")} />} /> {/* ✅ NUEVA RUTA */}
             <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
           </Routes>
         </Layout>
