@@ -1,3 +1,4 @@
+// ✅ Este es el archivo completo y actualizado
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -344,7 +345,7 @@ function MiEquipo() {
             >
               <MenuItem value="admin">Administrador</MenuItem>
               <MenuItem value="gerente de proyecto">Gerente de Proyecto</MenuItem>
-              <MenuItem value="usuario">Usuario</MenuItem>
+              <MenuItem value="user">Usuario</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
