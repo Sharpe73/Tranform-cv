@@ -39,7 +39,7 @@ export default function UserMenu() {
 
   const confirmarCerrarSesion = () => {
     setOpenDialog(true);
-    handleClose(); 
+    handleClose();
   };
 
   const handleLogout = () => {
@@ -50,12 +50,17 @@ export default function UserMenu() {
 
   if (!usuario) return null;
 
+  
+  let iconColor = "#4caf50";
+  if (usuario.rol === "admin") iconColor = "#1976d2";
+  else if (usuario.rol === "gerente de proyecto") iconColor = "#9c27b0";
+
   return (
     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", px: 2 }}>
       <Tooltip title="Opciones de usuario">
         <IconButton onClick={handleOpen} size="small" sx={{ ml: 2 }}>
-          <Avatar sx={{ bgcolor: "#1976d2", width: 32, height: 32 }}>
-            <FaceIcon sx={{ color: "#fff", fontSize: 20 }} />
+          <Avatar sx={{ bgcolor: iconColor, width: 40, height: 40 }}>
+            <FaceIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Avatar>
         </IconButton>
       </Tooltip>
@@ -73,7 +78,6 @@ export default function UserMenu() {
         <MenuItem onClick={confirmarCerrarSesion}>Cerrar Sesión</MenuItem>
       </Menu>
 
-      
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>¿Cerrar sesión?</DialogTitle>
         <DialogContent>
