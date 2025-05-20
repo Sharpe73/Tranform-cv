@@ -24,7 +24,6 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
@@ -127,11 +126,6 @@ function Sidebar() {
                   </ListItem>
                 </List>
               </Collapse>
-
-              <ListItem button onClick={() => handleNavigate("/crear-usuario")}>
-                <ListItemIcon><PersonAddIcon /></ListItemIcon>
-                <ListItemText primary="Crear Usuario" />
-              </ListItem>
             </>
           )}
 

@@ -5,7 +5,6 @@ import Config from "./components/Config";
 import Transform from "./components/Transform";
 import ProcessedCVs from "./components/ProcessedCVs";
 import Dashboard from "./components/Dashboard";
-import CreateUser from "./components/CreateUser";
 import MiEquipo from "./components/MiEquipo";
 import RolesPermisos from "./components/RolesPermisos";
 import Login from "./components/Login";
@@ -133,11 +132,10 @@ function App() {
                 <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
                 <Route path="/ajustes/equipo" element={<MiEquipo />} />
                 <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />
-                <Route path="/crear-usuario" element={<CreateUser />} />
               </>
             )}
             <Route path="/login" element={<Login />} />
-            <Route path="/cambiar-clave" element={<CambiarClave token={localStorage.getItem("token")} />} /> {/* ✅ NUEVA RUTA */}
+            <Route path="/cambiar-clave" element={<CambiarClave token={localStorage.getItem("token")} />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
           </Routes>
         </Layout>
