@@ -7,6 +7,11 @@ import {
   Box,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import FaceIcon from "@mui/icons-material/Face";
@@ -14,6 +19,7 @@ import FaceIcon from "@mui/icons-material/Face";
 export default function UserMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [usuario, setUsuario] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +35,11 @@ export default function UserMenu() {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const confirmarCerrarSesion = () => {
+    setOpenDialog(true);
+    handleClose(); 
   };
 
   const handleLogout = () => {
@@ -59,8 +70,22 @@ export default function UserMenu() {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
+        <MenuItem onClick={confirmarCerrarSesion}>Cerrar Sesión</MenuItem>
       </Menu>
+
+      
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>¿Cerrar sesión?</DialogTitle>
+        <DialogContent>
+          <Typography>¿Estás seguro que deseas cerrar tu sesión?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
+          <Button onClick={handleLogout} color="error" variant="contained">
+            Cerrar Sesión
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
