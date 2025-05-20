@@ -24,7 +24,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import API_BASE_URL from "../apiConfig";
-import UserMenu from "./UserMenu"; 
+import UserMenu from "./UserMenu";
 
 const COLORS = ["#1976d2", "#ffb74d"];
 const ROLE_COLORS = {
@@ -76,16 +76,18 @@ function Dashboard() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
-      
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+      {/* Icono de usuario alineado a la derecha */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1, pr: 2 }}>
         <UserMenu />
       </Box>
 
+      {/* Título centrado */}
       <Typography
         variant={esMovil ? "h5" : "h4"}
         fontWeight="bold"
         color="primary"
         gutterBottom
+        align="center"
       >
         📊 Consumo de CVs Transformados
       </Typography>
@@ -100,7 +102,7 @@ function Dashboard() {
           flexWrap: "wrap",
         }}
       >
-        
+        {/* Pie Chart */}
         <Paper
           elevation={3}
           sx={{
@@ -159,7 +161,7 @@ function Dashboard() {
           </Box>
         </Paper>
 
-        
+        {/* Bar Chart */}
         <Paper
           elevation={3}
           sx={{
