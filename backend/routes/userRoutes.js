@@ -2,56 +2,12 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database");
 const verifyToken = require("../middleware/verifyToken");
-const { invitarUsuario } = require("../controllers/userController"); // 👈 nueva línea
+const { invitarUsuario } = require("../controllers/userController"); 
 
-// 🔹 Crear Usuario (admin)
-router.post("/admin/crear-usuario", verifyToken, async (req, res) => {
-  const { nombre, apellido, email, password, rol } = req.body;
 
-  if (req.user?.rol !== "admin") {
-    return res.status(403).json({ message: "Acceso denegado: solo el administrador puede crear usuarios." });
-  }
+router.post("/invitar", verifyToken, invitarUsuario); 
 
-  if (!nombre || !apellido || !email || !password || !rol) {
-    return res.status(400).json({ message: "Faltan campos obligatorios" });
-  }
 
-  try {
-    const rolResult = await db.query(
-      "SELECT id FROM roles WHERE LOWER(TRIM(nombre)) = LOWER(TRIM($1))",
-      [rol]
-    );
-
-    if (rolResult.rows.length === 0) {
-      return res.status(400).json({ message: `El rol '${rol}' no existe` });
-    }
-
-    const rol_id = rolResult.rows[0].id;
-
-    await db.query(
-      `INSERT INTO usuarios (nombre, apellido, email, password, rol_id)
-       VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5)`,
-      [nombre, apellido, email, password, rol_id]
-    );
-
-    res.status(201).json({ message: "✅ Usuario creado correctamente" });
-  } catch (error) {
-    console.error("❌ Error al crear usuario:", error.message);
-
-    if (error.code === "23505" && error.constraint === "usuarios_email_key") {
-      return res.status(400).json({
-        message: "❗ El correo ya está registrado en la base de datos. Por favor, ingrese otro correo.",
-      });
-    }
-
-    res.status(500).json({ message: "Error interno al crear el usuario" });
-  }
-});
-
-// 🔹 INVITAR USUARIO (nuevo)
-router.post("/invitar", verifyToken, invitarUsuario); // 👈 NUEVA RUTA
-
-// 🔹 Obtener todos los usuarios
 router.get("/", verifyToken, async (req, res) => {
   try {
     const result = await db.query(
@@ -77,7 +33,7 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Actualizar usuario
+
 router.put("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { nombre, apellido, rol } = req.body;
@@ -122,7 +78,7 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Eliminar usuario
+
 router.delete("/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
 
@@ -153,7 +109,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// 🔹 Obtener todos los roles disponibles
+
 router.get("/roles", verifyToken, async (req, res) => {
   try {
     const result = await db.query("SELECT nombre FROM roles ORDER BY id ASC");

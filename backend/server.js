@@ -114,7 +114,6 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
   }
 });
 
-
 app.get("/styles", (req, res) => {
   const estilosPath = path.join(__dirname, "plantillas.json");
 
@@ -182,7 +181,6 @@ app.get("/cv/list", verifyToken, async (req, res) => {
   }
 });
 
-
 app.get("/cv/consumo", async (req, res) => {
   try {
     const inicioMes = new Date();
@@ -229,7 +227,6 @@ app.get("/cv/limite", (req, res) => {
   res.json({ limite: LIMITE_MENSUAL });
 });
 
-
 app.delete("/cv/eliminar/:id", verifyToken, async (req, res) => {
   if (req.user?.rol !== "admin") {
     return res.status(403).json({ mensaje: "No autorizado: solo el administrador puede eliminar CVs." });
@@ -266,43 +263,6 @@ app.post("/admin/limpiar-cvs", verifyToken, async (req, res) => {
   } catch (error) {
     console.error("❌ Error al limpiar los CVs:", error.message);
     res.status(500).json({ mensaje: "Error al limpiar los CVs." });
-  }
-});
-
-app.post("/users/admin/crear-usuario", verifyToken, async (req, res) => {
-  const { nombre, apellido, email, password, rol } = req.body;
-
-  if (req.user?.rol !== "admin") {
-    return res.status(403).json({ message: "Acceso denegado: solo el administrador puede crear usuarios." });
-  }
-
-  if (!nombre || !apellido || !email || !password || !rol) {
-    return res.status(400).json({ message: "Faltan campos obligatorios" });
-  }
-
-  try {
-    const existingUser = await db.query("SELECT id FROM usuarios WHERE email = $1", [email]);
-    if (existingUser.rows.length > 0) {
-      return res.status(409).json({ message: "El correo ya existe en la base de datos. Por favor ingrese otro correo." });
-    }
-
-    const rolResult = await db.query("SELECT id FROM roles WHERE nombre = $1", [rol]);
-    if (rolResult.rows.length === 0) {
-      return res.status(400).json({ message: `El rol '${rol}' no existe.` });
-    }
-
-    const rol_id = rolResult.rows[0].id;
-
-    await db.query(
-      `INSERT INTO usuarios (nombre, apellido, email, password, rol_id)
-       VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5)`,
-      [nombre, apellido, email, password, rol_id]
-    );
-
-    res.status(201).json({ message: "✅ Usuario creado correctamente" });
-  } catch (error) {
-    console.error("❌ Error al crear usuario:", error.message);
-    res.status(500).json({ message: "Error interno al crear el usuario" });
   }
 });
 
@@ -354,8 +314,6 @@ app.get("/ping", (req, res) => {
   res.status(200).send("pong");
 });
 
-
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
 });
-
