@@ -37,16 +37,10 @@ export default function CambiarClave() {
         throw new Error("Error al cambiar la contraseña");
       }
 
-      
-      const usuarioGuardado = localStorage.getItem("usuario");
-      if (usuarioGuardado) {
-        const parsed = JSON.parse(usuarioGuardado);
-        parsed.requiereCambioClave = false;
-        localStorage.setItem("usuario", JSON.stringify(parsed));
-      }
-
-      alert("✅ Contraseña actualizada. Ya puedes usar la aplicación.");
-      navigate("/transform");
+      alert("✅ Contraseña actualizada. Por favor inicia sesión nuevamente.");
+      localStorage.removeItem("token");
+      localStorage.removeItem("usuario");
+      navigate("/login");
     } catch (error) {
       console.error("Error:", error);
       alert("❌ Hubo un error al cambiar la contraseña.");
