@@ -140,8 +140,8 @@ function Transform() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      {/* Este box está fuera del card */}
-      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={1} mt={1} pr={2}>
+      
+      <Box display="flex" justifyContent="flex-end" alignItems="center" mt={1} sx={{ pr: 6 }}>
         <UserMenu />
       </Box>
 
