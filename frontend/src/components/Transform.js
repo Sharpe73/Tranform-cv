@@ -142,7 +142,7 @@ function Transform() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 3, pb: 6, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} sx={{ mt: -1, mr: -2 }}>
         <Typography variant="h4" color="primary" fontWeight="bold">
           🖹 Transformar Documento
         </Typography>
