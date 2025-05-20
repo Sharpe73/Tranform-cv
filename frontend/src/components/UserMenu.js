@@ -5,7 +5,6 @@ import {
   MenuItem,
   Typography,
   Box,
-  IconButton,
   Tooltip,
   Dialog,
   DialogTitle,
@@ -17,6 +16,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import FaceIcon from "@mui/icons-material/Face";
 import LogoutIcon from "@mui/icons-material/Logout";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 export default function UserMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -53,23 +53,35 @@ export default function UserMenu() {
   if (!usuario) return null;
 
   
-  let iconColor = "#4caf50";
+  let iconColor = "#4caf50"; 
   if (usuario.rol === "admin") iconColor = "#1976d2";
   else if (usuario.rol === "gerente de proyecto") iconColor = "#9c27b0";
 
   return (
     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", px: 2 }}>
       <Tooltip title="Opciones de usuario">
-        <IconButton onClick={handleOpen} size="small" sx={{ ml: 2 }}>
+        <Box
+          onClick={handleOpen}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+        >
           <Avatar sx={{ bgcolor: iconColor, width: 40, height: 40 }}>
             <FaceIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Avatar>
-        </IconButton>
+          <Box sx={{ ml: 1, textAlign: "left" }}>
+            <Typography fontWeight="bold" fontSize="0.9rem">
+              {usuario.nombre} {usuario.apellido}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {usuario.email}
+            </Typography>
+          </Box>
+          <KeyboardArrowDownIcon sx={{ ml: 1 }} />
+        </Box>
       </Tooltip>
-
-      <Typography variant="body1" sx={{ ml: 1, fontWeight: "bold" }}>
-        {usuario.nombre} {usuario.apellido}
-      </Typography>
 
       <Menu
         anchorEl={anchorEl}
@@ -79,7 +91,6 @@ export default function UserMenu() {
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         sx={{ mt: 1 }}
       >
-        
         <Box sx={{ px: 2, py: 1, minWidth: 250 }}>
           <Typography variant="subtitle1" fontWeight="bold">
             {usuario.nombre} {usuario.apellido}
@@ -91,7 +102,6 @@ export default function UserMenu() {
 
         <Divider />
 
-        
         <MenuItem onClick={confirmarCerrarSesion}>
           <LogoutIcon sx={{ mr: 1, color: "orange" }} />
           Cerrar Sesión
