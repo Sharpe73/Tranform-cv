@@ -140,8 +140,8 @@ function Transform() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
-      {/* UserMenu bien alineado, fuera del Paper */}
-      <Box display="flex" justifyContent="flex-end" sx={{ mb: 2 }}>
+      {/* UserMenu arriba a la derecha con margen extra */}
+      <Box display="flex" justifyContent="flex-end" sx={{ mb: 2, pr: 4 }}>
         <UserMenu />
       </Box>
 
