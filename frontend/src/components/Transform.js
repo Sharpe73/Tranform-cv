@@ -139,23 +139,15 @@ function Transform() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1, mb: 1, pr: 3 }}>
+    <Container maxWidth="xl" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} mt={1} px={2}>
+        <Typography variant="h4" color="primary" fontWeight="bold">
+          🖹 Transformar Documento
+        </Typography>
         <UserMenu />
       </Box>
 
       <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          align="center"
-          fontWeight="bold"
-        >
-          🖹 Transformar Documento
-        </Typography>
-
         <UploadSection
           file={file}
           handleFileChange={handleFileChange}
