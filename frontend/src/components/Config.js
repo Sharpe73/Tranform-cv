@@ -16,6 +16,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { CloudUpload, PhotoCamera, Close } from "@mui/icons-material";
+import UserMenu from "../components/UserMenu";
 
 function Config({ setConfig }) {
   const storedConfig = JSON.parse(localStorage.getItem("cvConfig")) || {};
@@ -99,9 +100,12 @@ function Config({ setConfig }) {
           backgroundColor: "#fff",
         }}
       >
-        <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
-          📄 Configuración del PDF
-        </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
+            📄 Configuración del PDF
+          </Typography>
+          <UserMenu />
+        </Box>
 
         <TextField
           label="Nombre de la Organización"

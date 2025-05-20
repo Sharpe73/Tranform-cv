@@ -11,6 +11,7 @@ import ConfigCard from "./ConfigCard";
 import UploadActions from "./UploadActions";
 import MessageDisplay from "./MessageDisplay";
 import DownloadLink from "./DownloadLink";
+import UserMenu from "./UserMenu";
 import API_BASE_URL from "../apiConfig";
 import { pdfjs } from "react-pdf";
 
@@ -139,6 +140,10 @@ function Transform() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <UserMenu />
+      </Box>
+
       <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
         <Typography
           variant="h4"

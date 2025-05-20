@@ -33,6 +33,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { jwtDecode } from "jwt-decode";
 import API_BASE_URL from "../apiConfig";
+import UserMenu from "../components/UserMenu";
 
 function capitalizarTexto(texto) {
   if (!texto || typeof texto !== "string") return "";
@@ -202,9 +203,10 @@ function ProcessedCVs() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
-      <Typography variant="h4" gutterBottom>
-        📄 CVs Procesados
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4">📄 CVs Procesados</Typography>
+        <UserMenu />
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

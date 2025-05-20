@@ -32,6 +32,7 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditUserModal from "./EditUserModal";
 import API_BASE_URL from "../apiConfig";
+import UserMenu from "../components/UserMenu";
 
 function MiEquipo() {
   const [usuarios, setUsuarios] = useState([]);
@@ -242,9 +243,12 @@ function MiEquipo() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4, minHeight: "100vh" }}>
-      <Typography variant="h4" gutterBottom textAlign="center" color="primary">
-        👥 Mi Equipo
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" color="primary">
+          👥 Mi Equipo
+        </Typography>
+        <UserMenu />
+      </Box>
 
       {currentUserRol === "admin" && (
         <Box display="flex" justifyContent="flex-end" mb={2}>

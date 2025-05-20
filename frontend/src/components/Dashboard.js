@@ -76,7 +76,7 @@ function Dashboard() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
-      {/* ✅ Menú de usuario en parte superior derecha */}
+      
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <UserMenu />
       </Box>
@@ -100,7 +100,7 @@ function Dashboard() {
           flexWrap: "wrap",
         }}
       >
-        {/* PieChart de Consumo */}
+        
         <Paper
           elevation={3}
           sx={{
@@ -159,7 +159,7 @@ function Dashboard() {
           </Box>
         </Paper>
 
-        {/* BarChart de uso por usuario */}
+        
         <Paper
           elevation={3}
           sx={{

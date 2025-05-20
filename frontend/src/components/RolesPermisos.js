@@ -20,6 +20,7 @@ import {
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import API_BASE_URL from "../apiConfig";
+import UserMenu from "../components/UserMenu";
 
 function RolesPermisos() {
   const [permisos, setPermisos] = useState([]);
@@ -61,9 +62,12 @@ function RolesPermisos() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom textAlign="center" color="primary">
-        🔐 Roles y Permisos
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" color="primary">
+          🔐 Roles y Permisos
+        </Typography>
+        <UserMenu />
+      </Box>
 
       {isMobile ? (
         <Stack spacing={2} mt={2}>
