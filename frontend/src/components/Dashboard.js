@@ -76,21 +76,25 @@ function Dashboard() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
-      {/* Icono de usuario alineado a la derecha */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1, pr: 2 }}>
+      
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+          px: 2,
+        }}
+      >
+        <Typography
+          variant={esMovil ? "h5" : "h4"}
+          fontWeight="bold"
+          color="primary"
+        >
+          📊 Consumo de CVs Transformados
+        </Typography>
         <UserMenu />
       </Box>
-
-      {/* Título centrado */}
-      <Typography
-        variant={esMovil ? "h5" : "h4"}
-        fontWeight="bold"
-        color="primary"
-        gutterBottom
-        align="center"
-      >
-        📊 Consumo de CVs Transformados
-      </Typography>
 
       <Box
         sx={{
