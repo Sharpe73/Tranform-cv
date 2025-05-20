@@ -24,6 +24,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import API_BASE_URL from "../apiConfig";
+import UserMenu from "./UserMenu"; 
 
 const COLORS = ["#1976d2", "#ffb74d"];
 const ROLE_COLORS = {
@@ -45,13 +46,11 @@ function Dashboard() {
       .then((data) => setConsumoMaximo(data?.limite))
       .catch((error) => console.error("❌ Error al obtener límite:", error));
 
-    
     fetch(`${API_BASE_URL}/cv/consumo`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => setConsumo(data?.total || 0))
       .catch((error) => console.error("❌ Error al obtener consumo:", error));
 
-    
     fetch(`${API_BASE_URL}/cv/por-usuario`, { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
@@ -77,6 +76,11 @@ function Dashboard() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 3, pb: 6 }}>
+      {/* ✅ Menú de usuario en parte superior derecha */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <UserMenu />
+      </Box>
+
       <Typography
         variant={esMovil ? "h5" : "h4"}
         fontWeight="bold"
