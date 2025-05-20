@@ -28,6 +28,7 @@ function App() {
   const [usuario, setUsuario] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [requiereCambioClave, setRequiereCambioClave] = useState(false);
 
   useEffect(() => {
     const validarToken = async () => {
@@ -39,7 +40,9 @@ function App() {
           if (decoded.exp && decoded.exp > now) {
             const usuarioGuardado = localStorage.getItem("usuario");
             if (usuarioGuardado) {
-              setUsuario(JSON.parse(usuarioGuardado));
+              const parsed = JSON.parse(usuarioGuardado);
+              setUsuario(parsed);
+              setRequiereCambioClave(parsed.requiereCambioClave === true);
               setIsAuthenticated(true);
             } else {
               setIsAuthenticated(false);
@@ -96,6 +99,12 @@ function App() {
     );
   };
 
+  const RutaProtegida = ({ children }) => {
+    if (!isAuthenticated) return <Navigate to="/login" />;
+    if (requiereCambioClave) return <Navigate to="/cambiar-clave" />;
+    return children;
+  };
+
   if (loading) {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Cargando aplicación...</div>;
   }
@@ -103,7 +112,6 @@ function App() {
   const rol = usuario?.rol;
   const esAdmin = rol === "admin";
   const esGerente = rol === "gerente de proyecto";
-  const esUsuario = rol === "usuario";
 
   return (
     <ThemeProvider theme={theme}>
@@ -113,25 +121,41 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={isAuthenticated && esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
+              element={
+                <RutaProtegida>
+                  {esAdmin ? <Config config={config} setConfig={setConfig} /> : <Navigate to="/login" />}
+                </RutaProtegida>
+              }
             />
             <Route
               path="/transform"
-              element={isAuthenticated ? <Transform config={config} /> : <Navigate to="/login" />}
+              element={
+                <RutaProtegida>
+                  <Transform config={config} />
+                </RutaProtegida>
+              }
             />
             <Route
               path="/dashboard"
-              element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+              element={
+                <RutaProtegida>
+                  <Dashboard />
+                </RutaProtegida>
+              }
             />
             <Route
               path="/procesados"
-              element={(esAdmin || esGerente) && isAuthenticated ? <ProcessedCVs /> : <Navigate to="/login" />}
+              element={
+                <RutaProtegida>
+                  {(esAdmin || esGerente) ? <ProcessedCVs /> : <Navigate to="/login" />}
+                </RutaProtegida>
+              }
             />
             {esAdmin && (
               <>
-                <Route path="/ajustes/organizacion" element={<Config config={config} setConfig={setConfig} />} />
-                <Route path="/ajustes/equipo" element={<MiEquipo />} />
-                <Route path="/ajustes/roles-permisos" element={<RolesPermisos />} />
+                <Route path="/ajustes/organizacion" element={<RutaProtegida><Config config={config} setConfig={setConfig} /></RutaProtegida>} />
+                <Route path="/ajustes/equipo" element={<RutaProtegida><MiEquipo /></RutaProtegida>} />
+                <Route path="/ajustes/roles-permisos" element={<RutaProtegida><RolesPermisos /></RutaProtegida>} />
               </>
             )}
             <Route path="/login" element={<Login />} />

@@ -13,6 +13,7 @@ import {
   AppBar,
   Toolbar,
   useMediaQuery,
+  Tooltip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -32,17 +33,22 @@ function Sidebar() {
   const navigate = useNavigate();
   const [rolUsuario, setRolUsuario] = useState("");
   const [usuarioNombre, setUsuarioNombre] = useState("");
+  const [requiereCambioClave, setRequiereCambioClave] = useState(false);
   const [openAjustes, setOpenAjustes] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:600px)");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
+    const storedUser = localStorage.getItem("usuario");
+
+    if (token && storedUser) {
       try {
         const decoded = jwtDecode(token);
+        const usuario = JSON.parse(storedUser);
         setUsuarioNombre(`${decoded.nombre} ${decoded.apellido}`);
         setRolUsuario(decoded.rol);
+        setRequiereCambioClave(usuario.requiereCambioClave === true);
       } catch (error) {
         console.error("❌ Error al decodificar token:", error.message);
       }
@@ -50,12 +56,23 @@ function Sidebar() {
   }, []);
 
   const handleNavigate = (path) => {
-    navigate(path);
-    if (isMobile) setMobileOpen(false);
+    if (!requiereCambioClave) {
+      navigate(path);
+      if (isMobile) setMobileOpen(false);
+    }
   };
 
   const esAdmin = rolUsuario === "admin";
   const esGerente = rolUsuario === "gerente de proyecto";
+
+  const disabledItem = (text, icon) => (
+    <Tooltip title="Debe cambiar su contraseña" placement="right">
+      <ListItem button disabled>
+        <ListItemIcon sx={{ color: "#ccc" }}>{icon}</ListItemIcon>
+        <ListItemText primary={text} sx={{ color: "#ccc" }} />
+      </ListItem>
+    </Tooltip>
+  );
 
   const contenidoSidebar = (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
@@ -72,41 +89,53 @@ function Sidebar() {
         )}
 
         <List>
-          <ListItem button onClick={() => handleNavigate("/dashboard")}>
-            <ListItemIcon><BarChartIcon /></ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItem>
+          {requiereCambioClave
+            ? disabledItem("Dashboard", <BarChartIcon />)
+            : (
+              <ListItem button onClick={() => handleNavigate("/dashboard")}>
+                <ListItemIcon><BarChartIcon /></ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
+            )}
 
-          <ListItem button onClick={() => handleNavigate("/transform")}>
-            <ListItemIcon><DescriptionIcon /></ListItemIcon>
-            <ListItemText primary="Transformar Documento" />
-          </ListItem>
+          {requiereCambioClave
+            ? disabledItem("Transformar Documento", <DescriptionIcon />)
+            : (
+              <ListItem button onClick={() => handleNavigate("/transform")}>
+                <ListItemIcon><DescriptionIcon /></ListItemIcon>
+                <ListItemText primary="Transformar Documento" />
+              </ListItem>
+            )}
 
           {(esAdmin || esGerente) && (
-            <ListItem button onClick={() => handleNavigate("/procesados")}>
-              <ListItemIcon><AssignmentIcon /></ListItemIcon>
-              <ListItemText primary="CVs Procesados" />
-            </ListItem>
+            requiereCambioClave
+              ? disabledItem("CVs Procesados", <AssignmentIcon />)
+              : (
+                <ListItem button onClick={() => handleNavigate("/procesados")}>
+                  <ListItemIcon><AssignmentIcon /></ListItemIcon>
+                  <ListItemText primary="CVs Procesados" />
+                </ListItem>
+              )
           )}
 
           {esAdmin && (
             <>
-              <ListItem button onClick={() => setOpenAjustes(!openAjustes)}>
+              <ListItem button onClick={() => setOpenAjustes(!openAjustes)} disabled={requiereCambioClave}>
                 <ListItemIcon><SettingsIcon /></ListItemIcon>
                 <ListItemText primary="Ajustes" />
                 {openAjustes ? <ExpandLess /> : <ExpandMore />}
               </ListItem>
               <Collapse in={openAjustes} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                  <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/organizacion")}>
+                  <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/organizacion")} disabled={requiereCambioClave}>
                     <ListItemIcon><BusinessIcon /></ListItemIcon>
                     <ListItemText primary="Mi Organización" />
                   </ListItem>
-                  <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/equipo")}>
+                  <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/equipo")} disabled={requiereCambioClave}>
                     <ListItemIcon><GroupIcon /></ListItemIcon>
                     <ListItemText primary="Mi Equipo" />
                   </ListItem>
-                  <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/roles-permisos")}>
+                  <ListItem button sx={{ pl: 4 }} onClick={() => handleNavigate("/ajustes/roles-permisos")} disabled={requiereCambioClave}>
                     <ListItemIcon><SecurityIcon /></ListItemIcon>
                     <ListItemText primary="Roles y Permisos" />
                   </ListItem>
