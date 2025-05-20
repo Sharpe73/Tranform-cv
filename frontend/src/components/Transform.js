@@ -140,7 +140,8 @@ function Transform() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="flex-end" alignItems="center" sx={{ mb: -4, mt: -2, mr: -2 }}>
+      {/* UserMenu bien alineado, fuera del Paper */}
+      <Box display="flex" justifyContent="flex-end" sx={{ mb: 2 }}>
         <UserMenu />
       </Box>
 
@@ -149,8 +150,8 @@ function Transform() {
           variant="h4"
           color="primary"
           gutterBottom
-          align="center"
           fontWeight="bold"
+          sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
         >
           🖹 Transformar Documento
         </Typography>
