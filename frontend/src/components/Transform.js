@@ -40,9 +40,7 @@ function Transform() {
         });
         if (res.data?.total >= 5) {
           setBloqueado(true);
-          setMessage(
-            "❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs."
-          );
+          setMessage("❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs.");
         }
       } catch (error) {
         console.error("❌ Error al verificar consumo:", error);
@@ -141,15 +139,22 @@ function Transform() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ pt: 3, pb: 6, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} sx={{ mt: -1, mr: -2 }}>
-        <Typography variant="h4" color="primary" fontWeight="bold">
-          🖹 Transformar Documento
-        </Typography>
+    <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
+      <Box display="flex" justifyContent="flex-end" alignItems="center" sx={{ mb: -4, mt: -2, mr: -2 }}>
         <UserMenu />
       </Box>
 
       <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
+        <Typography
+          variant="h4"
+          color="primary"
+          gutterBottom
+          align="center"
+          fontWeight="bold"
+        >
+          🖹 Transformar Documento
+        </Typography>
+
         <UploadSection
           file={file}
           handleFileChange={handleFileChange}
