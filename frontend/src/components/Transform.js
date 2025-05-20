@@ -140,21 +140,19 @@ function Transform() {
 
   return (
     <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
-      {/* UserMenu arriba a la derecha con margen extra */}
-      <Box display="flex" justifyContent="flex-end" sx={{ mb: 2, pr: 4 }}>
-        <UserMenu />
-      </Box>
-
       <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          fontWeight="bold"
-          sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-        >
-          🖹 Transformar Documento
-        </Typography>
+        {/* Encabezado alineado como el mockup */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <Typography
+            variant="h4"
+            color="primary"
+            fontWeight="bold"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            🖹 Transformar Documento
+          </Typography>
+          <UserMenu />
+        </Box>
 
         <UploadSection
           file={file}
