@@ -85,174 +85,176 @@ function Config({ setConfig }) {
         pt: 4,
         pb: 6,
         minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
+        px: 2,
         backgroundColor: "#f9fafc",
       }}
     >
-      <Paper
-        elevation={4}
-        sx={{
-          width: "100%",
-          maxWidth: 720,
-          p: { xs: 3, md: 5 },
-          borderRadius: 4,
-          backgroundColor: "#fff",
-        }}
-      >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <UserMenu />
+      </Box>
+
+      <Box display="flex" justifyContent="center">
+        <Paper
+          elevation={4}
+          sx={{
+            width: "100%",
+            maxWidth: 720,
+            p: { xs: 3, md: 5 },
+            borderRadius: 4,
+            backgroundColor: "#fff",
+          }}
+        >
           <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
             📄 Configuración del PDF
           </Typography>
-          <UserMenu />
-        </Box>
 
-        <TextField
-          label="Nombre de la Organización"
-          fullWidth
-          value={organizationName}
-          onChange={(e) => setOrganizationName(e.target.value)}
-          sx={{ mt: 2 }}
-        />
+          <TextField
+            label="Nombre de la Organización"
+            fullWidth
+            value={organizationName}
+            onChange={(e) => setOrganizationName(e.target.value)}
+            sx={{ mt: 2 }}
+          />
 
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h6" gutterBottom>
-            🖼️ Logo
-          </Typography>
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-            archivo <strong>PNG</strong> o <strong>SVG</strong>
-          </Typography>
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              🖼️ Logo
+            </Typography>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+              archivo <strong>PNG</strong> o <strong>SVG</strong>
+            </Typography>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              alignItems: "center",
-              gap: 2,
-              border: "1px solid #ccc",
-              p: 2,
-              borderRadius: 2,
-            }}
-          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: "center",
+                gap: 2,
+                border: "1px solid #ccc",
+                p: 2,
+                borderRadius: 2,
+              }}
+            >
+              <Button
+                variant="contained"
+                component="label"
+                color="primary"
+                startIcon={<PhotoCamera />}
+              >
+                Subir Logo
+                <input type="file" hidden onChange={handleLogoChange} />
+              </Button>
+              <Typography variant="body2" noWrap>
+                {logoFileName}
+              </Typography>
+              {logoBase64 && (
+                <IconButton color="error" size="small" onClick={handleLogoDelete}>
+                  <Close />
+                </IconButton>
+              )}
+            </Box>
+          </Box>
+
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              🔤 Fuentes y Colores
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                gap: 2,
+              }}
+            >
+              <FormControl fullWidth>
+                <InputLabel>Fuente del Encabezado</InputLabel>
+                <Select
+                  value={fontHeader}
+                  label="Fuente del Encabezado"
+                  onChange={(e) => setFontHeader(e.target.value)}
+                >
+                  <MenuItem value="Helvetica">Helvetica</MenuItem>
+                  <MenuItem value="Courier">Courier</MenuItem>
+                  <MenuItem value="Times New Roman">Times New Roman</MenuItem>
+                </Select>
+              </FormControl>
+
+              <TextField
+                label="Color del Encabezado"
+                type="color"
+                value={colorHeader}
+                onChange={(e) => setColorHeader(e.target.value)}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                gap: 2,
+                mt: 2,
+              }}
+            >
+              <FormControl fullWidth>
+                <InputLabel>Fuente del Párrafo</InputLabel>
+                <Select
+                  value={fontParagraph}
+                  label="Fuente del Párrafo"
+                  onChange={(e) => setFontParagraph(e.target.value)}
+                >
+                  <MenuItem value="Helvetica">Helvetica</MenuItem>
+                  <MenuItem value="Courier">Courier</MenuItem>
+                  <MenuItem value="Times New Roman">Times New Roman</MenuItem>
+                </Select>
+              </FormControl>
+
+              <TextField
+                label="Color del Párrafo"
+                type="color"
+                value={colorParagraph}
+                onChange={(e) => setColorParagraph(e.target.value)}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+            </Box>
+          </Box>
+
+          <TextField
+            fullWidth
+            label="Tamaño de letra"
+            type="number"
+            value={fontSize}
+            onChange={(e) => setFontSize(e.target.value)}
+            sx={{ mt: 3 }}
+          />
+
+          <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
             <Button
               variant="contained"
-              component="label"
-              color="primary"
-              startIcon={<PhotoCamera />}
+              color="success"
+              onClick={handleSave}
+              startIcon={<CloudUpload />}
+              sx={{ px: 4 }}
             >
-              Subir Logo
-              <input type="file" hidden onChange={handleLogoChange} />
+              Guardar Cambios
             </Button>
-            <Typography variant="body2" noWrap>
-              {logoFileName}
-            </Typography>
-            {logoBase64 && (
-              <IconButton color="error" size="small" onClick={handleLogoDelete}>
-                <Close />
-              </IconButton>
-            )}
-          </Box>
-        </Box>
-
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>
-            🔤 Fuentes y Colores
-          </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: 2,
-            }}
-          >
-            <FormControl fullWidth>
-              <InputLabel>Fuente del Encabezado</InputLabel>
-              <Select
-                value={fontHeader}
-                label="Fuente del Encabezado"
-                onChange={(e) => setFontHeader(e.target.value)}
-              >
-                <MenuItem value="Helvetica">Helvetica</MenuItem>
-                <MenuItem value="Courier">Courier</MenuItem>
-                <MenuItem value="Times New Roman">Times New Roman</MenuItem>
-              </Select>
-            </FormControl>
-
-            <TextField
-              label="Color del Encabezado"
-              type="color"
-              value={colorHeader}
-              onChange={(e) => setColorHeader(e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
           </Box>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "column" : "row",
-              gap: 2,
-              mt: 2,
-            }}
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           >
-            <FormControl fullWidth>
-              <InputLabel>Fuente del Párrafo</InputLabel>
-              <Select
-                value={fontParagraph}
-                label="Fuente del Párrafo"
-                onChange={(e) => setFontParagraph(e.target.value)}
-              >
-                <MenuItem value="Helvetica">Helvetica</MenuItem>
-                <MenuItem value="Courier">Courier</MenuItem>
-                <MenuItem value="Times New Roman">Times New Roman</MenuItem>
-              </Select>
-            </FormControl>
-
-            <TextField
-              label="Color del Párrafo"
-              type="color"
-              value={colorParagraph}
-              onChange={(e) => setColorParagraph(e.target.value)}
-              fullWidth
-              InputLabelProps={{ shrink: true }}
-            />
-          </Box>
-        </Box>
-
-        <TextField
-          fullWidth
-          label="Tamaño de letra"
-          type="number"
-          value={fontSize}
-          onChange={(e) => setFontSize(e.target.value)}
-          sx={{ mt: 3 }}
-        />
-
-        <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleSave}
-            startIcon={<CloudUpload />}
-            sx={{ px: 4 }}
-          >
-            Guardar Cambios
-          </Button>
-        </Box>
-
-        <Snackbar
-          open={snackbarOpen}
-          autoHideDuration={3000}
-          onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert severity="info" variant="filled" onClose={() => setSnackbarOpen(false)}>
-            🗑️ Logo eliminado correctamente
-          </Alert>
-        </Snackbar>
-      </Paper>
+            <Alert severity="info" variant="filled" onClose={() => setSnackbarOpen(false)}>
+              🗑️ Logo eliminado correctamente
+            </Alert>
+          </Snackbar>
+        </Paper>
+      </Box>
     </Box>
   );
 }

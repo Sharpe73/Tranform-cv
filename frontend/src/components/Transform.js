@@ -139,12 +139,12 @@ function Transform() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="flex-end" mb={2}>
+    <Container maxWidth="md" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
+      <Box display="flex" justifyContent="flex-end" mt={1} mr={1}>
         <UserMenu />
       </Box>
 
-      <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
+      <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4, mt: 2 }}>
         <Typography
           variant="h4"
           color="primary"
