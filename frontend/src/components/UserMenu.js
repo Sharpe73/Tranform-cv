@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import FaceIcon from "@mui/icons-material/Face";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 export default function UserMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -50,23 +51,31 @@ export default function UserMenu() {
 
   if (!usuario) return null;
 
-  
+  // Color por rol
   let iconColor = "#4caf50";
   if (usuario.rol === "admin") iconColor = "#1976d2";
   else if (usuario.rol === "gerente de proyecto") iconColor = "#9c27b0";
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", px: 2 }}>
+    <Box display="flex" alignItems="center" gap={1}>
       <Tooltip title="Opciones de usuario">
-        <IconButton onClick={handleOpen} size="small" sx={{ ml: 2 }}>
-          <Avatar sx={{ bgcolor: iconColor, width: 40, height: 40 }}>
+        <IconButton onClick={handleOpen} size="small">
+          <Avatar sx={{ bgcolor: iconColor, width: 48, height: 48 }}>
             <FaceIcon sx={{ color: "#fff", fontSize: 28 }} />
           </Avatar>
         </IconButton>
       </Tooltip>
-      <Typography variant="body1" sx={{ ml: 1, fontWeight: "bold" }}>
-        {usuario.nombre} {usuario.apellido}
-      </Typography>
+      <Box onClick={handleOpen} sx={{ cursor: "pointer" }}>
+        <Typography fontWeight="bold" variant="subtitle2">
+          {usuario.nombre} {usuario.apellido}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {usuario.email}
+        </Typography>
+      </Box>
+      <IconButton onClick={handleOpen}>
+        <ArrowDropDownIcon />
+      </IconButton>
 
       <Menu
         anchorEl={anchorEl}
@@ -75,7 +84,7 @@ export default function UserMenu() {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <MenuItem onClick={confirmarCerrarSesion}>Cerrar Sesión</MenuItem>
+        <MenuItem onClick={confirmarCerrarSesion}>Cerrar sesión</MenuItem>
       </Menu>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
@@ -86,7 +95,7 @@ export default function UserMenu() {
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
           <Button onClick={handleLogout} color="error" variant="contained">
-            Cerrar Sesión
+            Cerrar sesión
           </Button>
         </DialogActions>
       </Dialog>
