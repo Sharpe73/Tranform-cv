@@ -36,7 +36,7 @@ const Login = () => {
       const { token, usuario, requiereCambioClave } = response.data;
 
       localStorage.setItem("token", token);
-      localStorage.setItem("usuario", JSON.stringify(usuario));
+      localStorage.setItem("usuario", JSON.stringify({ ...usuario, requiereCambioClave }));
 
       setTimeout(() => {
         if (requiereCambioClave) {
