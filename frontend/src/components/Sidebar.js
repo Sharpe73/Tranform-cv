@@ -8,11 +8,6 @@ import {
   ListItemText,
   Typography,
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Collapse,
   IconButton,
   AppBar,
@@ -24,7 +19,6 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import LogoutIcon from "@mui/icons-material/Logout";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import GroupIcon from "@mui/icons-material/Group";
@@ -37,7 +31,6 @@ const drawerWidth = 250;
 function Sidebar() {
   const navigate = useNavigate();
   const [rolUsuario, setRolUsuario] = useState("");
-  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [usuarioNombre, setUsuarioNombre] = useState("");
   const [openAjustes, setOpenAjustes] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -61,13 +54,6 @@ function Sidebar() {
     if (isMobile) setMobileOpen(false);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    navigate("/login");
-  };
-
-  const hayUsuario = !!localStorage.getItem("token");
   const esAdmin = rolUsuario === "admin";
   const esGerente = rolUsuario === "gerente de proyecto";
 
@@ -128,13 +114,6 @@ function Sidebar() {
               </Collapse>
             </>
           )}
-
-          {hayUsuario && (
-            <ListItem button onClick={() => setOpenLogoutDialog(true)}>
-              <ListItemIcon><LogoutIcon /></ListItemIcon>
-              <ListItemText primary="Cerrar Sesión" />
-            </ListItem>
-          )}
         </List>
       </Box>
     </Box>
@@ -189,19 +168,6 @@ function Sidebar() {
           </Drawer>
         )}
       </Box>
-
-      <Dialog open={openLogoutDialog} onClose={() => setOpenLogoutDialog(false)}>
-        <DialogTitle>¿Cerrar sesión?</DialogTitle>
-        <DialogContent>
-          <Typography>¿Estás seguro de que deseas cerrar tu sesión?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenLogoutDialog(false)}>Cancelar</Button>
-          <Button onClick={handleLogout} variant="contained" color="error">
-            Cerrar Sesión
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 }
