@@ -21,7 +21,6 @@ async function login(req, res) {
     const passwordValida = await bcrypt.compare(password, user.password);
     if (!passwordValida) return res.status(401).json({ error: "Contraseña incorrecta" });
 
-    
     const token = jwt.sign(
       {
         id: user.id,
@@ -29,6 +28,7 @@ async function login(req, res) {
         apellido: user.apellido,
         email: user.email,
         rol: user.rol,
+        requiereCambioClave: user.requiere_cambio_clave === true,
       },
       process.env.JWT_SECRET,
       {
@@ -36,7 +36,6 @@ async function login(req, res) {
       }
     );
 
-    
     res.json({
       token,
       requiereCambioClave: user.requiere_cambio_clave === true,
