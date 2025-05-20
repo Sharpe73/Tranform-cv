@@ -40,7 +40,9 @@ function Transform() {
         });
         if (res.data?.total >= 5) {
           setBloqueado(true);
-          setMessage("❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs.");
+          setMessage(
+            "❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs."
+          );
         }
       } catch (error) {
         console.error("❌ Error al verificar consumo:", error);
@@ -114,13 +116,19 @@ function Transform() {
         setBloqueado(true);
         setMessage(error.response.data?.message || "❌ Límite mensual alcanzado.");
       } else if (error.response?.status === 404) {
-        setMessage("⚠️ Este archivo no contiene texto reconocible. Intentando OCR con IA...");
+        setMessage(
+          "⚠️ Este archivo no contiene texto reconocible. Intentando OCR con IA..."
+        );
 
         try {
           const imageBase64 = await convertirPrimeraPaginaAPNG(file);
-          const ocrResponse = await axios.post(`${API_BASE_URL}/ocr`, { imageBase64 });
+          const ocrResponse = await axios.post(`${API_BASE_URL}/ocr`, {
+            imageBase64,
+          });
           console.log("✅ OCR con IA resultó en:", ocrResponse.data);
-          setMessage("✅ Texto extraído correctamente con IA. PDF generado desde el backend.");
+          setMessage(
+            "✅ Texto extraído correctamente con IA. PDF generado desde el backend."
+          );
           if (ocrResponse.data?.pdfPath) {
             setPdfLink(`${API_BASE_URL}${ocrResponse.data.pdfPath}`);
           }
@@ -139,22 +147,20 @@ function Transform() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="flex-end" mt={1} mr={1}>
+    <Container maxWidth="md" sx={{ pt: 3, pb: 6, minHeight: "100vh" }}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        <Typography variant="h4" color="primary" fontWeight="bold">
+          🖹 Transformar Documento
+        </Typography>
         <UserMenu />
       </Box>
 
-      <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4, mt: 2 }}>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          align="center"
-          fontWeight="bold"
-        >
-          🖹 Transformar Documento
-        </Typography>
-
+      <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
         <UploadSection
           file={file}
           handleFileChange={handleFileChange}
