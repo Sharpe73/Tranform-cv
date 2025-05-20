@@ -141,7 +141,7 @@ function Transform() {
   return (
     <Container maxWidth="md" sx={{ pt: 4, pb: 6, minHeight: "100vh" }}>
       <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
-        {/* Encabezado alineado como el mockup */}
+        {/* Alineación perfecta entre título y UserMenu */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography
             variant="h4"
@@ -151,7 +151,9 @@ function Transform() {
           >
             🖹 Transformar Documento
           </Typography>
-          <UserMenu />
+          <Box sx={{ mr: 1 }}>
+            <UserMenu />
+          </Box>
         </Box>
 
         <UploadSection
