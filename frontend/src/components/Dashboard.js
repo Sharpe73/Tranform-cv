@@ -89,7 +89,7 @@ function Dashboard() {
         <Typography
           variant={esMovil ? "h5" : "h4"}
           fontWeight="bold"
-          color="primary"
+          color="text.primary"
         >
           📊 Consumo de CVs Transformados
         </Typography>
