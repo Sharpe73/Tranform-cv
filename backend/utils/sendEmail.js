@@ -41,4 +41,4 @@ async function sendInvitationEmail(destinatario, nombre, claveTemporal) {
   }
 }
 
-module.exports = { sendInvitationEmail };//
+module.exports = { sendInvitationEmail };
