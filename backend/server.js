@@ -80,24 +80,24 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     const timestamp = new Date().toISOString();
 
     const result = await db.query(
-      `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id)
-       SELECT $1, $2, $3, $4, $5
-       WHERE (
-         SELECT COUNT(*) FROM cv_files 
-         WHERE created_at >= $6 AND created_at < $7
-       ) < $8
-       RETURNING id`,
-      [
-        jsonData,
-        pdfUrl,
-        pdfBuffer,
-        timestamp,
-        req.user.id,
-        inicioMes.toISOString(),
-        finMes.toISOString(),
-        LIMITE_MENSUAL
-      ]
-    );
+  `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id)
+   SELECT $1, $2, $3, $4, $5
+   WHERE (
+     SELECT COUNT(*) FROM cv_files 
+     WHERE created_at::timestamp >= $6 AND created_at::timestamp < $7
+   ) < $8
+   RETURNING id`,
+  [
+    jsonData,
+    pdfUrl,
+    pdfBuffer,
+    timestamp,
+    req.user.id,
+    inicioMes.toISOString(),
+    finMes.toISOString(),
+    LIMITE_MENSUAL
+  ]
+);
 
     if (result.rowCount === 0) {
       return res.status(403).json({
