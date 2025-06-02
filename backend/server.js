@@ -79,32 +79,27 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     const pdfBuffer = fs.readFileSync(pdfPath);
     const timestamp = new Date().toISOString();
 
-    console.log("🧪 INSERT chequeando límite con created_at::timestamp ✅");
-    const result = await db.query(
-  `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id)
-   SELECT $1, $2, $3, $4, $5
-   WHERE (
-     SELECT COUNT(*) FROM cv_files 
-     WHERE created_at::timestamp >= $6 AND created_at::timestamp < $7
-   ) < $8
-   RETURNING id`,
-  [
-    jsonData,
-    pdfUrl,
-    pdfBuffer,
-    timestamp,
-    req.user.id,
-    inicioMes.toISOString(),
-    finMes.toISOString(),
-    LIMITE_MENSUAL
-  ]
-);
+    const consumoActual = await db.query(
+      `SELECT COUNT(*) FROM cv_files 
+       WHERE created_at::timestamp >= $1 AND created_at::timestamp < $2`,
+      [inicioMes.toISOString(), finMes.toISOString()]
+    );
 
-    if (result.rowCount === 0) {
+    const totalMes = parseInt(consumoActual.rows[0].count, 10);
+    console.log(`📊 Consumo actual: ${totalMes} de ${LIMITE_MENSUAL}`);
+
+    if (totalMes >= LIMITE_MENSUAL) {
       return res.status(403).json({
         message: `❌ Has alcanzado el límite mensual global de ${LIMITE_MENSUAL} CVs procesados.`,
       });
     }
+
+    const result = await db.query(
+      `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id`,
+      [jsonData, pdfUrl, pdfBuffer, timestamp, req.user.id]
+    );
 
     console.log("✅ Datos guardados en la base de datos.");
     res.json({ message: "Archivo procesado con éxito.", pdfPath: pdfUrl });
@@ -114,6 +109,7 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     res.status(status).json({ message: error.message || "Error al procesar el archivo." });
   }
 });
+
 
 app.get("/styles", (req, res) => {
   const estilosPath = path.join(__dirname, "plantillas.json");
