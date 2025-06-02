@@ -79,6 +79,7 @@ app.post("/upload", verifyToken, upload.fields([{ name: "file" }, { name: "logo"
     const pdfBuffer = fs.readFileSync(pdfPath);
     const timestamp = new Date().toISOString();
 
+    console.log("🧪 INSERT chequeando límite con created_at::timestamp ✅");
     const result = await db.query(
   `INSERT INTO cv_files (json_data, pdf_url, pdf_data, created_at, usuario_id)
    SELECT $1, $2, $3, $4, $5
