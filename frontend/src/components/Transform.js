@@ -23,6 +23,7 @@ function Transform() {
   const [config, setConfig] = useState({});
   const [showConfig, setShowConfig] = useState(false);
   const [bloqueado, setBloqueado] = useState(false);
+  const [limiteMensual, setLimiteMensual] = useState(null);
 
   useEffect(() => {
     const savedConfig = JSON.parse(localStorage.getItem("cvConfig"));
@@ -33,12 +34,21 @@ function Transform() {
     const verificarBloqueo = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_BASE_URL}/cv/consumo`, {
+
+        const limiteRes = await axios.get(`${API_BASE_URL}/cv/limite`);
+        const consumoRes = await axios.get(`${API_BASE_URL}/cv/consumo`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (res.data?.total >= 5) {
+
+        const limite = limiteRes.data?.limite;
+        const total = consumoRes.data?.total;
+
+        setLimiteMensual(limite);
+        console.log("🔁 consumo:", total, "limite:", limite);
+
+        if (total >= limite) {
           setBloqueado(true);
           setMessage("❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs.");
         }
@@ -107,6 +117,20 @@ function Transform() {
       if (response.data?.pdfPath) {
         setPdfLink(`${API_BASE_URL}/${response.data.pdfPath}`);
       }
+
+      
+      const consumoRes = await axios.get(`${API_BASE_URL}/cv/consumo`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const nuevoTotal = consumoRes.data?.total;
+      if (limiteMensual !== null && nuevoTotal >= limiteMensual) {
+        setBloqueado(true);
+        setMessage("❌ Has alcanzado el límite mensual. Debes esperar hasta el próximo mes para seguir transformando CVs.");
+      }
+
     } catch (error) {
       console.error("❌ Error al procesar el archivo:", error);
 
