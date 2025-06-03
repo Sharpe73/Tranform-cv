@@ -9,6 +9,7 @@ import MiEquipo from "./components/MiEquipo";
 import RolesPermisos from "./components/RolesPermisos";
 import Login from "./components/Login";
 import CambiarClave from "./components/TemporalClave";
+import OlvidarContrasena from "./components/OlvidarContrasena"; // ✅ NUEVA IMPORTACIÓN
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ThemeProvider, useMediaQuery } from "@mui/material";
@@ -159,6 +160,7 @@ function App() {
               </>
             )}
             <Route path="/login" element={<Login />} />
+            <Route path="/olvide-contrasena" element={<OlvidarContrasena />} />
             <Route path="/cambiar-clave" element={<CambiarClave token={localStorage.getItem("token")} />} />
             <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
           </Routes>

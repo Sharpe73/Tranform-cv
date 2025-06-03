@@ -139,6 +139,15 @@ const Login = () => {
             {loading ? "Cargando..." : "Ingresar"}
           </Button>
         </form>
+
+        
+        <Typography
+          variant="body2"
+          sx={{ mt: 2, cursor: "pointer", color: "#1976d2" }}
+          onClick={() => navigate("/olvidar-contrasena")}
+        >
+          ¿Olvidaste tu contraseña?
+        </Typography>
       </Paper>
     </Box>
   );
