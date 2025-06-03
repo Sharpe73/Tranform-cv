@@ -13,11 +13,13 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import axios from "axios";
 import API_BASE_URL from "../apiConfig";
+import { useNavigate } from "react-router-dom";
 
 const OlvidarContrasena = () => {
   const [email, setEmail] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,6 +29,11 @@ const OlvidarContrasena = () => {
     try {
       const response = await axios.post(`${API_BASE_URL}/auth/olvide-clave`, { email });
       setMensaje(response.data.message || "Revisa tu correo para una nueva contraseña temporal.");
+
+      
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
     } catch (err) {
       if (err.response?.status === 404) {
         setError("El correo ingresado no está registrado.");
