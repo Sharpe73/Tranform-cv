@@ -30,15 +30,20 @@ const OlvidarContrasena = () => {
       const response = await axios.post(`${API_BASE_URL}/auth/olvide-clave`, { email });
       setMensaje(response.data.message || "Revisa tu correo para una nueva contraseña temporal.");
 
-      
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (err) {
       if (err.response?.status === 404) {
         setError("El correo ingresado no está registrado.");
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       } else {
         setError(err.response?.data?.message || "Hubo un error al enviar la solicitud.");
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       }
     }
   };
