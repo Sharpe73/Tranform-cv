@@ -4,6 +4,7 @@ const db = require("../database");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const verifyToken = require("../middleware/verifyToken");
+const { sendInvitationEmail, sendPasswordRecoveryEmail } = require("../utils/sendEmail"); // ✅ Corrección aquí
 
 
 router.post("/login", async (req, res) => {
@@ -24,7 +25,6 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
 
-    
     const esValida = await bcrypt.compare(password, user.password);
 
     if (!esValida) {
@@ -80,6 +80,46 @@ router.post("/cambiar-clave", verifyToken, async (req, res) => {
   } catch (err) {
     console.error("❌ Error al cambiar clave:", err.message);
     res.status(500).json({ message: "Error interno al cambiar la contraseña." });
+  }
+});
+
+
+router.post("/olvide-clave", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ message: "Debes ingresar un correo." });
+  }
+
+  try {
+    const result = await db.query(
+      `SELECT id, nombre FROM usuarios WHERE email = $1`,
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Usuario o correo no encontrado." });
+    }
+
+    const usuario = result.rows[0];
+
+    
+    const claveTemporal = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(claveTemporal, 10);
+
+    
+    await db.query(
+      `UPDATE usuarios SET password = $1, requiere_cambio_clave = true WHERE id = $2`,
+      [hashedPassword, usuario.id]
+    );
+
+    
+    await sendPasswordRecoveryEmail(email, usuario.nombre, claveTemporal);
+
+    res.json({ message: "Contraseña temporal enviada al correo registrado." });
+  } catch (error) {
+    console.error("❌ Error al recuperar clave:", error.message);
+    res.status(500).json({ message: "Error al procesar la solicitud." });
   }
 });
 
