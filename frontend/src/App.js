@@ -9,7 +9,7 @@ import MiEquipo from "./components/MiEquipo";
 import RolesPermisos from "./components/RolesPermisos";
 import Login from "./components/Login";
 import CambiarClave from "./components/TemporalClave";
-import OlvidarContrasena from "./components/OlvidarContrasena"; // ✅ NUEVA IMPORTACIÓN
+import OlvidarContrasena from "./components/OlvidarContrasena";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ThemeProvider, useMediaQuery } from "@mui/material";
@@ -78,12 +78,12 @@ function App() {
 
   const Layout = ({ children }) => {
     const location = useLocation();
-    const isLogin = location.pathname === "/login";
+    const isPublic = location.pathname === "/login" || location.pathname === "/olvide-contrasena";
     const isMobile = useMediaQuery("(max-width:600px)");
 
     return (
       <Box display="flex">
-        {!isLogin && <Sidebar />}
+        {!isPublic && <Sidebar />}
         <Box
           component="main"
           sx={{
