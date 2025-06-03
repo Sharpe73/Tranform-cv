@@ -14,7 +14,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import axios from "axios";
 import API_BASE_URL from "../apiConfig";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -140,13 +140,10 @@ const Login = () => {
           </Button>
         </form>
 
-        
-        <Typography
-          variant="body2"
-          sx={{ mt: 2, cursor: "pointer", color: "#1976d2" }}
-          onClick={() => navigate("/olvidar-contrasena")}
-        >
-          ¿Olvidaste tu contraseña?
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          <Link to="/olvide-contrasena" style={{ textDecoration: "none", color: "#1976d2", fontWeight: "bold" }}>
+            ¿Olvidaste tu contraseña?
+          </Link>
         </Typography>
       </Paper>
     </Box>
