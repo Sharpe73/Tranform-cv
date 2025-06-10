@@ -359,17 +359,29 @@ function ProcessedCVs() {
         </Stack>
       ) : (
         <TableContainer component={Paper}>
-          <Table>
-            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableRow>
-                <TableCell><strong>🧑 Nombre</strong></TableCell>
-                <TableCell><strong>🗓️ Fecha</strong></TableCell>
-                <TableCell><strong>👤 Transformado por</strong></TableCell>
-                <TableCell><strong>📄 PDF / JSON</strong></TableCell>
-                {isAdmin && <TableCell><strong>Acciones</strong></TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
+                <Table>
+                  <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+                    <TableRow>
+                      <TableCell>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <PersonIcon fontSize="small" sx={{ color: "#1976d2" }} />
+                          <strong>Nombre</strong>
+                        </Box>
+                      </TableCell>
+                      <TableCell><strong>🗓️ Fecha</strong></TableCell>
+                      <TableCell><strong>👤 Transformado por</strong></TableCell>
+                      <TableCell><strong>📄 PDF / JSON</strong></TableCell>
+                      {isAdmin && (
+                        <TableCell>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <SettingsIcon fontSize="small" sx={{ color: "#616161" }} />
+                            <strong>Acciones</strong>
+                          </Box>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
               {paginatedCvs.map((cv) => {
                 const parsedJson = cv.json || {};
                 const nombreOriginal =
