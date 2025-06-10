@@ -34,6 +34,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { jwtDecode } from "jwt-decode";
 import API_BASE_URL from "../apiConfig";
 import UserMenu from "../components/UserMenu";
+import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 function capitalizarTexto(texto) {
   if (!texto || typeof texto !== "string") return "";
