@@ -118,7 +118,6 @@ function Transform() {
         setPdfLink(`${API_BASE_URL}/${response.data.pdfPath}`);
       }
 
-      
       const consumoRes = await axios.get(`${API_BASE_URL}/cv/consumo`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -164,38 +163,41 @@ function Transform() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={1} mt={1} px={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} mt={1} px={2}>
+        <ConfigCard
+          config={config}
+          showConfig={showConfig}
+          setShowConfig={setShowConfig}
+          inlineMode
+        />
         <UserMenu />
       </Box>
 
-      <Paper elevation={4} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4 }}>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          align="center"
-          fontWeight="bold"
-        >
-          🖹 Transformar Documento
-        </Typography>
+      <Typography
+        variant="h4"
+        color="primary"
+        gutterBottom
+        align="center"
+        fontWeight="bold"
+      >
+        🖹 Transformar Documento
+      </Typography>
 
+      <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, background: "transparent" }}>
         <UploadSection
           file={file}
           handleFileChange={handleFileChange}
           disabled={bloqueado}
         />
 
-        <ConfigCard
-          config={config}
-          showConfig={showConfig}
-          setShowConfig={setShowConfig}
-        />
-
-        <UploadActions
-          isUploading={isUploading}
-          handleUpload={handleUpload}
-          disabled={bloqueado}
-        />
+        <Box mt={2}>
+          <UploadActions
+            isUploading={isUploading}
+            handleUpload={handleUpload}
+            disabled={bloqueado}
+            variant="modern"
+          />
+        </Box>
 
         {message && <MessageDisplay message={message} />}
         {pdfLink && <DownloadLink pdfLink={pdfLink} />}
