@@ -295,37 +295,38 @@ function MiEquipo() {
           ))}
         </Stack>
       ) : (
-        <TableContainer component={Paper} sx={{ borderRadius: 4 }}>
+      
+      <TableContainer component={Paper} sx={{ borderRadius: 4 }}>
   <Table>
     <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
       <TableRow>
         <TableCell>
           <Box display="flex" alignItems="center" gap={1}>
-            <PersonIcon fontSize="small" />
+            <PersonIcon fontSize="small" sx={{ color: "#1976d2" }} />
             <strong>Nombre</strong>
           </Box>
         </TableCell>
         <TableCell>
           <Box display="flex" alignItems="center" gap={1}>
-            <EmailIcon fontSize="small" />
+            <EmailIcon fontSize="small" sx={{ color: "#d32f2f" }} />
             <strong>Correo</strong>
           </Box>
         </TableCell>
         <TableCell>
           <Box display="flex" alignItems="center" gap={1}>
-            <FolderIcon fontSize="small" />
+            <FolderIcon fontSize="small" sx={{ color: "#388e3c" }} />
             <strong>Proyecto</strong>
           </Box>
         </TableCell>
         <TableCell>
           <Box display="flex" alignItems="center" gap={1}>
-            <LockIcon fontSize="small" />
+            <LockIcon fontSize="small" sx={{ color: "#f57c00" }} />
             <strong>Acceso</strong>
           </Box>
         </TableCell>
         <TableCell>
           <Box display="flex" alignItems="center" gap={1}>
-            <SettingsIcon fontSize="small" />
+            <SettingsIcon fontSize="small" sx={{ color: "#616161" }} />
             <strong>Acciones</strong>
           </Box>
         </TableCell>
