@@ -5,6 +5,8 @@ import {
   Paper,
   Typography,
   Container,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import UploadSection from "./UploadSection";
 import ConfigCard from "./ConfigCard";
@@ -24,6 +26,9 @@ function Transform() {
   const [showConfig, setShowConfig] = useState(false);
   const [bloqueado, setBloqueado] = useState(false);
   const [limiteMensual, setLimiteMensual] = useState(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     const savedConfig = JSON.parse(localStorage.getItem("cvConfig"));
@@ -163,27 +168,45 @@ function Transform() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} mt={1} px={2}>
-        <ConfigCard
-          config={config}
-          showConfig={showConfig}
-          setShowConfig={setShowConfig}
-          inlineMode
-        />
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={1}
+        mt={1}
+        px={2}
+        flexWrap="wrap"
+        gap={1}
+      >
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography
+            variant="h6"
+            color="primary"
+            fontWeight="bold"
+          >
+            🖹 Transformar Documento
+          </Typography>
+          <ConfigCard
+            config={config}
+            showConfig={showConfig}
+            setShowConfig={setShowConfig}
+            inlineMode
+          />
+        </Box>
         <UserMenu />
       </Box>
 
-      <Typography
-        variant="h4"
-        color="primary"
-        gutterBottom
-        align="center"
-        fontWeight="bold"
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, md: 4 },
+          borderRadius: 4,
+          background: isMobile ? "transparent" : "#F8F9FC",
+          border: isMobile ? "none" : "1px solid #ddd",
+          maxWidth: 800,
+          mx: "auto",
+        }}
       >
-        🖹 Transformar Documento
-      </Typography>
-
-      <Paper elevation={0} sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, background: "transparent" }}>
         <UploadSection
           file={file}
           handleFileChange={handleFileChange}

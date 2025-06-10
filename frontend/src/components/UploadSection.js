@@ -2,13 +2,15 @@ import React, { useRef, useState } from "react";
 import {
   Box,
   Typography,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const UploadSection = ({ file, handleFileChange, disabled }) => {
   const inputRef = useRef(null);
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [dragOver, setDragOver] = useState(false);
 
   const handleClick = () => {
@@ -47,7 +49,7 @@ const UploadSection = ({ file, handleFileChange, disabled }) => {
       sx={{
         border: `2px dashed ${dragOver ? theme.palette.primary.main : "#ccc"}`,
         borderRadius: 4,
-        padding: 4,
+        padding: isMobile ? 3 : 5,
         textAlign: "center",
         cursor: disabled ? "not-allowed" : "pointer",
         backgroundColor: dragOver ? "#f0f0f0" : "transparent",
