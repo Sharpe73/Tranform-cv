@@ -30,6 +30,11 @@ import {
   FormHelperText,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import FolderIcon from "@mui/icons-material/Folder";
+import LockIcon from "@mui/icons-material/Lock";
+import SettingsIcon from "@mui/icons-material/Settings";
 import EditUserModal from "./EditUserModal";
 import API_BASE_URL from "../apiConfig";
 import UserMenu from "../components/UserMenu";
@@ -291,126 +296,151 @@ function MiEquipo() {
         </Stack>
       ) : (
         <TableContainer component={Paper} sx={{ borderRadius: 4 }}>
-          <Table>
-            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableRow>
-                <TableCell><strong>Nombre</strong></TableCell>
-                <TableCell><strong>Correo</strong></TableCell>
-                <TableCell><strong>Proyecto</strong></TableCell>
-                <TableCell><strong>Acceso</strong></TableCell>
-                <TableCell><strong>Acciones</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {usuarios.map((usuario) => (
-                <TableRow key={usuario.id}>
-                  <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
-                  <TableCell>{usuario.email || "-"}</TableCell>
-                  <TableCell>Todos los proyectos</TableCell>
-                  <TableCell>{mapearRol(usuario.rol, usuario.es_dueno)}</TableCell>
-                  <TableCell>
-                    {!usuario.es_dueno && usuario.id !== currentUserId && (
-                      <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
-                        <MoreVertIcon />
-                      </IconButton>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+  <Table>
+    <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+      <TableRow>
+        <TableCell>
+          <Box display="flex" alignItems="center" gap={1}>
+            <PersonIcon fontSize="small" />
+            <strong>Nombre</strong>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Box display="flex" alignItems="center" gap={1}>
+            <EmailIcon fontSize="small" />
+            <strong>Correo</strong>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Box display="flex" alignItems="center" gap={1}>
+            <FolderIcon fontSize="small" />
+            <strong>Proyecto</strong>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Box display="flex" alignItems="center" gap={1}>
+            <LockIcon fontSize="small" />
+            <strong>Acceso</strong>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Box display="flex" alignItems="center" gap={1}>
+            <SettingsIcon fontSize="small" />
+            <strong>Acciones</strong>
+          </Box>
+        </TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {usuarios.map((usuario) => (
+        <TableRow key={usuario.id}>
+          <TableCell>{usuario.nombre} {usuario.apellido}</TableCell>
+          <TableCell>{usuario.email || "-"}</TableCell>
+          <TableCell>Todos los proyectos</TableCell>
+          <TableCell>{mapearRol(usuario.rol, usuario.es_dueno)}</TableCell>
+          <TableCell>
+            {!usuario.es_dueno && usuario.id !== currentUserId && (
+              <IconButton onClick={(e) => handleMenuOpen(e, usuario)}>
+                <MoreVertIcon />
+              </IconButton>
+            )}
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
+)}
 
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={handleEditar}>Editar</MenuItem>
-        <MenuItem onClick={handleEliminar}>Eliminar</MenuItem>
-      </Menu>
+<Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+  <MenuItem onClick={handleEditar}>Editar</MenuItem>
+  <MenuItem onClick={handleEliminar}>Eliminar</MenuItem>
+</Menu>
 
-      <EditUserModal
-        open={openModal}
-        onClose={handleCloseModal}
-        usuario={usuarioSeleccionado}
-        onChange={handleChangeUsuario}
-        onSave={handleGuardarCambios}
-      />
+<EditUserModal
+  open={openModal}
+  onClose={handleCloseModal}
+  usuario={usuarioSeleccionado}
+  onChange={handleChangeUsuario}
+  onSave={handleGuardarCambios}
+/>
 
-      <Dialog open={openInvitar} onClose={() => setOpenInvitar(false)}>
-        <DialogTitle>Invitar a un nuevo miembro</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Nombre"
-            type="text"
-            fullWidth
-            name="nombre"
-            value={nuevoUsuario.nombre}
-            onChange={handleChangeNuevoUsuario}
-          />
-          <TextField
-            margin="dense"
-            label="Apellido"
-            type="text"
-            fullWidth
-            name="apellido"
-            value={nuevoUsuario.apellido}
-            onChange={handleChangeNuevoUsuario}
-          />
-          <TextField
-            margin="dense"
-            label="Correo"
-            type="email"
-            fullWidth
-            name="email"
-            value={nuevoUsuario.email}
-            onChange={handleChangeNuevoUsuario}
-            error={formatoCorreoInvalido}
-            helperText={formatoCorreoInvalido ? "Ingrese un correo válido (ej: usuario@dominio.cl)" : ""}
-          />
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel id="rol-label">Rol</InputLabel>
-            <Select
-              labelId="rol-label"
-              name="rol"
-              value={nuevoUsuario.rol}
-              label="Rol"
-              onChange={handleChangeNuevoUsuario}
-            >
-              <MenuItem value="admin">Administrador</MenuItem>
-              <MenuItem value="gerente de proyecto">Gerente de Proyecto</MenuItem>
-              <MenuItem value="user">Usuario</MenuItem>
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenInvitar(false)}>Cancelar</Button>
-          <Button
-            onClick={handleEnviarInvitacion}
-            variant="contained"
-            color="success"
-            disabled={!camposCompletos() || formatoCorreoInvalido}
-          >
-            Enviar Invitación
-          </Button>
-        </DialogActions>
-      </Dialog>
+<Dialog open={openInvitar} onClose={() => setOpenInvitar(false)}>
+  <DialogTitle>Invitar a un nuevo miembro</DialogTitle>
+  <DialogContent>
+    <TextField
+      autoFocus
+      margin="dense"
+      label="Nombre"
+      type="text"
+      fullWidth
+      name="nombre"
+      value={nuevoUsuario.nombre}
+      onChange={handleChangeNuevoUsuario}
+    />
+    <TextField
+      margin="dense"
+      label="Apellido"
+      type="text"
+      fullWidth
+      name="apellido"
+      value={nuevoUsuario.apellido}
+      onChange={handleChangeNuevoUsuario}
+    />
+    <TextField
+      margin="dense"
+      label="Correo"
+      type="email"
+      fullWidth
+      name="email"
+      value={nuevoUsuario.email}
+      onChange={handleChangeNuevoUsuario}
+      error={formatoCorreoInvalido}
+      helperText={formatoCorreoInvalido ? "Ingrese un correo válido (ej: usuario@dominio.cl)" : ""}
+/>
+    <FormControl fullWidth sx={{ mt: 2 }}>
+      <InputLabel id="rol-label">Rol</InputLabel>
+      <Select
+        labelId="rol-label"
+        name="rol"
+        value={nuevoUsuario.rol}
+        label="Rol"
+        onChange={handleChangeNuevoUsuario}
+      >
+        <MenuItem value="admin">Administrador</MenuItem>
+        <MenuItem value="gerente de proyecto">Gerente de Proyecto</MenuItem>
+        <MenuItem value="user">Usuario</MenuItem>
+      </Select>
+    </FormControl>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenInvitar(false)}>Cancelar</Button>
+    <Button
+      onClick={handleEnviarInvitacion}
+      variant="contained"
+      color="success"
+      disabled={!camposCompletos() || formatoCorreoInvalido}
+    >
+      Enviar Invitación
+    </Button>
+  </DialogActions>
+</Dialog>
 
-      <Dialog open={modalErrorOpen} onClose={() => setModalErrorOpen(false)}>
-        <DialogTitle>Correo ya registrado</DialogTitle>
-        <DialogContent>
-          <Typography>
-            ❌ El correo ingresado ya está registrado en la base de datos. Por favor, intente con otro.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalErrorOpen(false)} variant="contained" color="primary">
-            Aceptar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
-  );
+<Dialog open={modalErrorOpen} onClose={() => setModalErrorOpen(false)}>
+  <DialogTitle>Correo ya registrado</DialogTitle>
+  <DialogContent>
+    <Typography>
+      ❌ El correo ingresado ya está registrado en la base de datos. Por favor, intente con otro.
+    </Typography>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setModalErrorOpen(false)} variant="contained" color="primary">
+      Aceptar
+    </Button>
+  </DialogActions>
+</Dialog>
+</Container>
+);
 }
 
 export default MiEquipo;
