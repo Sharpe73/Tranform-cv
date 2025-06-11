@@ -204,7 +204,7 @@ function Transform() {
           />
         </Box>
 
-        <Box mt={3} display="flex" justifyContent="center">
+        <Box mt={5} display="flex" justifyContent="center">
           <ConfigCard
             config={config}
             showConfig={showConfig}
