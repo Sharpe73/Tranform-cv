@@ -19,6 +19,10 @@ import {
 } from "@mui/material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import DescriptionIcon from "@mui/icons-material/Description";
+import FolderIcon from "@mui/icons-material/Folder";
+import SettingsIcon from "@mui/icons-material/Settings";
 import API_BASE_URL from "../apiConfig";
 import UserMenu from "../components/UserMenu";
 
@@ -92,10 +96,30 @@ function RolesPermisos() {
               <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
                 <TableRow>
                   <TableCell><strong>Rol</strong></TableCell>
-                  <TableCell align="center"><strong>Dashboard</strong></TableCell>
-                  <TableCell align="center"><strong>CVs</strong></TableCell>
-                  <TableCell align="center"><strong>Repositorios</strong></TableCell>
-                  <TableCell align="center"><strong>Ajustes</strong></TableCell>
+                  <TableCell align="center">
+                    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                      <DashboardIcon color="primary" />
+                      <strong>Dashboard</strong>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                      <DescriptionIcon color="secondary" />
+                      <strong>CVs</strong>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                      <FolderIcon sx={{ color: "#6d4c41" }} />
+                      <strong>Repositorios</strong>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                      <SettingsIcon sx={{ color: "#455a64" }} />
+                      <strong>Ajustes</strong>
+                    </Box>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
