@@ -23,7 +23,7 @@ function ConfigCard({ config, showConfig, setShowConfig, inlineMode = false }) {
       sx={{
         display: "flex",
         alignItems: "center",
-        justifyContent: inlineMode ? "flex-start" : "space-between",
+        justifyContent: inlineMode ? "center" : "space-between",
         gap: 1,
         cursor: "pointer",
       }}
@@ -93,7 +93,7 @@ function ConfigCard({ config, showConfig, setShowConfig, inlineMode = false }) {
 
   if (inlineMode) {
     return (
-      <Box sx={{ ml: 2 }}>
+      <Box sx={{ textAlign: "center" }}>
         {renderHeader}
         {configContent}
       </Box>

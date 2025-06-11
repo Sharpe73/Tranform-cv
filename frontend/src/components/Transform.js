@@ -168,32 +168,14 @@ function Transform() {
 
   return (
     <Container maxWidth="xl" sx={{ pt: 2, pb: 6, minHeight: "100vh" }}>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={1}
-        mt={1}
-        px={2}
-        flexWrap="wrap"
-        gap={1}
-      >
-        <Box display="flex" alignItems="center" gap={2}>
-          <Typography
-            variant="h6"
-            color="primary"
-            fontWeight="bold"
-          >
-            🖹 Transformar Documento
-          </Typography>
-          <ConfigCard
-            config={config}
-            showConfig={showConfig}
-            setShowConfig={setShowConfig}
-            inlineMode
-          />
-        </Box>
+      <Box display="flex" justifyContent="flex-end" mb={1} px={2}>
         <UserMenu />
+      </Box>
+
+      <Box display="flex" justifyContent="center" alignItems="center" mb={3}>
+        <Typography variant="h5" color="primary" fontWeight="bold">
+          🖹 Transformar Documento
+        </Typography>
       </Box>
 
       <Paper
@@ -219,6 +201,15 @@ function Transform() {
             handleUpload={handleUpload}
             disabled={bloqueado}
             variant="modern"
+          />
+        </Box>
+
+        <Box mt={3} display="flex" justifyContent="center">
+          <ConfigCard
+            config={config}
+            showConfig={showConfig}
+            setShowConfig={setShowConfig}
+            inlineMode
           />
         </Box>
 
