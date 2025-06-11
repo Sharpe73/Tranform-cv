@@ -23,7 +23,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import DescriptionIcon from "@mui/icons-material/Description";
 import FolderIcon from "@mui/icons-material/Folder";
 import SettingsIcon from "@mui/icons-material/Settings";
-import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople"; // Ícono para "Rol"
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount"; 
 import API_BASE_URL from "../apiConfig";
 import UserMenu from "../components/UserMenu";
 
@@ -98,7 +98,7 @@ function RolesPermisos() {
                 <TableRow>
                   <TableCell>
                     <Box display="flex" alignItems="center" gap={1}>
-                      <EmojiPeopleIcon sx={{ color: "#ff9800" }} />
+                      <SupervisorAccountIcon sx={{ color: "#3f51b5" }} />
                       <strong>Rol</strong>
                     </Box>
                   </TableCell>
